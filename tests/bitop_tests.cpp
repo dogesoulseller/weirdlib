@@ -37,8 +37,8 @@ TEST(BitOps, bit_set_ip) {
 	uint8_t x = 0b11101111;
 	uint8_t y = 0b11111111;
 
-	wlib::bop::set(&x, 4);
-	wlib::bop::set(&y, 4);
+	wlib::bop::set_ip(x, 4);
+	wlib::bop::set_ip(y, 4);
 
 	EXPECT_EQ(x, 0b11111111);
 	EXPECT_EQ(y, 0b11111111);
@@ -48,8 +48,8 @@ TEST(BitOps, bit_reset_ip) {
 	uint8_t x = 0b11111111;
 	uint8_t y = 0b11101111;
 
-	wlib::bop::reset(&x, 4);
-	wlib::bop::reset(&y, 4);
+	wlib::bop::reset_ip(x, 4);
+	wlib::bop::reset_ip(y, 4);
 
 	EXPECT_EQ(x, 0b11101111);
 	EXPECT_EQ(y, 0b11101111);
@@ -59,8 +59,8 @@ TEST(BitOps, bit_toggle_ip) {
 	uint8_t x = 0b11101111;
 	uint8_t y = 0b11111111;
 
-	wlib::bop::toggle(&x, 4);
-	wlib::bop::toggle(&y, 4);
+	wlib::bop::toggle_ip(x, 4);
+	wlib::bop::toggle_ip(y, 4);
 
 	EXPECT_EQ(x, 0b11111111);
 	EXPECT_EQ(y, 0b11101111);

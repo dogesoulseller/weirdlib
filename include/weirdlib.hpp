@@ -5,6 +5,26 @@
 
 namespace wlib
 {
+	namespace traits
+	{
+		template<typename...>
+		using try_to_instantiate = void;
+
+		template<typename T, typename Attempt = void>
+		struct has_bitops : std::false_type{};
+
+		template<typename T>
+		struct has_bitops<T, try_to_instantiate<decltype(std::declval<T>() & 1,
+			std::declval<T>() | 1,
+			std::declval<T>() ^ 1,
+			~std::declval<T>(),
+			std::declval<T>() << 1)>> : std::true_type{};
+
+		template<typename T>
+		constexpr bool has_bitops_v = has_bitops<T>::value;
+
+	} // traits
+
 	size_t strlen(const char* s) noexcept;
 
 	bool strcmp(const std::string& str0, const std::string& str1);
@@ -18,14 +38,14 @@ namespace wlib
 
 	namespace bop
 	{
-		template<typename T, typename TPos>
+		template<typename T, typename TPos, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 		constexpr bool test(const T x, const TPos pos) noexcept {
 			return (x & (1u << pos)) != 0;
 		}
 
 		template<typename T, typename TPos>
-		void set(T* x, const TPos pos) noexcept {
-			*x |= (1u << pos);
+		void set_ip(T& x, const TPos pos) noexcept {
+			x |= (1u << pos);
 		}
 
 		template<typename T, typename TPos>
@@ -34,8 +54,8 @@ namespace wlib
 		}
 
 		template<typename T, typename TPos>
-		void reset(T* x, const TPos pos) noexcept {
-			*x &= ~(1u << pos);
+		void reset_ip(T& x, const TPos pos) noexcept {
+			x &= ~(1u << pos);
 		}
 
 		template<typename T, typename TPos>
@@ -44,8 +64,8 @@ namespace wlib
 		}
 
 		template<typename T, typename TPos>
-		void toggle(T* x, const TPos pos) noexcept {
-			*x ^= 1u << pos;
+		void toggle_ip(T& x, const TPos pos) noexcept {
+			x ^= 1u << pos;
 		}
 
 		template<typename T, typename TPos>
@@ -87,14 +107,14 @@ namespace wlib
 
 		// Alias for count_trailing_zeros
 		template<typename T>
-		uint32_t ctz(T x) noexcept {
-			return count_trailing_zeros(x);
+		uint32_t ctz(T&& x) noexcept {
+			return count_trailing_zeros(std::forward<T>(x));
 		}
 
 		// Alias for count_leading_zeros
 		template<typename T>
-		uint32_t clz(T x) noexcept {
-			return count_leading_zeros(x);
+		uint32_t clz(T&& x) noexcept {
+			return count_leading_zeros(std::forward<T>(x));
 		}
 
 	} // bop
