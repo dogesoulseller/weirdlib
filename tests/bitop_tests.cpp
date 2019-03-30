@@ -103,3 +103,56 @@ TEST(BitOps, clz) {
 	EXPECT_EQ(wlib::bop::ctz(w), sizeof(uint32_t) * 8);
 	EXPECT_EQ(wlib::bop::count_trailing_zeros(w), sizeof(uint32_t) * 8);
 }
+
+TEST(BitOps, bit_scan_forward) {
+	const uint32_t x = 0x0FFFFFF0;
+	const uint32_t y = 0xFFFFFFF0;
+	const uint32_t z = 0xFFFFFFFF;
+	const uint32_t w = 0x00000000;
+
+	EXPECT_EQ(wlib::bop::bsf(x), 4);
+	EXPECT_EQ(wlib::bop::bit_scan_forward(x), 4);
+
+	EXPECT_EQ(wlib::bop::bsf(y), 4);
+	EXPECT_EQ(wlib::bop::bit_scan_forward(y), 4);
+
+	EXPECT_EQ(wlib::bop::bsf(z), 0);
+	EXPECT_EQ(wlib::bop::bit_scan_forward(z), 0);
+
+	EXPECT_EQ(wlib::bop::bsf(w), 0);
+	EXPECT_EQ(wlib::bop::bit_scan_forward(w), 0);
+}
+
+TEST(BitOps, bit_scan_reverse) {
+	const uint32_t x = 0x0FFFFFF0;
+	const uint32_t y = 0x0FFFFFFF;
+	const uint32_t z = 0xFFFFFFFF;
+	const uint32_t w = 0x00000000;
+
+	EXPECT_EQ(wlib::bop::bsr(x), 28);
+	EXPECT_EQ(wlib::bop::bit_scan_reverse(x), 28);
+
+	EXPECT_EQ(wlib::bop::bsr(y), 28);
+	EXPECT_EQ(wlib::bop::bit_scan_reverse(y), 28);
+
+	EXPECT_EQ(wlib::bop::bsr(z), 0);
+	EXPECT_EQ(wlib::bop::bit_scan_reverse(z), 0);
+
+	EXPECT_EQ(wlib::bop::bsr(w), 0);
+	EXPECT_EQ(wlib::bop::bit_scan_reverse(w), 0);
+}
+
+TEST(BitOps, popcnt) {
+	const uint32_t x = 0xFFFFFFFF;
+	const uint32_t y = 0x0FFFF0FF;
+	const uint32_t z = 0x00000000;
+
+	EXPECT_EQ(wlib::bop::popcnt(x), 32);
+	EXPECT_EQ(wlib::bop::population_count(x), 32);
+
+	EXPECT_EQ(wlib::bop::popcnt(y), 24);
+	EXPECT_EQ(wlib::bop::population_count(y), 24);
+
+	EXPECT_EQ(wlib::bop::popcnt(z), 0);
+	EXPECT_EQ(wlib::bop::population_count(z), 0);
+}
