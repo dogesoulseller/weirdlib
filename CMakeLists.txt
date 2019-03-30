@@ -7,7 +7,8 @@ file(GLOB WEIRDLIB_SOURCES "include/*.hpp" "src/*.c*" "src/*.h*")
 
 add_library(weirdlib ${WEIRDLIB_SOURCES})
 set_target_properties(weirdlib PROPERTIES
-	CXX_STANDARD 14
+	CXX_STANDARD 17
+	CMAKE_CXX_STANDARD_REQUIRED ON
 )
 
 if(WEIRDLIB_ENABLE_TESTING)
@@ -20,7 +21,8 @@ if(WEIRDLIB_ENABLE_TESTING)
 	add_executable(weirdlib_tests ${WEIRDLIB_TEST_SOURCES})
 	target_link_libraries(weirdlib_tests Threads::Threads weirdlib GTest::GTest)
 	set_target_properties(weirdlib_tests PROPERTIES
-		CXX_STANDARD 14
+		CXX_STANDARD 17
+		CMAKE_CXX_STANDARD_REQUIRED ON
 	)
 
 	# set(CMAKE_CXX_FLAGS "-march=native -mtune=native -mavx512f -mavx512bw -mavx512dq -mavx512vl -fstandalone-debug")
