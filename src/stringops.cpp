@@ -1,7 +1,7 @@
 #include "../include/weirdlib.hpp"
 #include "common.hpp"
 #include <algorithm>
-#include <string.h>
+#include <cstring>
 
 namespace wlib
 {
@@ -122,7 +122,6 @@ namespace wlib
 	bool strcmp(const std::string& str0, const std::string& str1, size_t len) {
 		size_t totalOffset = 0;
 		size_t iters = 0;
-		size_t itersRem = 0;
 
 		// If length is 0, no reason to go further
         if (len == 0) {
@@ -136,13 +135,11 @@ namespace wlib
 
 		// Clamp length to minimum string length between compared strings
 		len = std::min(std::min(str0.size(), str1.size()), len);
-		bool x = bop::set(len, 3);
 
 		#if defined(AVX512_BW)
 
 		if (len >= 64) {
 			iters = len / 64;
-            itersRem = len % 64;
 
             // SIMD what is possible
             for (size_t i = 0; i < iters; i++) {
@@ -169,7 +166,6 @@ namespace wlib
 
 		if (len >= 32) {
 			iters = len / 32;
-            itersRem = len % 32;
 
             // SIMD what is possible
             for (size_t i = 0; i < iters; i++) {
@@ -196,7 +192,6 @@ namespace wlib
 
 		if (len >= 16) {
 			iters = len / 16;
-            itersRem = len % 16;
 
             // SIMD what is possible
             for (size_t i = 0; i < iters; i++) {

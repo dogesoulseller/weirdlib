@@ -108,8 +108,8 @@ namespace wlib
 
 			uint32_t count = 0;
 			while ((x & 1) == 0) {
-					x = x >> 1;
-					count++;
+				x = x >> 1;
+				count++;
 			}
 
 			return count;
@@ -167,14 +167,14 @@ namespace wlib
 			}
 			#endif
 
-			return count_trailing_zeros(x);
+			return count_trailing_zeros<T>(x);
 		}
 
 		template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 		uint32_t bit_scan_reverse(T x) noexcept {
 			if (x == 0 || test(x, sizeof(x) * 8 - 1)) return 0;
 
-			return sizeof(T) * 8 - count_leading_zeros(x);
+			return sizeof(T) * 8 - count_leading_zeros<T>(x);
 		}
 
 		template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>

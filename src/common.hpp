@@ -2,7 +2,7 @@
 #include "cpu_detection.hpp"
 
 #include <type_traits>
-#include <stdint.h>
+#include <cstdint>
 
 #if defined(AVX512_BW)
 	const __m512i SIMD512B_zeroMask = _mm512_set1_epi8(0);
