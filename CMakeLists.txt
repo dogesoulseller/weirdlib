@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.9.6)
-project(weirdlib)
+project(weirdlib CXX)
 
 option(WEIRDLIB_ENABLE_TESTING "Enable building test target" ON)
+option(WEIRDLIB_ENABLE_BENCHMARKS "(Stub) Enable building benchmark target" OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 file(GLOB WEIRDLIB_SOURCES "include/*.hpp" "src/*.c*" "src/*.h*")
 
@@ -10,6 +11,19 @@ set_target_properties(weirdlib PROPERTIES
 	CXX_STANDARD 17
 	CXX_STANDARD_REQUIRED ON
 )
+# set(CMAKE_CXX_FLAGS "-march=native -mtune=native -mllvm -polly -fstandalone-debug -Weverything -Wno-c++98-c++11-c++14-compat -Wno-c++98-compat -Wno-pedantic -Wno-c++98-c++11-compat-binary-literal")
+# set(CMAKE_CXX_FLAGS "-march=native -mtune=native -mavx512f -mavx512bw -mavx512dq -mavx512vl -fstandalone-debug")
+
+if(WEIRDLIB_ENABLE_BENCHMARKS)
+	set(WEIRDLIB_BENCHMARK_DIR "${CMAKE_CURRENT_LIST_DIR}/benchmark")
+	add_executable(wlib_bench_strlen ${WEIRDLIB_BENCHMARK_DIR}/bench_strlen.cpp)
+	set_target_properties(wlib_bench_strlen PROPERTIES
+		CXX_STANDARD 17
+		CXX_STANDARD_REQUIRED ON
+	)
+	target_link_libraries(wlib_bench_strlen weirdlib)
+
+endif(WEIRDLIB_ENABLE_BENCHMARKS)
 
 if(WEIRDLIB_ENABLE_TESTING)
 	enable_testing()
@@ -24,9 +38,6 @@ if(WEIRDLIB_ENABLE_TESTING)
 		CXX_STANDARD 17
 		CXX_STANDARD_REQUIRED ON
 	)
-
-	# set(CMAKE_CXX_FLAGS "-march=native -mtune=native -mavx512f -mavx512bw -mavx512dq -mavx512vl -fstandalone-debug")
-	# set(CMAKE_CXX_FLAGS "-march=native -mtune=native -fstandalone-debug -mavx2 -Weverything")
 
 	gtest_add_tests(TARGET weirdlib_tests SOURCES ${WEIRDLIB_TEST_SOURCES} WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/tests/")
 endif(WEIRDLIB_ENABLE_TESTING)

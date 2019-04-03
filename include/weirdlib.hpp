@@ -91,9 +91,9 @@ namespace wlib
 
 			#ifdef __GNUC__
 			if constexpr (sizeof(T) <= sizeof(uint32_t)) {
-				return __builtin_ctz(x);
+				return static_cast<uint32_t>(__builtin_ctz(x));
 			} else if constexpr (sizeof(T) == sizeof(uint64_t)) {
-				return __builtin_ctzll(x);
+				return static_cast<uint32_t>(__builtin_ctzll(x));
 			}
 			#elif defined(_MSC_VER)
 			int result = 0;
@@ -121,9 +121,9 @@ namespace wlib
 
 			#ifdef __GNUC__
 			if constexpr (sizeof(T) == sizeof(uint32_t)) {
-				return __builtin_clz(x);
+				return static_cast<uint32_t>(__builtin_clz(x));
 			} else if constexpr (sizeof(T) == sizeof(uint64_t)) {
-				return __builtin_clzll(x);
+				return static_cast<uint32_t>(__builtin_clzll(x));
 			}
 			#elif defined(_MSC_VER) && defined(__AVX__)
 			if constexpr (sizeof(T) == sizeof(uint32_t)) {
@@ -152,9 +152,9 @@ namespace wlib
 
 			#ifdef __GNUC__
 			if constexpr (sizeof(T) <= sizeof(uint32_t)) {
-				return __builtin_ctz(x);
+				return static_cast<uint32_t>(__builtin_ctz(x));
 			} else if constexpr (sizeof(T) == sizeof(uint64_t)) {
-				return __builtin_ctzll(x);
+				return static_cast<uint32_t>(__builtin_ctzll(x));
 			}
 			#elif defined(_MSC_VER)
 			int result = 0;
@@ -181,9 +181,9 @@ namespace wlib
 		uint32_t population_count(T x) noexcept {
 			#ifdef __GNUC__
 			if constexpr (sizeof(T) == sizeof(uint32_t)) {
-				return __builtin_popcount(x);
+				return static_cast<uint32_t>(__builtin_popcount(x));
 			} else if constexpr (sizeof(T) == sizeof(uint64_t)) {
-				return __bulitin_popcountll(x);
+				return static_cast<uint32_t>(__bulitin_popcountll(x));
 			}
 			#elif defined(_MSC_VER) && defined(__AVX__)
 			if constexpr (sizeof(T) == sizeof(uint32_t)) {

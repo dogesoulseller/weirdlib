@@ -40,11 +40,10 @@ namespace wlib
 		#if X86_SIMD_LEVEL >= 8 	// AVX2
 			// Move through bytes with a 32-byte stride
 			if (reinterpret_cast<const size_t>(s) % 32 == 0) {
-				int32_t mask = 0;
 				while (true) {
 					const __m256i chars = _mm256_load_si256(reinterpret_cast<const __m256i*>(s + offset));
 
-					mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chars, SIMD256B_zeroMask));
+					const int32_t mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chars, SIMD256B_zeroMask));
 					if (mask == 0) {
 						offset += 32;
 						continue;
@@ -54,11 +53,10 @@ namespace wlib
 					}
 				}
 			} else {
-				int32_t mask = 0;
 				while (true) {
 					const __m256i chars = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(s + offset));
 
-					mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chars, SIMD256B_zeroMask));
+					const int32_t mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chars, SIMD256B_zeroMask));
 					if (mask == 0) {
 						offset += 32;
 						continue;
@@ -77,7 +75,7 @@ namespace wlib
 					const __m128i chars = _mm_load_si128(reinterpret_cast<const __m128i*>(s + offset));
 
 					// If no `\0` was found, check further
-					uint32_t mask = _mm_movemask_epi8(_mm_cmpeq_epi8(chars, SIMD128B_zeroMask));
+					const int32_t mask = _mm_movemask_epi8(_mm_cmpeq_epi8(chars, SIMD128B_zeroMask));
 					if (mask == 0) {
 						offset += 16;
 						continue;
@@ -91,7 +89,7 @@ namespace wlib
 					const __m128i chars = _mm_loadu_si128(reinterpret_cast<const __m128i*>(s + offset));
 
 					// If no `\0` was found, check further
-					uint32_t mask = _mm_movemask_epi8(_mm_cmpeq_epi8(chars, SIMD128B_zeroMask));
+					const int32_t mask = _mm_movemask_epi8(_mm_cmpeq_epi8(chars, SIMD128B_zeroMask));
 					if (mask == 0) {
 						offset += 16;
 						continue;
@@ -154,9 +152,9 @@ namespace wlib
                     return false;
                 }
 
-				len -= 64;
-				totalOffset += 64;
             }
+			len -= 64 * iters;
+			totalOffset += 64 * iters;
             _mm256_zeroupper();
 		}
 
@@ -180,9 +178,10 @@ namespace wlib
                     return false;
                 }
 
-				len -= 32;
-				totalOffset += 32;
             }
+			len -= 32 * iters;
+			totalOffset += 32 * iters;
+
             _mm256_zeroupper();
 		}
 
@@ -205,9 +204,9 @@ namespace wlib
                     return false;
                 }
 
-				len -= 16;
-				totalOffset += 16;
             }
+			len -= 16 * iters;
+			totalOffset += 16 * iters;
 		}
 
 		#endif // Nothin'
