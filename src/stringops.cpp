@@ -6,7 +6,7 @@
 namespace wlib
 {
 	size_t strlen(const char* s) noexcept {
-		std::ptrdiff_t offset = 0;
+		size_t offset = 0;
 		#if defined(AVX512_BW)
 			if (reinterpret_cast<const size_t>(s) % 64 == 0) {
 				// Move through bytes with a 64-byte stride
@@ -18,7 +18,7 @@ namespace wlib
 						offset += 64;
 						continue;
 					} else {
-						return offset + bop::ctz(mask);
+						return offset + static_cast<size_t>(bop::ctz(mask));
 					}
 				}
 			} else {
@@ -31,13 +31,11 @@ namespace wlib
 						offset += 64;
 						continue;
 					} else {
-						return offset + bop::ctz(mask);
+						return offset + static_cast<size_t>(bop::ctz(mask));
 					}
 				}
 			}
-		#endif
-
-		#if X86_SIMD_LEVEL >= 8 	// AVX2
+		#elif X86_SIMD_LEVEL >= 8 	// AVX2
 			// Move through bytes with a 32-byte stride
 			if (reinterpret_cast<const size_t>(s) % 32 == 0) {
 				while (true) {
@@ -49,7 +47,7 @@ namespace wlib
 						continue;
 					} else {
 						_mm256_zeroupper();
-						return offset + bop::ctz(mask);
+						return offset + static_cast<size_t>(bop::ctz(mask));
 					}
 				}
 			} else {
@@ -62,13 +60,11 @@ namespace wlib
 						continue;
 					} else {
 						_mm256_zeroupper();
-						return offset + bop::ctz(mask);
+						return offset + static_cast<size_t>(bop::ctz(mask));
 					}
 				}
 			}
-		#endif
-
-		#if X86_SIMD_LEVEL >= 2 // SSE2
+		#elif X86_SIMD_LEVEL >= 2 // SSE2
 			// Move through bytes with a 16-byte stride
 			if (reinterpret_cast<const size_t>(s) % 16 == 0) {
 				while (true) {
@@ -81,7 +77,7 @@ namespace wlib
 						continue;
 					} else {
 						// If a `\0` was found, get the position through a bitscan
-						return offset + bop::ctz(mask);
+						return offset + static_cast<size_t>(bop::ctz(mask));
 					}
 				}
 			} else {
@@ -95,10 +91,12 @@ namespace wlib
 						continue;
 					} else {
 						// If a `\0` was found, get the position through a bitscan
-						return offset + bop::ctz(mask);
+						return offset + static_cast<size_t>(bop::ctz(mask));
 					}
 				}
 			}
+		#else
+			return ::strlen(s);
 		#endif
 	}
 
@@ -170,7 +168,7 @@ namespace wlib
                 const __m256i LS = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(str0.c_str() + (i * 32)));
                 const __m256i RS = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(str1.c_str() + (i * 32)));
 
-                const uint32_t eqMask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(LS, RS));
+                const uint32_t eqMask = static_cast<uint32_t>(_mm256_movemask_epi8(_mm256_cmpeq_epi8(LS, RS)));
 
                 // Mask from bytes is in the first 32 bits
                 if ((eqMask & 0xFFFFFFFF) != 0xFFFFFFFF) {
@@ -197,7 +195,7 @@ namespace wlib
                 const __m128i LS = _mm_loadu_si128(reinterpret_cast<const __m128i*>(str0.c_str() + (i * 16)));
                 const __m128i RS = _mm_loadu_si128(reinterpret_cast<const __m128i*>(str1.c_str() + (i * 16)));
 
-                const uint32_t eqMask = _mm_movemask_epi8(_mm_cmpeq_epi8(LS, RS));
+                const uint32_t eqMask = static_cast<uint32_t>(_mm_movemask_epi8(_mm_cmpeq_epi8(LS, RS)));
 
                 // Mask from bytes is in the first 16 bits
                 if ((eqMask & 0xFFFF) != 0xFFFF) {

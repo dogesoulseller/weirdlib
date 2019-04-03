@@ -156,3 +156,23 @@ TEST(BitOps, popcnt) {
 	EXPECT_EQ(wlib::bop::popcnt(z), 0);
 	EXPECT_EQ(wlib::bop::population_count(z), 0);
 }
+
+TEST(BitOps, rotate_left) {
+	const uint32_t x = 0xFFFFFFFF;
+	const uint32_t y = 0x0FFFF0FF;
+	const uint32_t z = 0x00000000;
+
+	EXPECT_EQ(wlib::bop::rotate_left(x, 4), 0xFFFFFFFF);
+	EXPECT_EQ(wlib::bop::rotate_left(y, 4), 0xFFFF0FF0);
+	EXPECT_EQ(wlib::bop::rotate_left(z, 4), 0x00000000);
+}
+
+TEST(BitOps, rotate_right) {
+	const uint32_t x = 0xFFFFFFFF;
+	const uint32_t y = 0x0FFFF0FF;
+	const uint32_t z = 0x00000000;
+
+	EXPECT_EQ(wlib::bop::rotate_right(x, 4), 0xFFFFFFFF);
+	EXPECT_EQ(wlib::bop::rotate_right(y, 4), 0xF0FFFF0F);
+	EXPECT_EQ(wlib::bop::rotate_right(z, 4), 0x00000000);
+}
