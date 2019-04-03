@@ -100,22 +100,25 @@ namespace wlib
 		#endif
 	}
 
-	bool strcmp(const std::string& str0, const std::string& str1) {
+	bool strcmp(const char* str0, const char* str1) {
+		size_t str0Size = strlen(str0);
+		size_t str1Size = strlen(str1);
+
 		// If both strings are empty...
-		if (str0.empty() && str1.empty()) {
+		if (str0Size == 0 && str1Size == 0) {
 			return true;
 		}
 
 		// If string lengths are not equal, the strings are different
-		if (str0.size() != str1.size()) {
+		if (str0Size != str1Size) {
 			return false;
 		}
 
-		return wlib::strcmp(str0, str1, str0.size());
+		return wlib::strcmp(str0, str1, str0Size);
 	}
 
 	// This is equal to strncmp
-	bool strcmp(const std::string& str0, const std::string& str1, size_t len) {
+	bool strcmp(const char* str0, const char* str1, size_t len) {
 		size_t totalOffset = 0;
 		size_t iters = 0;
 
@@ -124,13 +127,16 @@ namespace wlib
             return true;
         }
 
+		size_t str0Size = strlen(str0);
+		size_t str1Size = strlen(str1);
+
 		// If both strings are empty...
-		if (str0.empty() && str1.empty()) {
+		if (str0Size == 0 && str1Size == 0) {
 			return true;
 		}
 
 		// Clamp length to minimum string length between compared strings
-		len = std::min(std::min(str0.size(), str1.size()), len);
+		len = std::min(std::min(str0Size, str1Size), len);
 
 		#if defined(AVX512_BW)
 
@@ -139,8 +145,8 @@ namespace wlib
 
             // SIMD what is possible
             for (size_t i = 0; i < iters; i++) {
-                const __m512i LS = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(str0.c_str() + (i * 64)));
-                const __m512i RS = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(str1.c_str() + (i * 64)));
+                const __m512i LS = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(str0 + (i * 64)));
+                const __m512i RS = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(str1 + (i * 64)));
 
                 const uint64_t eqMask = _mm512_cmpeq_epi8_mask(LS, RS);
 
@@ -165,8 +171,8 @@ namespace wlib
 
             // SIMD what is possible
             for (size_t i = 0; i < iters; i++) {
-                const __m256i LS = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(str0.c_str() + (i * 32)));
-                const __m256i RS = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(str1.c_str() + (i * 32)));
+                const __m256i LS = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(str0 + (i * 32)));
+                const __m256i RS = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(str1 + (i * 32)));
 
                 const uint32_t eqMask = static_cast<uint32_t>(_mm256_movemask_epi8(_mm256_cmpeq_epi8(LS, RS)));
 
@@ -192,8 +198,8 @@ namespace wlib
 
             // SIMD what is possible
             for (size_t i = 0; i < iters; i++) {
-                const __m128i LS = _mm_loadu_si128(reinterpret_cast<const __m128i*>(str0.c_str() + (i * 16)));
-                const __m128i RS = _mm_loadu_si128(reinterpret_cast<const __m128i*>(str1.c_str() + (i * 16)));
+                const __m128i LS = _mm_loadu_si128(reinterpret_cast<const __m128i*>(str0 + (i * 16)));
+                const __m128i RS = _mm_loadu_si128(reinterpret_cast<const __m128i*>(str1 + (i * 16)));
 
                 const uint32_t eqMask = static_cast<uint32_t>(_mm_movemask_epi8(_mm_cmpeq_epi8(LS, RS)));
 
@@ -209,6 +215,11 @@ namespace wlib
 
 		#endif // Nothin'
 
-		return ::strncmp(str0.c_str() + totalOffset, str1.c_str() + totalOffset, len) == 0;
+		return ::strncmp(str0 + totalOffset, str1 + totalOffset, len) == 0;
+	}
+
+	// strncmp is aliased to strcmp overloaded for a max len parameter
+	bool strncmp(const char* str0, const char* str1, const size_t len) {
+		return wlib::strcmp(str0, str1, len);
 	}
 } // wlib

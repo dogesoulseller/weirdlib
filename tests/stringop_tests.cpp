@@ -49,56 +49,56 @@ TEST(StringOps, strlen_empty) {
 }
 
 TEST(StringOps, strcmp_equal) {
-	const std::string str0 = std::string(teststring_matches);
-	const std::string str1 = std::string(teststring_matches);
+	const char* str0 = teststring_matches;
+	const char* str1 = teststring_matches;
 	EXPECT_TRUE(wlib::strcmp(str0, str1)) << "The string comparison failed";
 }
 
 TEST(StringOps, strcmp_not_equal) {
-	const std::string str0 = std::string(teststring_not_matches0);
-	const std::string str1 = std::string(teststring_not_matches1);
+	const char* str0 = teststring_not_matches0;
+	const char* str1 = teststring_not_matches1;
 	EXPECT_FALSE(wlib::strcmp(str0, str1)) << "The string comparison did not fail";
 }
 
 TEST(StringOps, strcmp_difflen) {
-	const std::string str0 = std::string(teststring_not_matches0);
-	const std::string str1 = std::string(teststring_not_matches_short);
+	const char* str0 = teststring_not_matches0;
+	const char* str1 = teststring_not_matches_short;
 	EXPECT_FALSE(wlib::strcmp(str0, str1)) << "The string comparison did not fail";
 }
 
 TEST(StringOps, strcmp_empty_0) {
-	const std::string str0 = std::string(teststring_zerolen);
-	const std::string str1 = std::string(teststring_matches);
+	const char* str0 = teststring_zerolen;
+	const char* str1 = teststring_matches;
 	EXPECT_FALSE(wlib::strcmp(str0, str1)) << "The string comparison did not fail";
 }
 
 TEST(StringOps, strcmp_empty_1) {
-	const std::string str0 = std::string(teststring_matches);
-	const std::string str1 = std::string(teststring_zerolen);
+	const char* str0 = teststring_matches;
+	const char* str1 = teststring_zerolen;
 	EXPECT_FALSE(wlib::strcmp(str0, str1)) << "The string comparison did not fail";
 }
 
 TEST(StringOps, strcmp_empty_both) {
-	const std::string str0 = std::string(teststring_zerolen);
-	const std::string str1 = std::string(teststring_zerolen);
+	const char* str0 = teststring_zerolen;
+	const char* str1 = teststring_zerolen;
 	EXPECT_TRUE(wlib::strcmp(str0, str1)) << "The string comparison failed";
 }
 
 TEST(StringOps, strncmp_equal) {
-	const std::string str0 = std::string(teststring_matches);
-	const std::string str1 = std::string(teststring_matches);
-	EXPECT_TRUE(wlib::strncmp(str0, str1, str0.size())) << "The string comparison failed";
+	const char* str0 = teststring_matches;
+	const char* str1 = teststring_matches;
+	EXPECT_TRUE(wlib::strncmp(str0, str1, strlen(str0))) << "The string comparison failed";
 }
 
 TEST(StringOps, strncmp_equal_different) {
-	const std::string str0 = std::string(teststring_not_matches0);
-	const std::string str1 = std::string(teststring_not_matches1);
+	const char* str0 = teststring_not_matches0;
+	const char* str1 = teststring_not_matches1;
 	EXPECT_TRUE(wlib::strncmp(str0, str1, 32u)) << "The string comparison failed";
 }
 
 TEST(StringOps, strncmp_not_equal) {
-	const std::string str0 = std::string(teststring_not_matches0);
-	const std::string str1 = std::string(teststring_not_matches1);
+	const char* str0 = teststring_not_matches0;
+	const char* str1 = teststring_not_matches1;
 	EXPECT_FALSE(wlib::strncmp(str0, str1, 40u)) << "The string comparison did not fail";
 }
 
