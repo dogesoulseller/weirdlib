@@ -3,8 +3,8 @@
 #include "weirdlib_bitops.hpp"
 #include "weirdlib_traits.hpp"
 #include "weirdlib_string.hpp"
+#include "weirdlib_crypto.hpp"
 
 namespace wlib
 {
-
 } // wlib
