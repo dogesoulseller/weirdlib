@@ -2,7 +2,7 @@
 #include <cstring>
 #include "../include/weirdlib.hpp"
 
-#if defined (__RDRND__) && defined (__GNUC__)
+#if defined(__RDRND__) && defined(__GNUC__) && !defined(__clang__)
 TEST(WlibCrypto, RNG) {
 	EXPECT_NO_THROW(wlib::crypto::SecureRandomInteger_u16());
 	EXPECT_NO_THROW(wlib::crypto::SecureRandomInteger_u32());
@@ -10,7 +10,7 @@ TEST(WlibCrypto, RNG) {
 }
 #endif
 
-#if defined (__RDSEED__) && defined (__GNUC__)
+#if defined(__RDSEED__) && defined(__GNUC__) && !defined(__clang__)
 TEST(WlibCrypto, SEED) {
 	EXPECT_NO_THROW(wlib::crypto::SecureRandomSeed_u16());
 	EXPECT_NO_THROW(wlib::crypto::SecureRandomSeed_u32());

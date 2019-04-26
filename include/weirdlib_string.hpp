@@ -21,7 +21,7 @@ namespace str
 	/// Compare two strings up to **len** characters
 	/// @param str0 first string
 	/// @param str1 second string
-	/// @param maximum length of comparison
+	/// @param len maximum length of comparison
 	/// @return true if strings are identical, false otherwise
 	bool strcmp(const char* str0, const char* str1, const size_t len);
 

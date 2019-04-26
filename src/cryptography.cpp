@@ -4,7 +4,7 @@ namespace wlib
 {
 namespace crypto
 {
-	#if defined (__RDRND__) && defined (__GNUC__)
+	#if defined(__RDRND__) && defined(__GNUC__) && !defined(__clang__)
 	uint16_t SecureRandomInteger_u16() {
 	uint16_t output;
 	asm volatile (
@@ -48,7 +48,7 @@ namespace crypto
 	}
 	#endif
 
-	#if defined (__RDSEED__) && defined (__GNUC__)
+	#if defined(__RDSEED__) && defined(__GNUC__) && !defined(__clang__)
 	uint16_t SecureRandomSeed_u16() {
 	uint16_t output;
 	asm volatile (
