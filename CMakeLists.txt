@@ -6,6 +6,12 @@ option(WEIRDLIB_ENABLE_BENCHMARKS "(Stub) Enable building benchmark target" OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 file(GLOB WEIRDLIB_SOURCES "include/*.hpp" "src/*.c*" "src/*.h*")
 
+# Force use of Intel syntax assembly
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -masm=intel")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -masm=intel")
+endif()
+
 add_library(weirdlib ${WEIRDLIB_SOURCES})
 set_target_properties(weirdlib PROPERTIES
 	CXX_STANDARD 17
