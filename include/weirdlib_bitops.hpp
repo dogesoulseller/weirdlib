@@ -14,48 +14,93 @@
 
 namespace wlib
 {
+
+/// Bit operations on variable-length integers
+///
+/// - Inline assembly for GCC-compatible compilers is provided wherever possible
+///	- Compiler builtins are used when they're available
 namespace bop
 {
+	//-----------------------//
+	// SINGLE BIT OPERATIONS //
+	//-----------------------//
+
+	/// Test bit at pos of value x
+	/// @param x input value
+	/// @param pos bit position (Little Endian)
+	/// @return boolean true if bit set, false if bit reset
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	constexpr bool test(const T x, const uint8_t pos) noexcept {
-		return (x & (1u << pos)) != 0;
+		return ((x >> pos) & 1) != 0;
 	}
 
+	/// Set bit at pos of value x (in-place)
+	/// @param x value to modify
+	/// @param pos bit position (Little Endian)
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	void set_ip(T& x, const uint8_t pos) noexcept {
 		x |= (1u << pos);
 	}
 
+	/// Set bit at pos of value x
+	/// @param x input value
+	/// @param pos bit position (Little Endian)
+	/// @return modified x
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	constexpr T set(const T x, const uint8_t pos) noexcept {
 		return x | T(1u << pos);
 	}
 
+	/// Reset bit at pos of value x (in-place)
+	/// @param x value to modify
+	/// @param pos bit position (Little Endian)
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	void reset_ip(T& x, const uint8_t pos) noexcept {
 		x &= ~(1u << pos);
 	}
 
+	/// Reset bit at pos of value x
+	/// @param x input value
+	/// @param pos bit position (Little Endian)
+	/// @return modified x
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	constexpr T reset(const T x, const uint8_t pos) noexcept {
 		return x & ~(1u << pos);
 	}
 
+	/// Toggle (complement) bit at pos of value x (in-place)
+	/// @param x value to modify
+	/// @param pos bit position (Little Endian)
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	void toggle_ip(T& x, const uint8_t pos) noexcept {
 		x ^= 1u << pos;
 	}
 
+	/// Complement bit at pos of value x
+	/// @param x input value
+	/// @param pos bit position (Little Endian)
+	/// @return modified x
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	constexpr T toggle(const T x, const uint8_t pos) noexcept {
 		return x ^ T(1u << pos);
 	}
 
+	/// Reset leftmost bit of x
+	/// @param x input value
+	/// @return modified x
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	constexpr T clear_leftmost_set(const T x) noexcept {
 		return x & (x - 1);
 	}
 
+	//-------------------------//
+	// BIT SCANNING OPERATIONS //
+	//-------------------------//
+
+	/// Count contiguous reset bits starting from least significant end
+	/// @param x tested value
+	/// @return count of trailing zeros
+	/// @see count_leading_zeros
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t count_trailing_zeros(T x) noexcept {
 		if (x == 0) return (sizeof(T) * 8);
@@ -112,6 +157,10 @@ namespace bop
 		return count;
 	}
 
+	/// Count contiguous reset bits starting from most significant end
+	/// @param x tested value
+	/// @return count of leading zeros
+	/// @see count_trailing_zeros
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t count_leading_zeros(T x) noexcept {
 		if (x == 0) return sizeof(T) * 8;
@@ -169,35 +218,42 @@ namespace bop
 		return res;
 	}
 
+	/// Find last set bit (from least significant)
+	/// @param x tested value
+	/// @return 0-based index of last set bit
+	/// @see bit_scan_reverse
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t bit_scan_forward(T x) noexcept {
-		if (x == 0) return 0;
-
 		#if defined(__GNUC__) && defined(__x86_64__)
 			T output;
 			if constexpr (std::is_same_v<T, uint16_t>) {
 				asm (
 					"bsf ax, ax;"
+					"cmovz ax, bx"
 					: "=a"(output)
-					: "a"(x)
+					: "a"(x), "b"(0)
 				);
 				return output;
 			} else if constexpr (std::is_same_v<T, uint32_t>) {
 				asm (
 					"bsf eax, eax;"
+					"cmovz eax, ebx"
 					: "=a"(output)
-					: "a"(x)
+					: "a"(x), "b"(0)
 				);
 				return output;
 			} else if constexpr (std::is_same_v<T, uint64_t>) {
 				asm (
 					"bsf rax, rax;"
+					"cmovz rax, rbx"
 					: "=a"(output)
-					: "a"(x)
+					: "a"(x), "b"(0)
 				);
 				return output;
 			}
 		#endif
+
+		if (x == 0) return 0;
 
 		#ifdef __GNUC__
 		if constexpr (sizeof(T) <= sizeof(uint32_t)) {
@@ -219,42 +275,60 @@ namespace bop
 		return count_trailing_zeros<T>(x);
 	}
 
+	/// Find first set bit (from least significant)
+	/// @param x tested value
+	/// @return 0-based index of first set bit
+	/// @see bit_scan_forward
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t bit_scan_reverse(T x) noexcept {
-		if (x == 0 || test(x, sizeof(x) * 8 - 1)) return 0;
-
 		#if defined(__GNUC__) && defined(__x86_64__)
 			T output;
 			if constexpr (std::is_same_v<T, uint16_t>) {
 				asm (
-					"bsr ax, ax"
-					"inc ax"
+					"bsr ax, ax;"
+					"cmovz ax, bx;"
 					: "=a"(output)
-					: "a"(x)
+					: "a"(x), "b"(0)
+					:
 				);
+
 				return output;
 			} else if constexpr (std::is_same_v<T, uint32_t>) {
 				asm (
 					"bsr eax, eax;"
-					"inc eax;"
+					"cmovz eax, ebx;"
 					: "=a"(output)
-					: "a"(x)
+					: "a"(x), "b"(0)
+					:
 				);
+
 				return output;
 			} else if constexpr (std::is_same_v<T, uint64_t>) {
 				asm (
 					"bsr rax, rax;"
-					"inc rax;"
+					"cmovz rax, rbx;"
 					: "=a"(output)
-					: "a"(x)
+					: "a"(x), "b"(0)
+					:
 				);
+
 				return output;
 			}
 		#endif
 
-		return sizeof(T) * 8 - count_leading_zeros<T>(x);
+		if (x == 0) return 0;
+
+		T temp = sizeof(T)*8 - 1;
+		while (test(x, temp) == false) {
+			temp--;
+		}
+
+		return temp;
 	}
 
+	/// Count set bits
+	/// @param x tested value
+	/// @return number of set bits
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t population_count(T x) noexcept {
 		#if defined(__POPCNT__) && defined(__GNUC__)
@@ -288,7 +362,7 @@ namespace bop
 		if constexpr (sizeof(T) == sizeof(uint32_t)) {
 			return static_cast<uint32_t>(__builtin_popcount(x));
 		} else if constexpr (sizeof(T) == sizeof(uint64_t)) {
-			return static_cast<uint32_t>(__bulitin_popcountll(x));
+			return static_cast<uint32_t>(__builtin_popcountll(x));
 		}
 		#elif defined(_MSC_VER) && defined(__AVX__)
 		if constexpr (sizeof(T) == sizeof(uint32_t)) {
@@ -312,6 +386,15 @@ namespace bop
 		return c;
 	}
 
+	//-------------------------//
+	// BIT ROTATION OPERATIONS //
+	//-------------------------//
+
+	/// Perform a series of bit rotation to the left
+	/// @param x input value
+	/// @param c rotations steps to perform
+	/// @return modified value
+	/// @see rotate_right
 	template<typename T, typename = std::enable_if_t<std::conjunction_v<std::is_unsigned<T>, traits::has_bitops<T>>>>
 	T rotate_left(const T x, uint8_t c) noexcept {
 		#if defined(__GNUC__ ) && defined(__x86_64__)
@@ -351,6 +434,11 @@ namespace bop
 		return (x << c) | (x >> ((-c) & mask));
 	}
 
+	/// Perform a series bit rotation to the left
+	/// @param x input value
+	/// @param c rotations steps to perform
+	/// @return modified value
+	/// @see rotate_left
 	template<typename T, typename = std::enable_if_t<std::conjunction_v<std::is_unsigned<T>, traits::has_bitops<T>>>>
 	T rotate_right(const T x, uint8_t c) noexcept {
 		#if defined(__GNUC__ ) && defined(__x86_64__)
@@ -390,31 +478,35 @@ namespace bop
 		return (x >> c) | ( x<< ((-c) & mask));
 	}
 
-	// Alias for population_count
+	//-------------------//
+	// OPERATION ALIASES //
+	//-------------------//
+
+	/// Alias for {@link population_count}
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t popcnt(T&& x) noexcept {
 		return population_count(std::forward<T>(x));
 	}
 
-	// Alias for count_trailing_zeros
+	/// Alias for {@link count_trailing_zeros}
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t ctz(T&& x) noexcept {
 		return count_trailing_zeros(std::forward<T>(x));
 	}
 
-	// Alias for count_leading_zeros
+	/// Alias for {@link count_leading_zeros}
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t clz(T&& x) noexcept {
 		return count_leading_zeros(std::forward<T>(x));
 	}
 
-	// Alias for bit_scan_forward
+	/// Alias for @{link bit_scan_forward}
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t bsf(T&& x) noexcept {
 		return bit_scan_forward(std::forward<T>(x));
 	}
 
-	// Alias for bit_scan_reverse
+	/// Alias for @{link bit_scan_reverse}
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t bsr(T&& x) noexcept {
 		return bit_scan_reverse(std::forward<T>(x));

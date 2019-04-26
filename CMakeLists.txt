@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.9.6)
 project(weirdlib CXX)
 
+option(WEIRDLIB_BUILD_DOCS "Enable building documentation" ON)
 option(WEIRDLIB_ENABLE_TESTING "Enable building test target" ON)
 option(WEIRDLIB_ENABLE_BENCHMARKS "(Stub) Enable building benchmark target" OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -19,6 +20,25 @@ set_target_properties(weirdlib PROPERTIES
 )
 # set(CMAKE_CXX_FLAGS "-march=native -mtune=native -mllvm -polly -fstandalone-debug -Weverything -Wno-missing-variable-declarations -Wno-global-constructors -Wno-c++98-c++11-c++14-compat -Wno-c++98-compat -Wno-pedantic -Wno-c++98-c++11-compat-binary-literal")
 # set(CMAKE_CXX_FLAGS "-march=native -mtune=native -mavx512f -mavx512bw -mavx512dq -mavx512vl -fstandalone-debug")
+
+if(WEIRDLIB_BUILD_DOCS)
+	find_package(Doxygen)
+	if(DOXYGEN_FOUND)
+		set(DOXYGEN_IN ${CMAKE_CURRENT_LIST_DIR}/docs/Doxyfile.in)
+		set(DOXYGEN_OUT ${CMAKE_CURRENT_LIST_DIR}/docs/Doxyfile)
+
+		configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+		message("Doxygen build started")
+
+		add_custom_target(wlib_doc COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+			WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/docs
+			COMMENT "Generating documentation..."
+			VERBATIM
+		)
+	endif(DOXYGEN_FOUND)
+
+endif(WEIRDLIB_BUILD_DOCS)
+
 
 if(WEIRDLIB_ENABLE_BENCHMARKS)
 	set(WEIRDLIB_BENCHMARK_DIR "${CMAKE_CURRENT_LIST_DIR}/benchmark")

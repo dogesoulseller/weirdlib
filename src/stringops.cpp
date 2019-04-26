@@ -5,6 +5,8 @@
 
 namespace wlib
 {
+namespace str
+{
 	size_t strlen(const char* s) noexcept {
 		size_t offset = 0;
 		#if defined(AVX512_BW)
@@ -114,7 +116,7 @@ namespace wlib
 			return false;
 		}
 
-		return wlib::strcmp(str0, str1, str0Size);
+		return wlib::str::strcmp(str0, str1, str0Size);
 	}
 
 	// This is equal to strncmp
@@ -220,6 +222,9 @@ namespace wlib
 
 	// strncmp is aliased to strcmp overloaded for a max len parameter
 	bool strncmp(const char* str0, const char* str1, const size_t len) {
-		return wlib::strcmp(str0, str1, len);
+		return wlib::str::strcmp(str0, str1, len);
 	}
+
+} // namespace str
+
 } // wlib
