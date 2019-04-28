@@ -5,6 +5,10 @@
 
 namespace wlib
 {
+
+/// Operations on strings that mimic the C standard library
+/// In some cases, they might be faster than the standard library's implementation
+/// In other cases, they might be slower or equal
 namespace str
 {
 	/// Get length of string

@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include "../include/weirdlib.hpp"
 
+
+
 TEST(BitOps, bit_test) {
 	const uint8_t x = 0b11101111;
 	const uint8_t y = 0b11111111;

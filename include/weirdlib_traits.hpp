@@ -4,13 +4,14 @@
 
 namespace wlib
 {
+
+/// SFINAE traits (mostly for internal use)
 namespace traits
 {
-
 	template<typename T, typename Attempt = void>
 	struct has_bitops : std::false_type{};
 
-	/// Is valid for a type that implements bitwise operators
+	/// Is valid for any type that implements bitwise operators
 	/// @see has_bitops_v
 	template<typename T>
 	struct has_bitops<T, std::void_t<decltype(std::declval<T>() & 1,
