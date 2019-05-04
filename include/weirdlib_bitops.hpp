@@ -4,13 +4,7 @@
 #include <utility>
 
 #include "weirdlib_traits.hpp"
-
-#if defined(_MSC_VER)
-#include <intrin.h>
-	#if defined(__AVX__)
-		#include <immintrin.h>
-	#endif
-#endif
+#include "cpu_detection.hpp"
 
 namespace wlib
 {
@@ -129,23 +123,29 @@ namespace bop
 				);
 				return output;
 			}
+		#elif defined(__BMI__) || X86_SIMD_LEVEL > 8
+			if constexpr (std::is_same_v<T, uint32_t>) {
+				return _tzcnt_u32(x);
+			} else if constexpr (std::is_same_v<T, uint64_t>) {
+				return _tzcnt_u64(x);
+			}
 		#endif
 
 		#ifdef __GNUC__
-		if constexpr (sizeof(T) <= sizeof(uint32_t)) {
-			return static_cast<uint32_t>(__builtin_ctz(x));
-		} else if constexpr (sizeof(T) == sizeof(uint64_t)) {
-			return static_cast<uint32_t>(__builtin_ctzll(x));
-		}
+			if constexpr (std::is_same_v<T, uint32_t>) {
+				return static_cast<uint32_t>(__builtin_ctz(x));
+			} else if constexpr (std::is_same_v<T, uint64_t>) {
+				return static_cast<uint32_t>(__builtin_ctzll(x));
+			}
 		#elif defined(_MSC_VER)
-		int result = 0;
-		if constexpr (sizeof(T) <= sizeof(uint32_t)) {
-			_BitScanForward(&result, x);
-			return result;
-		} else if constexpr (sizeof(T) == sizeof(uint64_t)) {
-			_BitScanForward64(&result, x);
-			return result;
-		}
+			int result = 0;
+			if constexpr (sizeof(T) <= sizeof(uint32_t)) {
+				_BitScanForward(&result, x);
+				return result;
+			} else if constexpr (sizeof(T) == sizeof(uint64_t)) {
+				_BitScanForward64(&result, x);
+				return result;
+			}
 		#endif
 
 		uint32_t count = 0;
@@ -189,23 +189,26 @@ namespace bop
 				);
 				return output;
 			}
+		#elif (defined(__ABM__) || defined(__BMI__)) || X86_SIMD_LEVEL > 8
+			if constexpr (std::is_same_v<T, uint32_t>) {
+				return _lzcnt_u32(x);
+			} else if constexpr (std::is_same_v<T, uint64_t>) {
+				return _lzcnt_u64(x);
+			}
 		#endif
 
 		#ifdef __GNUC__
-		if constexpr (sizeof(T) == sizeof(uint32_t)) {
-			return static_cast<uint32_t>(__builtin_clz(x));
-		} else if constexpr (sizeof(T) == sizeof(uint64_t)) {
-			return static_cast<uint32_t>(__builtin_clzll(x));
-		}
+			if constexpr (sizeof(T) == sizeof(uint32_t)) {
+				return static_cast<uint32_t>(__builtin_clz(x));
+			} else if constexpr (sizeof(T) == sizeof(uint64_t)) {
+				return static_cast<uint32_t>(__builtin_clzll(x));
+			}
 		#elif defined(_MSC_VER) && defined(__AVX__)
-		if constexpr (sizeof(T) == sizeof(uint32_t)) {
-			return _lzcnt_u32(x);
-		}
-		#ifdef _M_X64
-		else if constexpr (sizeof(T) == sizeof(uint64_t)) {
-			return _lzcnt_u64(x);
-		}
-		#endif
+			if constexpr (sizeof(T) == sizeof(uint32_t)) {
+				return _lzcnt_u32(x);
+			} else if constexpr (sizeof(T) == sizeof(uint64_t)) {
+				return _lzcnt_u64(x);
+			}
 		#endif
 
 		uint32_t total_bits = sizeof(T) * 8;
@@ -331,7 +334,7 @@ namespace bop
 	/// @return number of set bits
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t population_count(T x) noexcept {
-		#if defined(__POPCNT__) && defined(__GNUC__) && !defined(__clang__)
+		#if (defined(__POPCNT__) || defined(__ABM__)) && defined(__GNUC__) && !defined(__clang__)
 			T output;
 			if constexpr (std::is_same_v<T, uint16_t>) {
 				asm (
@@ -356,23 +359,27 @@ namespace bop
 				return output;
 			}
 
+		#elif defined(__POPCNT__) || defined(__ABM__)
+			if constexpr (std::is_same_v<T, uint32_t>) {
+				return _mm_popcnt_u32(x);
+			} else if constexpr (std::is_same_v<T, uint64_t>) {
+				return _mm_popcnt_u64(x);
+			}
 		#endif
 
 		#ifdef __GNUC__
-		if constexpr (sizeof(T) == sizeof(uint32_t)) {
-			return static_cast<uint32_t>(__builtin_popcount(x));
-		} else if constexpr (sizeof(T) == sizeof(uint64_t)) {
-			return static_cast<uint32_t>(__builtin_popcountll(x));
-		}
+			if constexpr (sizeof(T) == sizeof(uint32_t)) {
+				return static_cast<uint32_t>(__builtin_popcount(x));
+			} else if constexpr (sizeof(T) == sizeof(uint64_t)) {
+				return static_cast<uint32_t>(__builtin_popcountll(x));
+			}
 		#elif defined(_MSC_VER) && defined(__AVX__)
-		if constexpr (sizeof(T) == sizeof(uint32_t)) {
-			return _mm_popcnt_u32(x);
-		}
-		#ifdef _M_X64
-		else if constexpr (sizeof(T) == sizeof(uint64_t)) {
-			return _mm_popcnt_u64(x);
-		}
-		#endif
+			if constexpr (sizeof(T) == sizeof(uint32_t)) {
+				return _mm_popcnt_u32(x);
+			}
+			else if constexpr (sizeof(T) == sizeof(uint64_t)) {
+				return _mm_popcnt_u64(x);
+			}
 		#endif
 
 		// Some compilers will detect this as a popcnt and replace it with a single instruction
@@ -398,35 +405,35 @@ namespace bop
 	template<typename T, typename = std::enable_if_t<std::conjunction_v<std::is_unsigned<T>, traits::has_bitops<T>>>>
 	T rotate_left(const T x, uint8_t c) noexcept {
 		#if defined(__GNUC__) && !defined(__clang__) && defined(__x86_64__)
-		T output;
-		if constexpr (std::is_same_v<T, uint8_t>) {
-			asm (
-				"rol al, cl;"
-			: "=a"(output)
-			: "a"(x), "c"(c)
-			);
-			return output;
-		} else if constexpr (std::is_same_v<T, uint16_t>) {
-			asm (
-				"rol ax, cl;"
-			: "=a"(output)
-			: "a"(x), "c"(c)
-			);
-			return output;
-		} else if constexpr (std::is_same_v<T, uint32_t>) {
-			asm (
-				"rol eax, cl;"
-			: "=a"(output)
-			: "a"(x), "c"(c)
-			);
-			return output;
-		} else if constexpr (std::is_same_v<T, uint64_t>) {
-			asm (
-				"rol rax, cl;"
-			: "=a"(output)
-			: "a"(x), "c"(c)
-			);
-		}
+			T output;
+			if constexpr (std::is_same_v<T, uint8_t>) {
+				asm (
+					"rol al, cl;"
+				: "=a"(output)
+				: "a"(x), "c"(c)
+				);
+				return output;
+			} else if constexpr (std::is_same_v<T, uint16_t>) {
+				asm (
+					"rol ax, cl;"
+				: "=a"(output)
+				: "a"(x), "c"(c)
+				);
+				return output;
+			} else if constexpr (std::is_same_v<T, uint32_t>) {
+				asm (
+					"rol eax, cl;"
+				: "=a"(output)
+				: "a"(x), "c"(c)
+				);
+				return output;
+			} else if constexpr (std::is_same_v<T, uint64_t>) {
+				asm (
+					"rol rax, cl;"
+				: "=a"(output)
+				: "a"(x), "c"(c)
+				);
+			}
 		#endif
 		const T mask = (sizeof(T) * 8 - 1);
 
@@ -442,35 +449,35 @@ namespace bop
 	template<typename T, typename = std::enable_if_t<std::conjunction_v<std::is_unsigned<T>, traits::has_bitops<T>>>>
 	T rotate_right(const T x, uint8_t c) noexcept {
 		#if defined(__GNUC__) && !defined(__clang__) && defined(__x86_64__)
-		T output;
-		if constexpr (std::is_same_v<T, uint8_t>) {
-			asm (
-				"ror al, cl;"
-			: "=a"(output)
-			: "a"(x), "c"(c)
-			);
-			return output;
-		} else if constexpr (std::is_same_v<T, uint16_t>) {
-			asm (
-				"ror ax, cl;"
-			: "=a"(output)
-			: "a"(x), "c"(c)
-			);
-			return output;
-		} else if constexpr (std::is_same_v<T, uint32_t>) {
-			asm (
-				"ror eax, cl;"
-			: "=a"(output)
-			: "a"(x), "c"(c)
-			);
-			return output;
-		} else if constexpr (std::is_same_v<T, uint64_t>) {
-			asm (
-				"ror rax, cl;"
-			: "=a"(output)
-			: "a"(x), "c"(c)
-			);
-		}
+			T output;
+			if constexpr (std::is_same_v<T, uint8_t>) {
+				asm (
+					"ror al, cl;"
+				: "=a"(output)
+				: "a"(x), "c"(c)
+				);
+				return output;
+			} else if constexpr (std::is_same_v<T, uint16_t>) {
+				asm (
+					"ror ax, cl;"
+				: "=a"(output)
+				: "a"(x), "c"(c)
+				);
+				return output;
+			} else if constexpr (std::is_same_v<T, uint32_t>) {
+				asm (
+					"ror eax, cl;"
+				: "=a"(output)
+				: "a"(x), "c"(c)
+				);
+				return output;
+			} else if constexpr (std::is_same_v<T, uint64_t>) {
+				asm (
+					"ror rax, cl;"
+				: "=a"(output)
+				: "a"(x), "c"(c)
+				);
+			}
 		#endif
 		const T mask = (sizeof(T) * 8 - 1);
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "cpu_detection.hpp"
+#include "../include/cpu_detection.hpp"
 
 #include <type_traits>
 #include <cstdint>

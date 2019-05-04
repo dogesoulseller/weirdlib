@@ -1,5 +1,5 @@
 #include "../include/weirdlib.hpp"
-#include "cpu_detection.hpp"
+#include "../include/cpu_detection.hpp"
 #include "common.hpp"
 
 

@@ -1,6 +1,6 @@
 #include "../include/weirdlib_crypto.hpp"
 #include <numeric>
-#include "cpu_detection.hpp"
+#include "../include/cpu_detection.hpp"
 
 #ifdef __x86_64__
 	#include <immintrin.h>
@@ -128,7 +128,7 @@ namespace crypto
 		#else
 			int result;
 			do {
-				result = _rdrand64_step(&output);
+				result = _rdrand64_step(reinterpret_cast<unsigned long long*>(&output));
 			} while (result == 0);
 		#endif
 
@@ -195,7 +195,7 @@ namespace crypto
 		#else
 			int result;
 			do {
-				result = _rdseed64_step(&output);
+				result = _rdseed64_step(reinterpret_cast<unsigned long long*>(&output));
 			} while (result == 0);
 		#endif
 

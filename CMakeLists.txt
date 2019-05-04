@@ -5,7 +5,7 @@ option(WEIRDLIB_BUILD_DOCS "Enable building documentation" ON)
 option(WEIRDLIB_ENABLE_TESTING "Enable building test target" ON)
 option(WEIRDLIB_ENABLE_BENCHMARKS "(Stub) Enable building benchmark target" OFF)
 option(WEIRDLIB_ENABLE_PREFETCH "Enable use of prefetch instructions in optimized code.
- This can lead to potential performance improvements, or massive slowdowns in some cases (Ivy Bridge[43 cycles], Jaguar[~100 cycles])" ON)
+ This can lead to potential performance improvements, or massive slowdowns in some cases (Intel Ivy Bridge[43 cycles], AMD Jaguar[~100 cycles])" ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 file(GLOB WEIRDLIB_SOURCES "include/*.hpp" "src/*.c*" "src/*.h*")
@@ -23,7 +23,7 @@ set_target_properties(weirdlib PROPERTIES
 )
 
 if(WEIRDLIB_ENABLE_PREFETCH)
-	target_compile_definitions(weirdlib, "WLIB_ENABLE_PREFETCH")
+	target_compile_definitions(weirdlib PUBLIC WLIB_ENABLE_PREFETCH)
 endif(WEIRDLIB_ENABLE_PREFETCH)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -mtune=native -mllvm -polly -fstandalone-debug -Weverything -Wno-missing-variable-declarations -Wno-global-constructors -Wno-c++98-c++11-c++14-compat -Wno-c++98-compat -Wno-pedantic -Wno-c++98-c++11-compat-binary-literal")
