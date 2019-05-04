@@ -6,9 +6,10 @@ namespace wlib
 {
 
 /// Functions that deal with cryptography and hashing
+/// SecureRandomInteger / Seed functions are only valid when the appropriate compiler defines are set
 namespace crypto
 {
-	#if defined(__RDRND__) && defined(__GNUC__) && !defined(__clang__)
+	#if defined(__RDRND__)
 
 	/// Generate random 16-bit integer
 	/// @return hardware-generated 16-bit integer
@@ -23,7 +24,7 @@ namespace crypto
 	uint64_t SecureRandomInteger_u64();
 	#endif
 
-	#if defined(__RDSEED__) && defined(__GNUC__) && !defined(__clang__)
+	#if defined(__RDSEED__)
 
 	/// Generate random 16-bit seed
 	/// @return hardware-generated 16-bit integer meant for use as a seed
