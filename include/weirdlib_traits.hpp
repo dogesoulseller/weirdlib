@@ -1,6 +1,7 @@
 #pragma once
 #include <type_traits>
 #include <utility>
+#include <stdexcept>
 
 namespace wlib
 {
@@ -24,4 +25,10 @@ namespace traits
 	template<typename T>
 	constexpr inline bool has_bitops_v = has_bitops<T>::value;
 } // traits
+
+	class module_not_built : public std::runtime_error
+	{
+		public:
+		inline module_not_built(const char* m = "") : std::runtime_error(m) {}
+	};
 } // wlib

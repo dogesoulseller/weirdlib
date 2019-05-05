@@ -2,6 +2,8 @@
 #include <cstring>
 #include "../include/weirdlib.hpp"
 
+#ifdef WEIRDLIB_ENABLE_STRING_OPERATIONS
+
 const char* lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 "Sed feugiat, orci eu varius efficitur, arcu ex condimentum leo, et auctor felis nisi ut sapien. Aliquam at rutrum ante. Vivamus nisl neque, condimentum sed tincidunt eget, pellentesque sed enim. Phasellus mollis enim nibh. Suspendisse potenti. Morbi interdum consectetur commodo. Morbi ac feugiat dolor. Vestibulum nunc erat, pharetra non eros id, pharetra pretium tortor.Curabitur elementum,"
 "massa id sagittis interdum, urna metus interdum urna, eu scelerisque eros ex non ligula. Donec feugiat nisi velit, ac lobortis elit volutpat et. Suspendisse eu dui mattis, accumsan sem in, hendrerit nulla. In metus ligula, ullamcorper ut semper ut, fringilla commodo velit. Proin consectetur, mi a congue eleifend, leo ex sollicitudin ex, sit amet tincidunt libero velit ut arcu."
@@ -26,6 +28,7 @@ const char* teststring_not_matches1 = "This is a comparison string that seod not
 const char* teststring_not_matches_short = "This is a comparison string that doesn't match the other string perfectly";
 
 const char* teststring_zerolen = "";
+
 
 TEST(StringOps, strlen) {
 	const size_t len_reference = std::strlen(teststring_matches);
@@ -105,3 +108,5 @@ TEST(StringOps, strncmp_not_equal) {
 TEST(StringOps, strncmp_from_constchar) {
 	EXPECT_TRUE(wlib::str::strncmp(teststring_matches, teststring_matches, wlib::str::strlen(teststring_matches))) << "The string comparison failed";
 }
+
+#endif //WEIRDLIB_ENABLE_STRING_OPERATIONS

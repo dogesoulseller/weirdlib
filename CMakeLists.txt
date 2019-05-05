@@ -4,6 +4,8 @@ project(weirdlib CXX)
 option(WEIRDLIB_BUILD_DOCS "Enable building documentation" ON)
 option(WEIRDLIB_ENABLE_TESTING "Enable building test target" ON)
 option(WEIRDLIB_ENABLE_BENCHMARKS "(Stub) Enable building benchmark target" OFF)
+option(WEIRDLIB_ENABLE_BUILD_STRINGOPS "Enable building of string module" ON)
+option(WEIRDLIB_ENABLE_BUILD_CRYPTO "Enable building of crypto module" ON)
 option(WEIRDLIB_ENABLE_PREFETCH "Enable use of prefetch instructions in optimized code.
  This can lead to potential performance improvements, or massive slowdowns in some cases (Intel Ivy Bridge[43 cycles], AMD Jaguar[~100 cycles])" ON)
 
@@ -22,6 +24,18 @@ set_target_properties(weirdlib PROPERTIES
 	CXX_STANDARD_REQUIRED ON
 )
 
+# Conditionally enable building cryptography module
+if(WEIRDLIB_ENABLE_BUILD_CRYPTO)
+	target_compile_definitions(weirdlib PUBLIC WEIRDLIB_ENABLE_CRYPTOGRAPHY)
+endif(WEIRDLIB_ENABLE_BUILD_CRYPTO)
+
+#Conditionally enable building string operations module
+if(WEIRDLIB_ENABLE_BUILD_STRINGOPS)
+	target_compile_definitions(weirdlib PUBLIC WEIRDLIB_ENABLE_STRING_OPERATIONS)
+endif(WEIRDLIB_ENABLE_BUILD_STRINGOPS)
+
+
+# Conditionally enable use of prefetch instructions
 if(WEIRDLIB_ENABLE_PREFETCH)
 	target_compile_definitions(weirdlib PUBLIC WLIB_ENABLE_PREFETCH)
 endif(WEIRDLIB_ENABLE_PREFETCH)

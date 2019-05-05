@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_CRYPTOGRAPHY
 #include <gtest/gtest.h>
 #include <cstring>
 #include <random>
@@ -80,3 +81,5 @@ TEST(WlibCrypto, CRC64XZ) {
 TEST(WlibCrypto, CRC64ISO) {
 	EXPECT_NO_THROW(wlib::crypto::CRC64ISO(CRCTestVector.data(), CRCTestVector.data()+CRCTestVector.size()));
 }
+
+#endif

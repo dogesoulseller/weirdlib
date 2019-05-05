@@ -1,5 +1,6 @@
 #include "../include/weirdlib.hpp"
 #include "common.hpp"
+#include "../include/weirdlib_traits.hpp"
 #include <algorithm>
 #include <cstring>
 
@@ -7,7 +8,8 @@ namespace wlib
 {
 namespace str
 {
-	size_t strlen(const char* s) noexcept {
+	#ifdef WEIRDLIB_ENABLE_STRING_OPERATIONS
+	size_t strlen(const char* s) {
 		size_t offset = 0;
 		#if defined(AVX512_BW)
 			if (reinterpret_cast<const size_t>(s) % 64 == 0) {
@@ -224,6 +226,25 @@ namespace str
 	bool strncmp(const char* str0, const char* str1, const size_t len) {
 		return wlib::str::strcmp(str0, str1, len);
 	}
+
+	#else // not defined(WEIRDLIB_ENABLE_STRING_OPERATIONS)
+
+	constexpr const char* errMsg = "This function is a stub - stringops module was disabled for this compilation";
+
+	size_t strlen(const char* s) {
+		throw wlib::module_not_built(errMsg);
+	}
+	bool strcmp(const char* str0, const char* str1) {
+		throw wlib::module_not_built(errMsg);
+	}
+	bool strcmp(const char* str0, const char* str1, const size_t len) {
+		throw wlib::module_not_built(errMsg);
+	}
+	bool strncmp(const char* str0, const char* str1, const size_t len) {
+		throw wlib::module_not_built(errMsg);
+	}
+
+	#endif // WEIRDLIB_ENABLE_STRING_OPERATIONS
 
 } // namespace str
 

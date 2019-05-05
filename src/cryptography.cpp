@@ -1,4 +1,6 @@
 #include "../include/weirdlib_crypto.hpp"
+#include "../include/weirdlib_traits.hpp"
+
 #include <numeric>
 #include "../include/cpu_detection.hpp"
 
@@ -10,6 +12,7 @@ namespace wlib
 {
 namespace crypto
 {
+	#ifdef WEIRDLIB_ENABLE_CRYPTOGRAPHY
 	template<uint16_t rev_polynomial>
 	inline constexpr std::array<uint16_t, 256> __compileTimeGenerateCRC16Table() noexcept {
 		std::array<uint16_t, 256> result{};
@@ -314,5 +317,67 @@ namespace crypto
 		return CRC64_base(first, last, CRC64ISOLookupTable);
 	}
 
+	#else // not defined(WEIRDLIB_ENABLE_CRYPTOGRAPHY)
+	constexpr const char* errMsg = "This function is a stub - cryptography module was disabled for this compilation";
+	#if defined(__RDRND__)
+	uint16_t SecureRandomInteger_u16() {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint32_t SecureRandomInteger_u32() {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint64_t SecureRandomInteger_u64() {
+		throw wlib::module_not_built(errMsg);
+	}
+	#endif
+	#if defined(__RDSEED__)
+	uint16_t SecureRandomSeed_u16() {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint32_t SecureRandomSeed_u32() {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint64_t SecureRandomSeed_u64() {
+		throw wlib::module_not_built(errMsg);
+	}
+	#endif
+	uint16_t CRC16ARC(uint8_t* first, uint8_t* last) {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint16_t CRC16DNP(uint8_t* first, uint8_t* last) {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint16_t CRC16MAXIM(uint8_t* first, uint8_t* last) {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint16_t CRC16USB(uint8_t* first, uint8_t* last) {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint16_t CRC16X_25(uint8_t* first, uint8_t* last) {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint32_t CRC32(uint8_t* first, uint8_t* last) {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint32_t CRC32C(uint8_t* first, uint8_t* last) {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint32_t CRC32D(uint8_t* first, uint8_t* last) {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint32_t CRC32AUTOSAR(uint8_t* first, uint8_t* last) {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint32_t CRC32JAMCRC(uint8_t* first, uint8_t* last) {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint64_t CRC64XZ(uint8_t* first, uint8_t* last) {
+		throw wlib::module_not_built(errMsg);
+	}
+	uint64_t CRC64ISO(uint8_t* first, uint8_t* last) {
+		throw wlib::module_not_built(errMsg);
+	}
+	#endif // WEIRDLIB_ENABLE_CRYPTOGRAPHY
 	} // namespace crypto
+
 } // namespace wlib

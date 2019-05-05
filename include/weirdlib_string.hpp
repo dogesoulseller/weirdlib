@@ -14,7 +14,7 @@ namespace str
 	/// Get length of string
 	/// @param s pointer to start of string
 	/// @return size of string
-	size_t strlen(const char* s) noexcept;
+	size_t strlen(const char* s);
 
 	/// Compare two strings
 	/// @param str0 first string
