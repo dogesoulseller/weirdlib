@@ -100,7 +100,7 @@ namespace bop
 		if (x == 0) return (sizeof(T) * 8);
 
 		#if defined(__GNUC__) && !defined(__clang__) && defined(__BMI__)
-			T output;
+			[[maybe_unused]] T output;
 			if constexpr (std::is_same_v<T, uint16_t>) {
 				asm (
 					"tzcnt ax, ax;"
@@ -166,7 +166,7 @@ namespace bop
 		if (x == 0) return sizeof(T) * 8;
 
 		#if defined(__GNUC__) && !defined(__clang__) && (defined(__ABM__) || defined(__BMI__))
-			T output;
+			[[maybe_unused]] T output;
 			if constexpr (std::is_same_v<T, uint16_t>) {
 				asm (
 					"lzcnt ax, ax;"
@@ -228,7 +228,7 @@ namespace bop
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t bit_scan_forward(T x) noexcept {
 		#if defined(__GNUC__) && !defined(__clang__) && defined(__x86_64__)
-			T output;
+			[[maybe_unused]] [[maybe_unused]] T output;
 			if constexpr (std::is_same_v<T, uint16_t>) {
 				asm (
 					"bsf ax, ax;"
@@ -285,7 +285,7 @@ namespace bop
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t bit_scan_reverse(T x) noexcept {
 		#if defined(__GNUC__) && !defined(__clang__) && defined(__x86_64__)
-			T output;
+			[[maybe_unused]] T output;
 			if constexpr (std::is_same_v<T, uint16_t>) {
 				asm (
 					"bsr ax, ax;"
@@ -335,7 +335,7 @@ namespace bop
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t population_count(T x) noexcept {
 		#if (defined(__POPCNT__) || defined(__ABM__)) && defined(__GNUC__) && !defined(__clang__)
-			T output;
+			[[maybe_unused]] T output;
 			if constexpr (std::is_same_v<T, uint16_t>) {
 				asm (
 					"popcnt ax, ax;"
@@ -405,7 +405,7 @@ namespace bop
 	template<typename T, typename = std::enable_if_t<std::conjunction_v<std::is_unsigned<T>, traits::has_bitops<T>>>>
 	T rotate_left(const T x, uint8_t c) noexcept {
 		#if defined(__GNUC__) && !defined(__clang__) && defined(__x86_64__)
-			T output;
+			[[maybe_unused]] T output;
 			if constexpr (std::is_same_v<T, uint8_t>) {
 				asm (
 					"rol al, cl;"
@@ -449,7 +449,7 @@ namespace bop
 	template<typename T, typename = std::enable_if_t<std::conjunction_v<std::is_unsigned<T>, traits::has_bitops<T>>>>
 	T rotate_right(const T x, uint8_t c) noexcept {
 		#if defined(__GNUC__) && !defined(__clang__) && defined(__x86_64__)
-			T output;
+			[[maybe_unused]] T output;
 			if constexpr (std::is_same_v<T, uint8_t>) {
 				asm (
 					"ror al, cl;"

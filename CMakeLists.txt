@@ -10,13 +10,19 @@ option(WEIRDLIB_ENABLE_PREFETCH "Enable use of prefetch instructions in optimize
  This can lead to potential performance improvements, or massive slowdowns in some cases (Intel Ivy Bridge[43 cycles], AMD Jaguar[~100 cycles])" ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-file(GLOB WEIRDLIB_SOURCES "include/*.hpp" "src/*.c*" "src/*.h*")
+file(GLOB_RECURSE WEIRDLIB_SOURCES "include/*.hpp" "src/*.c*" "src/*.h*")
 
 # Force use of Intel syntax assembly
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -masm=intel")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -masm=intel")
-endif()
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -masm=intel -Wno-unknown-pragmas")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -masm=intel -Wno-unknown-pragmas")
+endif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Wextra -Wpedantic -Wno-unknown-pragmas")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wpedantic -Wno-unknown-pragmas")
+endif(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+
 
 add_library(weirdlib ${WEIRDLIB_SOURCES})
 set_target_properties(weirdlib PROPERTIES
@@ -86,6 +92,8 @@ if(WEIRDLIB_ENABLE_TESTING)
 		CXX_STANDARD 17
 		CXX_STANDARD_REQUIRED ON
 	)
+
+	target_compile_definitions(weirdlib_tests PUBLIC WLIBTEST_TESTING_DIRECTORY=\"${CMAKE_CURRENT_LIST_DIR}/tests/\")
 
 	gtest_add_tests(TARGET weirdlib_tests SOURCES ${WEIRDLIB_TEST_SOURCES} WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/tests/")
 endif(WEIRDLIB_ENABLE_TESTING)

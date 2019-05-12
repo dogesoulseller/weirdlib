@@ -15,12 +15,12 @@ namespace traits
 	/// Is valid for any type that implements bitwise operators
 	/// @see has_bitops_v
 	template<typename T>
-	struct has_bitops<T, std::void_t<decltype(std::declval<T>() & 1,
-		std::declval<T>() | 1,
-		std::declval<T>() ^ 1,
-		~std::declval<T>(),
-		std::declval<T>() << 1,
-		std::declval<T>() >> 1)>> : std::true_type{};
+	 struct has_bitops<T, std::void_t<decltype((std::declval<T>() &
+		std::declval<T>()) |
+		(std::declval<T>() ^
+		~std::declval<T>()) >>
+		std::declval<T>() <<
+		std::declval<T>())>>  : std::true_type{};
 
 	template<typename T>
 	constexpr inline bool has_bitops_v = has_bitops<T>::value;

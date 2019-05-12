@@ -14,7 +14,7 @@ namespace crypto
 {
 	#ifdef WEIRDLIB_ENABLE_CRYPTOGRAPHY
 	template<uint16_t rev_polynomial>
-	inline constexpr std::array<uint16_t, 256> __compileTimeGenerateCRC16Table() noexcept {
+	constexpr std::array<uint16_t, 256> __compileTimeGenerateCRC16Table() noexcept {
 		std::array<uint16_t, 256> result{};
 
 		for (uint16_t i = 0; i < 256; i++) {
@@ -30,7 +30,7 @@ namespace crypto
 	}
 
 	template<uint32_t rev_polynomial>
-	inline constexpr std::array<uint32_t, 256> __compileTimeGenerateCRC32Table() noexcept {
+	constexpr std::array<uint32_t, 256> __compileTimeGenerateCRC32Table() noexcept {
 		std::array<uint32_t, 256> result{};
 
 		for (uint32_t i = 0; i < 256; i++) {
@@ -46,7 +46,7 @@ namespace crypto
 	}
 
 	template<uint64_t rev_polynomial>
-	inline constexpr std::array<uint64_t, 256> __compileTimeGenerateCRC64Table() noexcept {
+	constexpr std::array<uint64_t, 256> __compileTimeGenerateCRC64Table() noexcept {
 		std::array<uint64_t, 256> result{};
 
 		for (uint64_t i = 0; i < 256; i++) {
@@ -61,17 +61,17 @@ namespace crypto
 		return result;
 	}
 
-	inline constexpr std::array<uint16_t, 256> CRC16CCITTLookupTable = __compileTimeGenerateCRC16Table<0x8408>();	// CCITT (0x1021)
-	inline constexpr std::array<uint16_t, 256> CRC16ARCLookupTable   = __compileTimeGenerateCRC16Table<0xA001>();	// ARC (0x8005)
-	inline constexpr std::array<uint16_t, 256> CRC16DNPLookupTable   = __compileTimeGenerateCRC16Table<0xA6BC>();	// DNP (0x3D65)
+	constexpr std::array<uint16_t, 256> CRC16CCITTLookupTable = __compileTimeGenerateCRC16Table<0x8408>();	// CCITT (0x1021)
+	constexpr std::array<uint16_t, 256> CRC16ARCLookupTable   = __compileTimeGenerateCRC16Table<0xA001>();	// ARC (0x8005)
+	constexpr std::array<uint16_t, 256> CRC16DNPLookupTable   = __compileTimeGenerateCRC16Table<0xA6BC>();	// DNP (0x3D65)
 
-	inline constexpr std::array<uint32_t, 256> CRC32LookupTable  = __compileTimeGenerateCRC32Table<0xEDB88320>();	// ISO-HDLC (0x04C11DB7)
-	inline constexpr std::array<uint32_t, 256> CRC32CLookupTable = __compileTimeGenerateCRC32Table<0x82F63B78>();	// Castagnolli polynomial (0x1EDC6F41)
-	inline constexpr std::array<uint32_t, 256> CRC32DLookupTable = __compileTimeGenerateCRC32Table<0xD419CC15>();	// BASE91-D (0xA833982B)
-	inline constexpr std::array<uint32_t, 256> CRC32AUTOSARLookupTable = __compileTimeGenerateCRC32Table<0xC8DF352F>();		// AUTOSAR (0xF4ACFB13)
+	constexpr std::array<uint32_t, 256> CRC32LookupTable  = __compileTimeGenerateCRC32Table<0xEDB88320>();	// ISO-HDLC (0x04C11DB7)
+	constexpr std::array<uint32_t, 256> CRC32CLookupTable = __compileTimeGenerateCRC32Table<0x82F63B78>();	// Castagnolli polynomial (0x1EDC6F41)
+	constexpr std::array<uint32_t, 256> CRC32DLookupTable = __compileTimeGenerateCRC32Table<0xD419CC15>();	// BASE91-D (0xA833982B)
+	constexpr std::array<uint32_t, 256> CRC32AUTOSARLookupTable = __compileTimeGenerateCRC32Table<0xC8DF352F>();		// AUTOSAR (0xF4ACFB13)
 
-	inline constexpr std::array<uint64_t, 256> CRC64XZLookupTable = __compileTimeGenerateCRC64Table<0xC96C5795D7870F42>();	// GO-ECMA
-	inline constexpr std::array<uint64_t, 256> CRC64ISOLookupTable = __compileTimeGenerateCRC64Table<0xD800000000000000>();	// GO-ISO
+	constexpr std::array<uint64_t, 256> CRC64XZLookupTable = __compileTimeGenerateCRC64Table<0xC96C5795D7870F42>();	// GO-ECMA
+	constexpr std::array<uint64_t, 256> CRC64ISOLookupTable = __compileTimeGenerateCRC64Table<0xD800000000000000>();	// GO-ISO
 
 
 	#if defined(__RDRND__)
