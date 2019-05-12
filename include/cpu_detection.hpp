@@ -52,3 +52,8 @@
 #else
 	#define X86_SIMD_LEVEL 0
 #endif
+
+// Detect FMA presence separately (because AMD)
+#ifdef __FMA__
+	#define X86_SIMD_FMA
+#endif

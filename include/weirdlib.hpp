@@ -4,6 +4,7 @@
 #include "weirdlib_traits.hpp"
 #include "weirdlib_string.hpp"
 #include "weirdlib_crypto.hpp"
+#include "weirdlib_image.hpp"
 
 namespace wlib
 {
