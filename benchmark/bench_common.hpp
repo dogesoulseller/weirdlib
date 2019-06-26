@@ -19,7 +19,7 @@ namespace bench
 		return std::chrono::duration_cast<std::chrono::microseconds>(dur).count();
 	}
 
-	volatile inline float random_float() {
+	inline float random_float() {
 		return float_dist(rng);
 	}
 } // bench

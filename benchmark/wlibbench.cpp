@@ -10,7 +10,6 @@
 #include <thread>
 #include <iostream>
 #include <filesystem>
-#include <future>
 #include <functional>
 #include <tuple>
 
@@ -52,21 +51,16 @@ int main(int argc, char* argv[]) {
 		return 2;
 	}
 
-	// Load images asynchronously
-	std::packaged_task<std::vector<uint8_t>*()> vlargeLoad(std::bind(bench::loadImage, std::cref(imageVeryLargePath), 3));
-	std::packaged_task<std::vector<uint8_t>*()> largeLoad(std::bind(bench::loadImage, std::cref(imageLargePath), 3));
-	std::packaged_task<std::vector<uint8_t>*()> mediumLoad(std::bind(bench::loadImage, std::cref(imageMediumPath), 3));
-	std::packaged_task<std::vector<uint8_t>*()> smallLoad(std::bind(bench::loadImage, std::cref(imageSmallPath), 3));
+	// Start asynchronously loading images
+	std::vector<uint8_t>* vlargeImage;
+	std::vector<uint8_t>* largeImage;
+	std::vector<uint8_t>* mediumImage;
+	std::vector<uint8_t>* smallImage;
 
-	auto vlargeImage_future = vlargeLoad.get_future();
-	auto largeImage_future = largeLoad.get_future();
-	auto mediumImage_future = mediumLoad.get_future();
-	auto smallImage_future = smallLoad.get_future();
-
-	std::thread t1([&](){vlargeLoad();});
-	std::thread t2([&](){largeLoad();});
-	std::thread t3([&](){mediumLoad();});
-	std::thread t4([&](){smallLoad();});
+	std::thread t1([&](){vlargeImage = bench::loadImage(imageVeryLargePath, 3);});
+	std::thread t2([&](){largeImage = bench::loadImage(imageLargePath, 3);});
+	std::thread t3([&](){mediumImage = bench::loadImage(imageMediumPath, 3);});
+	std::thread t4([&](){smallImage = bench::loadImage(imageSmallPath, 3);});
 
 	// Load text
 	std::ifstream loremIpsum(lipsumLongPath);
@@ -79,23 +73,20 @@ int main(int argc, char* argv[]) {
 	loremIpsum.close();
 
 	// Wait for all images
-	auto vlargeImage = vlargeImage_future.get();
-	auto largeImage = largeImage_future.get();
-	auto mediumImage = mediumImage_future.get();
-	auto smallImage = smallImage_future.get();
+	t1.join(); t2.join(); t3.join(); t4.join();
 
 	// Benchmark cases
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-	std::cout << "String processing:\n" << (std::string)bench::testStrings(lipsumString, fSize) << std::endl;
+	std::cout << "String processing:\n" << bench::testStrings(lipsumString, fSize) << std::endl;
 
 	std::cout << "-------------------- IMAGE PROCESSING --------------------" << "\n\n";
 
-	std::cout << "Small image processing:\n" << (std::string)bench::testImages(smallImage, imageSmallDimensions.first, imageSmallDimensions.second) << '\n';
-	std::cout << "Medium image processing:\n" << (std::string)bench::testImages(mediumImage, imageMediumDimensions.first, imageMediumDimensions.second) << '\n';
-	std::cout << "Large image processing:\n" << (std::string)bench::testImages(largeImage, imageLargeDimensions.first, imageLargeDimensions.second) << '\n';
-	std::cout << "Very large image processing:\n" << (std::string)bench::testImages(vlargeImage, imageVeryLargeDimensions.first, imageVeryLargeDimensions.second) << '\n';
+	std::cout << "Small image processing:\n" << bench::testImages(smallImage, imageSmallDimensions.first, imageSmallDimensions.second) << '\n';
+	std::cout << "Medium image processing:\n" << bench::testImages(mediumImage, imageMediumDimensions.first, imageMediumDimensions.second) << '\n';
+	std::cout << "Large image processing:\n" << bench::testImages(largeImage, imageLargeDimensions.first, imageLargeDimensions.second) << '\n';
+	std::cout << "Very large image processing:\n" << bench::testImages(vlargeImage, imageVeryLargeDimensions.first, imageVeryLargeDimensions.second) << '\n';
 
 	delete vlargeImage;
 	delete largeImage;
