@@ -63,3 +63,48 @@ TEST(ImgOps, LoadFromFormatted) {
 	EXPECT_FLOAT_EQ(testImg.GetPixels()[2], testImgF.GetPixels()[2]);
 	EXPECT_FLOAT_EQ(testImg.GetPixels()[3], testImgF.GetPixels()[3]);
 }
+
+TEST(ImgOps, ConvertRGBA_Grayscale) {
+	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	ASSERT_TRUE(std::filesystem::exists(imgPath));
+
+	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
+	wlib::image::ImageSoA testSoAA(testImg);
+	wlib::image::ImageSoA testSoANA(testImg);
+
+	testSoAA = wlib::image::ConvertToGrayscale(testSoAA, true);
+	EXPECT_EQ(testSoAA.channels.size(), 2);
+
+	testSoANA = wlib::image::ConvertToGrayscale(testSoANA, false);
+	EXPECT_EQ(testSoANA.channels.size(), 1);
+}
+
+TEST(ImgOps, ColorOrderConversion) {
+	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	ASSERT_TRUE(std::filesystem::exists(imgPath));
+
+	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
+	wlib::image::ImageSoA testSoAA(testImg);
+	wlib::image::ImageSoA testSoANA(testImg);
+
+	wlib::image::ConvertToBGRA(testSoAA);
+	wlib::image::ConvertToBGR(testSoANA);
+
+	EXPECT_EQ(testSoAA.channels[0][0], testImg.GetPixels()[2]);
+	EXPECT_EQ(testSoAA.channels[1][0], testImg.GetPixels()[1]);
+	EXPECT_EQ(testSoAA.channels[2][0], testImg.GetPixels()[0]);
+	EXPECT_EQ(testSoAA.channels[3][0], testImg.GetPixels()[3]);
+
+	EXPECT_EQ(testSoANA.channels[0][0], testImg.GetPixels()[2]);
+	EXPECT_EQ(testSoANA.channels[1][0], testImg.GetPixels()[1]);
+	EXPECT_EQ(testSoANA.channels[2][0], testImg.GetPixels()[0]);
+	EXPECT_EQ(testSoANA.channels.size(), 3);
+
+	// Check alpha append
+	wlib::image::ConvertToBGRA(testSoANA);
+
+	EXPECT_EQ(testSoANA.channels[0][0], testImg.GetPixels()[2]);
+	EXPECT_EQ(testSoANA.channels[1][0], testImg.GetPixels()[1]);
+	EXPECT_EQ(testSoANA.channels[2][0], testImg.GetPixels()[0]);
+	EXPECT_EQ(testSoANA.channels[3][0], 255.0f);
+}

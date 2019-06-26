@@ -17,18 +17,13 @@ namespace wlib::image
 			alignas(64) auto c0 = new float[width*height];
 
 			auto source = img.GetPixels();
-
-			#pragma GCC ivdep
 			#pragma ivdep
-			#pragma loop ivdep
-			#pragma omp simd
 			for (size_t i = 0; i < width * height; i++) {
 				c0[i] = static_cast<float>(source[i]);
 			}
 
 			channels.push_back(c0);
 			break;
-
 		}
 		case ColorFormat::F_GrayAlpha: {
 
@@ -36,11 +31,7 @@ namespace wlib::image
 			alignas(64) auto c1 = new float[width*height];
 
 			auto source = img.GetPixels();
-
-			#pragma GCC ivdep
 			#pragma ivdep
-			#pragma loop ivdep
-			#pragma omp simd
 			for (size_t i = 0; i < width * height; i++) {
 				c0[i] = static_cast<float>(source[i*2]);
 				c1[i] = static_cast<float>(source[i*2+1]);
@@ -48,7 +39,6 @@ namespace wlib::image
 
 			channels.push_back(c0);
 			channels.push_back(c1);
-
 		}
 			break;
 		case ColorFormat::F_RGB:
@@ -59,11 +49,7 @@ namespace wlib::image
 			alignas(64) auto c2 = new float[width*height];
 
 			auto source = img.GetPixels();
-
-			#pragma GCC ivdep
 			#pragma ivdep
-			#pragma loop ivdep
-			#pragma omp simd
 			for (size_t i = 0; i < width * height; i++) {
 				c0[i] = static_cast<float>(source[i*3]);
 				c1[i] = static_cast<float>(source[i*3+1]);
@@ -73,7 +59,6 @@ namespace wlib::image
 			channels.push_back(c0);
 			channels.push_back(c1);
 			channels.push_back(c2);
-
 		}
 			break;
 		case ColorFormat::F_RGBA:
@@ -86,11 +71,7 @@ namespace wlib::image
 			alignas(64) auto c3 = new float[width*height];
 
 			auto source = img.GetPixels();
-
-			#pragma GCC ivdep
 			#pragma ivdep
-			#pragma loop ivdep
-			#pragma omp simd
 			for (size_t i = 0; i < width * height; i++) {
 				c0[i] = static_cast<float>(source[i*4]);
 				c1[i] = static_cast<float>(source[i*4+1]);
@@ -150,7 +131,6 @@ namespace wlib::image
 	Image ImageSoA::ConvertToImage() {
 		alignas(64) float* outputPix;
 
-		// TODO: Unpack SIMD
 		switch (format)
 		{
 		case ColorFormat::F_Grayscale:
@@ -159,6 +139,7 @@ namespace wlib::image
 			break;
 		case ColorFormat::F_GrayAlpha:
 			outputPix = new float[width*height*2];
+			#pragma ivdep
 			for (size_t i = 0; i < width * height; i++) {
 				outputPix[i*2] = channels[0][i];
 				outputPix[i*2+1] = channels[1][i];
@@ -167,6 +148,7 @@ namespace wlib::image
 		case ColorFormat::F_RGB:
 		case ColorFormat::F_BGR:
 			outputPix = new float[width*height*3];
+			#pragma ivdep
 			for (size_t i = 0; i < width * height; i++) {
 				outputPix[i*3] = channels[0][i];
 				outputPix[i*3+1] = channels[1][i];
@@ -177,6 +159,7 @@ namespace wlib::image
 		case ColorFormat::F_RGBA:
 		case ColorFormat::F_BGRA:
 			outputPix = new float[width*height*4];
+			#pragma ivdep
 			for (size_t i = 0; i < width * height; i++) {
 				outputPix[i*4] = channels[0][i];
 				outputPix[i*4+1] = channels[1][i];
@@ -209,7 +192,7 @@ namespace wlib::image
 			channelBlueN = 0;
 		}
 
-		alignas(64) auto outGr = new float[inImg.width * inImg.height];
+		alignas(32) auto outGr = new float[inImg.width * inImg.height];
 
 		// Processing with SIMD
 		#if X86_SIMD_LEVEL >= 7
@@ -222,9 +205,9 @@ namespace wlib::image
 			const auto iterRem_AVX = (inImg.width * inImg.height) % 8;
 
 			for (size_t i = 0; i < iter_AVX; i++) {
-				const auto rChan = _mm256_load_ps(inImg.channels[channelRedN]+i*8);
-				const auto gChan = _mm256_load_ps(inImg.channels[channelGreenN]+i*8);
-				const auto bChan = _mm256_load_ps(inImg.channels[channelBlueN]+i*8);
+				const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
+				const auto gChan = _mm256_loadu_ps(inImg.channels[channelGreenN]+i*8);
+				const auto bChan = _mm256_loadu_ps(inImg.channels[channelBlueN]+i*8);
 
 				#ifdef X86_SIMD_FMA
 					const auto resultGr = _mm256_min_ps(_mm256_fmadd_ps(rChan, redMul, _mm256_fmadd_ps(gChan, greenMul, _mm256_mul_ps(bChan, blueMul))), maxMask);
@@ -232,7 +215,7 @@ namespace wlib::image
 					const auto resultGr = _mm256_min_ps(
 						_mm256_add_ps(_mm256_mul_ps(rChan, redMul), _mm256_add_ps(_mm256_mul_ps(gChan, greenMul), _mm256_mul_ps(bChan, blueMul))), maxMask);
 				#endif
-					_mm256_store_ps(outGr+8*i, resultGr);
+					_mm256_storeu_ps(outGr+8*i, resultGr);
 			}
 
 			for (size_t i = iter_AVX * 8; i < iterRem_AVX + iter_AVX*8; i++) {
@@ -254,9 +237,9 @@ namespace wlib::image
 			const auto iterRem_SSE = (inImg.width * inImg.height) % 4;
 
 			for (size_t i = 0; i < iter_SSE; i++) {
-				const auto rChan = _mm_load_ps(inImg.channels[channelRedN]+i*4);
-				const auto gChan = _mm_load_ps(inImg.channels[channelGreenN]+i*4);
-				const auto bChan = _mm_load_ps(inImg.channels[channelBlueN]+i*4);
+				const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
+				const auto gChan = _mm_loadu_ps(inImg.channels[channelGreenN]+i*4);
+				const auto bChan = _mm_loadu_ps(inImg.channels[channelBlueN]+i*4);
 
 				#ifdef X86_SIMD_FMA	// Technically shouldn't be possible
 					const auto resultGr = _mm_min_ps(_mm_fmadd_ps(rChan, redMul, _mm256_fmadd_ps(gChan, greenMul, _mm_mul_ps(bChan, blueMul))), maxMask);
@@ -264,7 +247,7 @@ namespace wlib::image
 					const auto resultGr = _mm_min_ps(
 						_mm_add_ps(_mm_mul_ps(rChan, redMul), _mm_add_ps(_mm_mul_ps(gChan, greenMul), _mm_mul_ps(bChan, blueMul))), maxMask);
 				#endif
-					_mm_store_ps(outGr+4*i, resultGr);
+					_mm_storeu_ps(outGr+4*i, resultGr);
 			}
 
 			for (size_t i = iter_SSE * 4; i < iterRem_SSE + iter_SSE * 4; i++) {
@@ -298,7 +281,9 @@ namespace wlib::image
 		} else if (inImg.format == F_RGBA || inImg.format == F_BGRA) {
 			inImg.format = F_GrayAlpha;
 
-			std::for_each(inImg.channels.begin(), inImg.channels.end()-1, [](auto elem){delete[] elem;});
+			for (size_t i = 0; i < inImg.channels.size()-1; i++) {
+				delete[] inImg.channels[i];
+			}
 
 			auto imgAlpha = inImg.channels[3];
 
@@ -333,4 +318,90 @@ namespace wlib::image
 			}
 		#endif
 	}
+
+	void ConvertToRGB(ImageSoA& in) {
+		switch (in.format)
+		{
+		case F_BGRA:
+			std::swap(in.channels[0], in.channels[2]);
+			[[fallthrough]];
+		case F_RGBA:
+			delete[] in.channels[3];
+			in.channels.erase(in.channels.begin() + 3);
+			break;
+		case F_BGR:
+			std::swap(in.channels[0], in.channels[2]);
+			break;
+		default:
+			break;
+		}
+
+		in.format = F_RGB;
+	}
+
+	void ConvertToBGR(ImageSoA& in) {
+		switch (in.format)
+		{
+		case F_RGBA:
+			std::swap(in.channels[0], in.channels[2]);
+			[[fallthrough]];
+		case F_BGRA:
+			delete[] in.channels[3];
+			in.channels.erase(in.channels.begin() + 3);
+			break;
+		case F_RGB:
+			std::swap(in.channels[0], in.channels[2]);
+			break;
+		default:
+			break;
+		}
+
+		in.format = F_BGR;
+	}
+
+	void ConvertToRGBA(ImageSoA& in) {
+		switch (in.format)
+		{
+		case F_BGRA:
+			std::swap(in.channels[0], in.channels[2]);
+			break;
+		case F_BGR:
+			std::swap(in.channels[0], in.channels[2]);
+			[[fallthrough]];
+		case F_RGB:
+		{
+			alignas(64) auto tmp = new float[in.width * in.height];
+			std::uninitialized_fill(tmp, tmp + in.width * in.height, 255.0f);
+			in.channels.push_back(tmp);
+		}
+		default:
+			break;
+		}
+
+		in.format = F_RGBA;
+	}
+
+	void ConvertToBGRA(ImageSoA& in) {
+		switch (in.format)
+		{
+		case F_RGBA:
+			std::swap(in.channels[0], in.channels[2]);
+			break;
+		case F_RGB:
+			std::swap(in.channels[0], in.channels[2]);
+			[[fallthrough]];
+		case F_BGR:
+		{
+			alignas(64) auto tmp = new float[in.width * in.height];
+			std::uninitialized_fill(tmp, tmp + in.width * in.height, 255.0f);
+			in.channels.push_back(tmp);
+		}
+		default:
+			break;
+		}
+
+		in.format = F_BGRA;
+	}
+
+
 } // namespace wlib::image

@@ -77,8 +77,14 @@ namespace image
 		Image ConvertToImage();
 	};
 
-	ImageSoA& ConvertToGrayscale(ImageSoA inImg, bool preserveAlpha = false);
+	ImageSoA& ConvertToGrayscale(ImageSoA& inImg, bool preserveAlpha = false);
 
 	void ConvertUint8ToFloat(const uint8_t* in, float* out, size_t fileSize);
+
+	void ConvertToRGBA(ImageSoA&);
+	void ConvertToBGR(ImageSoA&);
+	void ConvertToRGB(ImageSoA&);
+	void ConvertToBGRA(ImageSoA&);
+
 } // namespace image
 } // namespace wlib
