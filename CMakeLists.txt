@@ -3,7 +3,7 @@ project(weirdlib CXX)
 
 option(WEIRDLIB_BUILD_DOCS "Enable building documentation" ON)
 option(WEIRDLIB_ENABLE_TESTING "Enable building test target" ON)
-option(WEIRDLIB_ENABLE_BENCHMARKS "(Stub) Enable building benchmark target" OFF)
+option(WEIRDLIB_ENABLE_BENCHMARKS "(Stub) Enable building benchmark target" ON)
 option(WEIRDLIB_ENABLE_BUILD_STRINGOPS "Enable building of string module" ON)
 option(WEIRDLIB_ENABLE_BUILD_CRYPTO "Enable building of crypto module" ON)
 option(WEIRDLIB_ENABLE_PREFETCH "Enable use of prefetch instructions in optimized code.
@@ -19,9 +19,14 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" 
 endif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Wextra -Wpedantic -Wno-unknown-pragmas")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wpedantic -Wno-unknown-pragmas")
+	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas")
 endif(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_RELWITHDEBINFO} -g3 -O2 -Wno-unknown-pragmas")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -g3 -O2 -Wno-unknown-pragmas")
+endif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
 
 
 add_library(weirdlib ${WEIRDLIB_SOURCES})
@@ -39,7 +44,6 @@ endif(WEIRDLIB_ENABLE_BUILD_CRYPTO)
 if(WEIRDLIB_ENABLE_BUILD_STRINGOPS)
 	target_compile_definitions(weirdlib PUBLIC WEIRDLIB_ENABLE_STRING_OPERATIONS)
 endif(WEIRDLIB_ENABLE_BUILD_STRINGOPS)
-
 
 # Conditionally enable use of prefetch instructions
 if(WEIRDLIB_ENABLE_PREFETCH)
@@ -70,12 +74,12 @@ endif(WEIRDLIB_BUILD_DOCS)
 
 if(WEIRDLIB_ENABLE_BENCHMARKS)
 	set(WEIRDLIB_BENCHMARK_DIR "${CMAKE_CURRENT_LIST_DIR}/benchmark")
-	add_executable(wlib_bench_strlen ${WEIRDLIB_BENCHMARK_DIR}/bench_strlen.cpp)
-	set_target_properties(wlib_bench_strlen PROPERTIES
+	add_executable(wlib_bench ${WEIRDLIB_BENCHMARK_DIR}/wlibbench.cpp ${WEIRDLIB_BENCHMARK_DIR}/bench_load.cpp ${WEIRDLIB_BENCHMARK_DIR}/bench_cases.cpp)
+	set_target_properties(wlib_bench PROPERTIES
 		CXX_STANDARD 17
 		CXX_STANDARD_REQUIRED ON
 	)
-	target_link_libraries(wlib_bench_strlen weirdlib)
+	target_link_libraries(wlib_bench weirdlib Threads::Threads)
 
 endif(WEIRDLIB_ENABLE_BENCHMARKS)
 
