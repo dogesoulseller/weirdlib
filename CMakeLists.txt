@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.9.6)
-project(weirdlib CXX)
+project(weirdlib C CXX)
+
+add_compile_definitions(WEIRDLIB_MTMODE_NONE=0 WEIRDLIB_MTMODE_TBB=1 WEIRDLIB_MTMODE_OMP=2)
 
 option(WEIRDLIB_BUILD_DOCS "Enable building documentation" ON)
 option(WEIRDLIB_ENABLE_TESTING "Enable building test target" ON)
@@ -7,15 +9,37 @@ option(WEIRDLIB_ENABLE_BENCHMARKS "(Stub) Enable building benchmark target" ON)
 option(WEIRDLIB_ENABLE_BUILD_STRINGOPS "Enable building of string module" ON)
 option(WEIRDLIB_ENABLE_BUILD_CRYPTO "Enable building of crypto module" ON)
 option(WEIRDLIB_ENABLE_PREFETCH "Enable use of prefetch instructions in optimized code.
- This can lead to potential performance improvements, or massive slowdowns in some cases (Intel Ivy Bridge[43 cycles], AMD Jaguar[~100 cycles])" ON)
+This can lead to potential performance improvements, or massive slowdowns in some cases (Intel Ivy Bridge[43 cycles], AMD Jaguar[~100 cycles])" ON)
+
+# Compilation selection helpers
+set(WEIRDLIB_LINKER_LIBRARIES "")
+set(WEIRDLIB_ADDITIONAL_CXX_FLAGS "")
+
+# Multithreading options
+option(WEIRDLIB_ENABLE_MULTITHREADING "Enable use of external threading library" ON)
+set(WEIRDLIB_MULTITHREADING_LIBRARY "tbb" CACHE STRING "Which external threading library to use: OpenMP, TBB")
+set_property(CACHE WEIRDLIB_MULTITHREADING_LIBRARY PROPERTY STRINGS OpenMP TBB)
+
+if(WEIRDLIB_ENABLE_MULTITHREADING)
+	find_package(OpenMP QUIET)
+
+	string(TOLOWER ${WEIRDLIB_MULTITHREADING_LIBRARY} WEIRDLIB_MULTITHREADING_LIBRARY)
+	if(WEIRDLIB_MULTITHREADING_LIBRARY STREQUAL "openmp" OR WEIRDLIB_MULTITHREADING_LIBRARY STREQUAL "omp")
+		string(APPEND WEIRDLIB_ADDITIONAL_CXX_FLAGS ${OpenMP_CXX_FLAGS})
+	elseif(WEIRDLIB_MULTITHREADING_LIBRARY STREQUAL "tbb")
+		string(APPEND WEIRDLIB_LINKER_LIBRARIES "tbb")
+	endif()
+endif(WEIRDLIB_ENABLE_MULTITHREADING)
+
+set(CMAKE_CXX_FLAGS "${WEIRDLIB_ADDITIONAL_CXX_FLAGS} ${CMAKE_CXX_FLAGS}")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 file(GLOB_RECURSE WEIRDLIB_SOURCES "include/*.hpp" "src/*.c*" "src/*.h*")
 
 # Force use of Intel syntax assembly
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -masm=intel -Wno-unknown-pragmas")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -masm=intel -Wno-unknown-pragmas")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -masm=intel -Wno-unknown-pragmas -march=native")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -masm=intel -Wno-unknown-pragmas -march=native")
 endif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
@@ -28,12 +52,24 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" 
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -g3 -O2 -Wno-unknown-pragmas")
 endif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
 
-
+# Primary build target
 add_library(weirdlib ${WEIRDLIB_SOURCES})
 set_target_properties(weirdlib PROPERTIES
 	CXX_STANDARD 17
 	CXX_STANDARD_REQUIRED ON
 )
+
+# Enable additional config definitions
+if(WEIRDLIB_ENABLE_MULTITHREADING)
+	if(WEIRDLIB_MULTITHREADING_LIBRARY STREQUAL "openmp" OR WEIRDLIB_MULTITHREADING_LIBRARY STREQUAL "omp")
+		add_compile_definitions(WEIRDLIB_MULTITHREADING_MODE=2)
+	elseif(WEIRDLIB_MULTITHREADING_LIBRARY STREQUAL "tbb")
+		add_compile_definitions(WEIRDLIB_MULTITHREADING_MODE=1)
+	endif()
+
+endif(WEIRDLIB_ENABLE_MULTITHREADING)
+
+
 
 # Conditionally enable building cryptography module
 if(WEIRDLIB_ENABLE_BUILD_CRYPTO)
@@ -53,6 +89,7 @@ endif(WEIRDLIB_ENABLE_PREFETCH)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -mtune=native -mllvm -polly -fstandalone-debug -Weverything -Wno-missing-variable-declarations -Wno-global-constructors -Wno-c++98-c++11-c++14-compat -Wno-c++98-compat -Wno-pedantic -Wno-c++98-c++11-compat-binary-literal")
 # set(CMAKE_CXX_FLAGS "-march=native -mtune=native -mavx512f -mavx512bw -mavx512dq -mavx512vl -fstandalone-debug")
 
+# API Documentation
 if(WEIRDLIB_BUILD_DOCS)
 	find_package(Doxygen)
 	if(DOXYGEN_FOUND)
@@ -71,7 +108,7 @@ if(WEIRDLIB_BUILD_DOCS)
 
 endif(WEIRDLIB_BUILD_DOCS)
 
-
+# Library benchmarks
 if(WEIRDLIB_ENABLE_BENCHMARKS)
 	set(WEIRDLIB_BENCHMARK_DIR "${CMAKE_CURRENT_LIST_DIR}/benchmark")
 	add_executable(wlib_bench ${WEIRDLIB_BENCHMARK_DIR}/wlibbench.cpp ${WEIRDLIB_BENCHMARK_DIR}/bench_load.cpp ${WEIRDLIB_BENCHMARK_DIR}/bench_cases.cpp)
@@ -79,10 +116,11 @@ if(WEIRDLIB_ENABLE_BENCHMARKS)
 		CXX_STANDARD 17
 		CXX_STANDARD_REQUIRED ON
 	)
-	target_link_libraries(wlib_bench weirdlib Threads::Threads)
+	target_link_libraries(wlib_bench weirdlib Threads::Threads ${WEIRDLIB_LINKER_LIBRARIES})
 
 endif(WEIRDLIB_ENABLE_BENCHMARKS)
 
+# Google Test testing
 if(WEIRDLIB_ENABLE_TESTING)
 	enable_testing()
 
@@ -91,7 +129,7 @@ if(WEIRDLIB_ENABLE_TESTING)
 	file(GLOB WEIRDLIB_TEST_SOURCES "tests/*.cpp")
 
 	add_executable(weirdlib_tests ${WEIRDLIB_TEST_SOURCES})
-	target_link_libraries(weirdlib_tests Threads::Threads weirdlib GTest::GTest)
+	target_link_libraries(weirdlib_tests Threads::Threads weirdlib ${WEIRDLIB_LINKER_LIBRARIES} GTest::GTest)
 	set_target_properties(weirdlib_tests PROPERTIES
 		CXX_STANDARD 17
 		CXX_STANDARD_REQUIRED ON

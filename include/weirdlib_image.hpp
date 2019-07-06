@@ -22,6 +22,17 @@ namespace image
 		F_Default = -1u
 	};
 
+	/// Method for computing grayscale
+	/// Luminosity: accounts for human perception of colors (default)
+	/// Lightness: average of maximum and minimum intensity
+	/// Average: simple average of components
+	enum class GrayscaleMethod
+	{
+		Luminosity = 0,
+		Lightness = 1,
+		Average = 2
+	};
+
 	class Image
 	{
 	  private:
@@ -77,7 +88,7 @@ namespace image
 		Image ConvertToImage();
 	};
 
-	ImageSoA& ConvertToGrayscale(ImageSoA& inImg, bool preserveAlpha = false);
+	ImageSoA& ConvertToGrayscale(ImageSoA& inImg, bool preserveAlpha = false, GrayscaleMethod method = GrayscaleMethod::Luminosity);
 
 	void ConvertUint8ToFloat(const uint8_t* in, float* out, size_t fileSize);
 

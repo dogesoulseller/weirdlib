@@ -32,3 +32,5 @@
 	const __m128 SIMD128F_zeroMask = _mm_set1_ps(0.0f);
 	const __m128d SIMD128D_zeroMask = _mm_set1_pd(0.0);
 #endif
+
+int getImagePreferredThreadCount(int width, int height);

@@ -72,11 +72,17 @@ TEST(ImgOps, ConvertRGBA_Grayscale) {
 	wlib::image::ImageSoA testSoAA(testImg);
 	wlib::image::ImageSoA testSoANA(testImg);
 
+	wlib::image::ImageSoA testSoA_Average(testImg);
+	wlib::image::ImageSoA testSoA_Lightness(testImg);
+
 	testSoAA = wlib::image::ConvertToGrayscale(testSoAA, true);
 	EXPECT_EQ(testSoAA.channels.size(), 2);
 
 	testSoANA = wlib::image::ConvertToGrayscale(testSoANA, false);
 	EXPECT_EQ(testSoANA.channels.size(), 1);
+
+	testSoA_Average = wlib::image::ConvertToGrayscale(testSoA_Average, false, wlib::image::GrayscaleMethod::Average);
+	testSoA_Lightness = wlib::image::ConvertToGrayscale(testSoA_Lightness, false, wlib::image::GrayscaleMethod::Lightness);
 }
 
 TEST(ImgOps, ColorOrderConversion) {

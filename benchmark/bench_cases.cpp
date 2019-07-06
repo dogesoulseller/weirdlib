@@ -57,9 +57,31 @@ namespace bench
 		output << "conversion to SoA: " << static_cast<float>(bench::as_us(bench::now() - startToSoA)) / 1000.0f / BENCHMARK_ITERATIONS_IMAGE << " milliseconds\n";
 
 		// Convert RGB to Grayscale
-		auto startToGrayscale = bench::now();
+		wlib::image::ImageSoA imageSoA_RGB_Lightness(imageAoS_RGB);
+		wlib::image::ImageSoA imageSoA_RGB_Average(imageAoS_RGB);
+
+		auto startToGrayscaleLuminosity = bench::now();
+		for (size_t i = 0; i < BENCHMARK_ITERATIONS_IMAGE-1; i++) {
+			imageSoA_RGB = wlib::image::ConvertToGrayscale(imageSoA_RGB);
+		}
 		imageSoA_RGB = wlib::image::ConvertToGrayscale(imageSoA_RGB);
-		output << "conversion to grayscale: " << static_cast<float>(bench::as_us(bench::now() - startToSoA)) / 1000.0f << " milliseconds\n";
+
+		output << "conversion to grayscale (luminosity): " << static_cast<float>(bench::as_us(bench::now() - startToGrayscaleLuminosity)) / 1000.0f / BENCHMARK_ITERATIONS_IMAGE << " milliseconds\n";
+
+		auto startToGrayscaleLightness = bench::now();
+		for (size_t i = 0; i < BENCHMARK_ITERATIONS_IMAGE-1; i++) {
+			imageSoA_RGB_Lightness = wlib::image::ConvertToGrayscale(imageSoA_RGB_Lightness, false, wlib::image::GrayscaleMethod::Lightness);
+		}
+		imageSoA_RGB_Lightness = wlib::image::ConvertToGrayscale(imageSoA_RGB_Lightness, false, wlib::image::GrayscaleMethod::Lightness);
+		output << "conversion to grayscale (lightness): " << static_cast<float>(bench::as_us(bench::now() - startToGrayscaleLightness)) / 1000.0f / BENCHMARK_ITERATIONS_IMAGE << " milliseconds\n";
+
+		auto startToGrayscaleAverage = bench::now();
+		for (size_t i = 0; i < BENCHMARK_ITERATIONS_IMAGE-1; i++) {
+			imageSoA_RGB_Average = wlib::image::ConvertToGrayscale(imageSoA_RGB_Average, false, wlib::image::GrayscaleMethod::Average);
+		}
+		imageSoA_RGB_Average = wlib::image::ConvertToGrayscale(imageSoA_RGB_Average, false, wlib::image::GrayscaleMethod::Average);
+		output << "conversion to grayscale (average): " << static_cast<float>(bench::as_us(bench::now() - startToGrayscaleAverage)) / 1000.0f / BENCHMARK_ITERATIONS_IMAGE << " milliseconds\n";
+
 
 		// Final output
 		auto outString = output.str();

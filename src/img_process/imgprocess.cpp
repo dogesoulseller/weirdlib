@@ -1,7 +1,13 @@
 #include "../../include/weirdlib_image.hpp"
 #include "../../include/cpu_detection.hpp"
+#include "../common.hpp"
 #include <cmath>
 #include <algorithm>
+#include <thread>
+
+#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
+#include <tbb/tbb.h>
+#endif
 
 namespace wlib::image
 {
@@ -10,82 +16,132 @@ namespace wlib::image
 		width = img.GetWidth();
 		height = img.GetHeight();
 
+		#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
+		tbb::task_scheduler_init tSched(8);
+		#endif
+
 		switch (format)
 		{
 		case ColorFormat::F_Grayscale: {
-
 			alignas(64) auto c0 = new float[width*height];
-
 			auto source = img.GetPixels();
-			#pragma ivdep
+
+			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
+			tbb::parallel_for(tbb::blocked_range<size_t>(0, width*height, 10000), [&c0, &source](tbb::blocked_range<size_t>& i){
+				for (size_t j = i.begin(); j != i.end(); j++) {
+					c0[j] = static_cast<float>(source[j]);
+				}
+			});
+			#else
+			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_OMP
+			#pragma omp parallel for simd num_threads(8)
+			#endif
 			for (size_t i = 0; i < width * height; i++) {
 				c0[i] = static_cast<float>(source[i]);
 			}
+			#endif
 
 			channels.push_back(c0);
+
 			break;
 		}
 		case ColorFormat::F_GrayAlpha: {
-
 			alignas(64) auto c0 = new float[width*height];
 			alignas(64) auto c1 = new float[width*height];
-
 			auto source = img.GetPixels();
-			#pragma ivdep
+
+			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
+			tbb::parallel_for(tbb::blocked_range<size_t>(0, width*height, 10000), [&c0, &c1, &source](tbb::blocked_range<size_t>& i){
+				for (size_t j = i.begin(); j != i.end(); j++) {
+					c0[j] = static_cast<float>(source[j*2]);
+					c1[j] = static_cast<float>(source[j*2+1]);
+				}
+			});
+			#else
+			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_OMP
+			#pragma omp parallel for simd num_threads(8)
+			#endif
 			for (size_t i = 0; i < width * height; i++) {
 				c0[i] = static_cast<float>(source[i*2]);
 				c1[i] = static_cast<float>(source[i*2+1]);
 			}
+			#endif
 
 			channels.push_back(c0);
 			channels.push_back(c1);
-		}
+
 			break;
+		}
 		case ColorFormat::F_RGB:
 		case ColorFormat::F_BGR: {
-
 			alignas(64) auto c0 = new float[width*height];
 			alignas(64) auto c1 = new float[width*height];
 			alignas(64) auto c2 = new float[width*height];
-
 			auto source = img.GetPixels();
-			#pragma ivdep
+
+
+			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
+			tbb::parallel_for(tbb::blocked_range<size_t>(0, width*height, 10000), [&c0, &c1, &c2, &source](tbb::blocked_range<size_t>& i){
+				for (size_t j = i.begin(); j != i.end(); j++) {
+					c0[j] = static_cast<float>(source[j*3]);
+					c1[j] = static_cast<float>(source[j*3+1]);
+					c2[j] = static_cast<float>(source[j*3+2]);
+				}
+			});
+			#else
+			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_OMP
+			#pragma omp parallel for simd num_threads(8)
+			#endif
 			for (size_t i = 0; i < width * height; i++) {
 				c0[i] = static_cast<float>(source[i*3]);
 				c1[i] = static_cast<float>(source[i*3+1]);
 				c2[i] = static_cast<float>(source[i*3+2]);
 			}
+			#endif
 
 			channels.push_back(c0);
 			channels.push_back(c1);
 			channels.push_back(c2);
-		}
+
 			break;
+		}
 		case ColorFormat::F_RGBA:
 		case ColorFormat::F_BGRA:
 		case ColorFormat::F_Default: {
-
 			alignas(64) auto c0 = new float[width*height];
 			alignas(64) auto c1 = new float[width*height];
 			alignas(64) auto c2 = new float[width*height];
 			alignas(64) auto c3 = new float[width*height];
-
 			auto source = img.GetPixels();
-			#pragma ivdep
+
+			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
+			tbb::parallel_for(tbb::blocked_range<size_t>(0, width*height, 10000), [&c0, &c1, &c2, &c3, &source](tbb::blocked_range<size_t>& i){
+				for (size_t j = i.begin(); j != i.end(); j++) {
+					c0[j] = static_cast<float>(source[j*4]);
+					c1[j] = static_cast<float>(source[j*4+1]);
+					c2[j] = static_cast<float>(source[j*4+2]);
+					c3[j] = static_cast<float>(source[j*4+3]);
+				}
+			});
+			#else
+			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_OMP
+			#pragma omp parallel for simd num_threads(8)
+			#endif
 			for (size_t i = 0; i < width * height; i++) {
 				c0[i] = static_cast<float>(source[i*4]);
 				c1[i] = static_cast<float>(source[i*4+1]);
 				c2[i] = static_cast<float>(source[i*4+2]);
 				c3[i] = static_cast<float>(source[i*4+3]);
 			}
+			#endif
 
 			channels.push_back(c0);
 			channels.push_back(c1);
 			channels.push_back(c2);
 			channels.push_back(c3);
-		}
 
 			break;
+		}
 		default:
 			break;
 		}
@@ -174,7 +230,7 @@ namespace wlib::image
 		return imgOut;
 	}
 
-	ImageSoA& ConvertToGrayscale(ImageSoA& inImg, bool preserveAlpha) {
+	ImageSoA& ConvertToGrayscale(ImageSoA& inImg, bool preserveAlpha, GrayscaleMethod method) {
 		// Converting to grayscale from grayscale...
 		if (inImg.format == F_GrayAlpha || inImg.format == F_Grayscale) {
 			return inImg;
@@ -194,78 +250,250 @@ namespace wlib::image
 
 		alignas(32) auto outGr = new float[inImg.width * inImg.height];
 
-		// Processing with SIMD
-		#if X86_SIMD_LEVEL >= 7
-			const auto redMul = _mm256_set1_ps(0.2126f);
-			const auto greenMul = _mm256_set1_ps(0.7152f);
-			const auto blueMul = _mm256_set1_ps(0.0722f);
-			const auto maxMask = _mm256_set1_ps(255.0f);
+		switch (method)
+		{
+		case GrayscaleMethod::Luminosity:
+		{
+			// Processing with SIMD
+			#if X86_SIMD_LEVEL >= 7
+				const auto redMul = _mm256_set1_ps(0.2126f);
+				const auto greenMul = _mm256_set1_ps(0.7152f);
+				const auto blueMul = _mm256_set1_ps(0.0722f);
+				const auto maxMask = _mm256_set1_ps(255.0f);
 
-			const auto iter_AVX = (inImg.width * inImg.height) / 8;
-			const auto iterRem_AVX = (inImg.width * inImg.height) % 8;
+				const auto iter_AVX = (inImg.width * inImg.height) / 8;
+				const auto iterRem_AVX = (inImg.width * inImg.height) % 8;
 
-			for (size_t i = 0; i < iter_AVX; i++) {
-				const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
-				const auto gChan = _mm256_loadu_ps(inImg.channels[channelGreenN]+i*8);
-				const auto bChan = _mm256_loadu_ps(inImg.channels[channelBlueN]+i*8);
+				for (size_t i = 0; i < iter_AVX; i++) {
+					const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
+					const auto gChan = _mm256_loadu_ps(inImg.channels[channelGreenN]+i*8);
+					const auto bChan = _mm256_loadu_ps(inImg.channels[channelBlueN]+i*8);
 
-				#ifdef X86_SIMD_FMA
-					const auto resultGr = _mm256_min_ps(_mm256_fmadd_ps(rChan, redMul, _mm256_fmadd_ps(gChan, greenMul, _mm256_mul_ps(bChan, blueMul))), maxMask);
-				#else
-					const auto resultGr = _mm256_min_ps(
-						_mm256_add_ps(_mm256_mul_ps(rChan, redMul), _mm256_add_ps(_mm256_mul_ps(gChan, greenMul), _mm256_mul_ps(bChan, blueMul))), maxMask);
-				#endif
+					#ifdef X86_SIMD_FMA
+						const auto resultGr = _mm256_min_ps(_mm256_fmadd_ps(rChan, redMul, _mm256_fmadd_ps(gChan, greenMul, _mm256_mul_ps(bChan, blueMul))), maxMask);
+					#else
+						const auto resultGr = _mm256_min_ps(
+							_mm256_add_ps(_mm256_mul_ps(rChan, redMul), _mm256_add_ps(_mm256_mul_ps(gChan, greenMul), _mm256_mul_ps(bChan, blueMul))), maxMask);
+					#endif
+						_mm256_storeu_ps(outGr+8*i, resultGr);
+				}
+
+				for (size_t i = iter_AVX * 8; i < iterRem_AVX + iter_AVX*8; i++) {
+					if (const auto result = std::fma(inImg.channels[channelRedN][i], 0.2126f, std::fma(inImg.channels[channelGreenN][i], 0.7152f, inImg.channels[channelBlueN][i] * 0.0722f)); result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+
+				_mm256_zeroupper();
+			#elif X86_SIMD_LEVEL >= 1
+				const auto redMul = _mm_set1_ps(0.2126f);
+				const auto greenMul = _mm_set1_ps(0.7152f);
+				const auto blueMul = _mm_set1_ps(0.0722f);
+				const auto maxMask = _mm_set1_ps(255.0f);
+
+				const auto iter_SSE = (inImg.width * inImg.height) / 4;
+				const auto iterRem_SSE = (inImg.width * inImg.height) % 4;
+
+				for (size_t i = 0; i < iter_SSE; i++) {
+					const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
+					const auto gChan = _mm_loadu_ps(inImg.channels[channelGreenN]+i*4);
+					const auto bChan = _mm_loadu_ps(inImg.channels[channelBlueN]+i*4);
+
+					#ifdef X86_SIMD_FMA	// Technically shouldn't be possible
+						const auto resultGr = _mm_min_ps(_mm_fmadd_ps(rChan, redMul, _mm256_fmadd_ps(gChan, greenMul, _mm_mul_ps(bChan, blueMul))), maxMask);
+					#else
+						const auto resultGr = _mm_min_ps(
+							_mm_add_ps(_mm_mul_ps(rChan, redMul), _mm_add_ps(_mm_mul_ps(gChan, greenMul), _mm_mul_ps(bChan, blueMul))), maxMask);
+					#endif
+						_mm_storeu_ps(outGr+4*i, resultGr);
+				}
+
+				for (size_t i = iter_SSE * 4; i < iterRem_SSE + iter_SSE * 4; i++) {
+					if (const auto result = std::fma(inImg.channels[channelRedN][i], 0.2126f, std::fma(inImg.channels[channelGreenN][i], 0.7152f, inImg.channels[channelBlueN][i] * 0.0722f)); result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+			#else
+				for (size_t i = 0; i < inImg.width * inImg.height; i++) {
+					if (const auto result = std::fma(inImg.channels[channelRedN][i], 0.2126f, std::fma(inImg.channels[channelGreenN][i], 0.7152f, inImg.channels[channelBlueN][i] * 0.0722f)); result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+			#endif
+			break;
+		}
+		// TODO: Change division to multiplication
+		case GrayscaleMethod::Lightness:
+		{
+			// Processing with SIMD
+			#if X86_SIMD_LEVEL >= 7
+				const auto maxMask = _mm256_set1_ps(255.0f);
+				const auto divMask = _mm256_set1_ps(0.5f);
+
+				const auto iter_AVX = (inImg.width * inImg.height) / 8;
+				const auto iterRem_AVX = (inImg.width * inImg.height) % 8;
+
+				for (size_t i = 0; i < iter_AVX; i++) {
+					const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
+					const auto gChan = _mm256_loadu_ps(inImg.channels[channelGreenN]+i*8);
+					const auto bChan = _mm256_loadu_ps(inImg.channels[channelBlueN]+i*8);
+
+					const auto maxValues = _mm256_max_ps(rChan, _mm256_max_ps(gChan, bChan));
+					const auto minValues = _mm256_min_ps(rChan, _mm256_min_ps(gChan, bChan));
+
+					#ifdef X86_SIMD_FMA
+					const auto resultGr = _mm256_min_ps(_mm256_fmadd_ps(maxValues, minValues, divMask), maxMask);
+					#else
+					const auto resultGr = _mm256_min_ps(_mm256_mul_ps(_mm256_add_ps(maxValues, minValues), divMask), maxMask);
+					#endif
+
 					_mm256_storeu_ps(outGr+8*i, resultGr);
-			}
-
-			for (size_t i = iter_AVX * 8; i < iterRem_AVX + iter_AVX*8; i++) {
-				if (const auto result = std::fma(inImg.channels[channelRedN][i], 0.2126f, std::fma(inImg.channels[channelGreenN][i], 0.7152f, inImg.channels[channelBlueN][i] * 0.0722f)); result > 255.0f) {
-					outGr[i] = 255.0f;
-				} else {
-					outGr[i] = result;
 				}
-			}
 
-			_mm256_zeroupper();
-		#elif X86_SIMD_LEVEL >= 1
-			const auto redMul = _mm_set1_ps(0.2126f);
-			const auto greenMul = _mm_set1_ps(0.7152f);
-			const auto blueMul = _mm_set1_ps(0.0722f);
-			const auto maxMask = _mm_set1_ps(255.0f);
+				for (size_t i = iter_AVX * 8; i < iterRem_AVX + iter_AVX*8; i++) {
+					const auto maxValue = std::max(std::max(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto minValue = std::min(std::min(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto result = (maxValue + minValue) * 0.5f;
 
-			const auto iter_SSE = (inImg.width * inImg.height) / 4;
-			const auto iterRem_SSE = (inImg.width * inImg.height) % 4;
+					if (result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
 
-			for (size_t i = 0; i < iter_SSE; i++) {
-				const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
-				const auto gChan = _mm_loadu_ps(inImg.channels[channelGreenN]+i*4);
-				const auto bChan = _mm_loadu_ps(inImg.channels[channelBlueN]+i*4);
+				_mm256_zeroupper();
+			#elif X86_SIMD_LEVEL >= 1
+				const auto maxMask = _mm_set1_ps(255.0f);
+				const auto divMask = _mm_set1_ps(0.5f);
 
-				#ifdef X86_SIMD_FMA	// Technically shouldn't be possible
-					const auto resultGr = _mm_min_ps(_mm_fmadd_ps(rChan, redMul, _mm256_fmadd_ps(gChan, greenMul, _mm_mul_ps(bChan, blueMul))), maxMask);
-				#else
-					const auto resultGr = _mm_min_ps(
-						_mm_add_ps(_mm_mul_ps(rChan, redMul), _mm_add_ps(_mm_mul_ps(gChan, greenMul), _mm_mul_ps(bChan, blueMul))), maxMask);
-				#endif
+				const auto iter_SSE = (inImg.width * inImg.height) / 4;
+				const auto iterRem_SSE = (inImg.width * inImg.height) % 4;
+
+				for (size_t i = 0; i < iter_SSE; i++) {
+					const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
+					const auto gChan = _mm_loadu_ps(inImg.channels[channelGreenN]+i*4);
+					const auto bChan = _mm_loadu_ps(inImg.channels[channelBlueN]+i*4);
+
+					const auto maxValues = _mm_max_ps(rChan, _mm_max_ps(gChan, bChan));
+					const auto minValues = _mm_min_ps(rChan, _mm_min_ps(gChan, bChan));
+
+					const auto resultGr = _mm_min_ps(_mm_mul_ps(_mm_add_ps(maxValues, minValues), divMask), maxMask);
+
 					_mm_storeu_ps(outGr+4*i, resultGr);
-			}
+				}
 
-			for (size_t i = iter_SSE * 4; i < iterRem_SSE + iter_SSE * 4; i++) {
-				if (const auto result = std::fma(inImg.channels[channelRedN][i], 0.2126f, std::fma(inImg.channels[channelGreenN][i], 0.7152f, inImg.channels[channelBlueN][i] * 0.0722f)); result > 255.0f) {
-					outGr[i] = 255.0f;
-				} else {
-					outGr[i] = result;
+				for (size_t i = iter_SSE * 4; i < iterRem_SSE + iter_SSE*4; i++) {
+					const auto maxValue = std::max(std::max(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto minValue = std::min(std::min(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto result = (maxValue + minValue) * 0.5f;
+
+					if (result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
 				}
-			}
-		#else
-			for (size_t i = 0; i < inImg.width * inImg.height; i++) {
-				if (const auto result = std::fma(inImg.channels[channelRedN][i], 0.2126f, std::fma(inImg.channels[channelGreenN][i], 0.7152f, inImg.channels[channelBlueN][i] * 0.0722f)); result > 255.0f) {
-					outGr[i] = 255.0f;
-				} else {
-					outGr[i] = result;
+
+			#else
+				for (size_t i = 0; i < inImg.width * inImg.height; i++) {
+					const auto maxValue = std::max(std::max(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto minValue = std::min(std::min(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto result = (maxValue + minValue) * 0.5f;
+
+					if (result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
 				}
-			}
-		#endif
+			#endif
+			break;
+		}
+		case GrayscaleMethod::Average:
+		{
+			// Processing with SIMD
+			#if X86_SIMD_LEVEL >= 7
+				const auto maxMask = _mm256_set1_ps(255.0f);
+				const auto divMask = _mm256_set1_ps(0.3333333333f);
+
+				const auto iter_AVX = (inImg.width * inImg.height) / 8;
+				const auto iterRem_AVX = (inImg.width * inImg.height) % 8;
+
+				for (size_t i = 0; i < iter_AVX; i++) {
+					const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
+					const auto gChan = _mm256_loadu_ps(inImg.channels[channelGreenN]+i*8);
+					const auto bChan = _mm256_loadu_ps(inImg.channels[channelBlueN]+i*8);
+
+					#ifdef X86_SIMD_FMA
+					const auto resultGr = _mm256_min_ps(_mm256_fmadd_ps(_mm256_add_ps(rChan, gChan), bChan, divMask), maxMask);
+					#else
+					const auto resultGr = _mm256_min_ps(_mm256_mul_ps(_mm256_add_ps(rChan, _mm256_add_ps(gChan, bChan)), divMask), maxMask);
+					#endif
+
+					_mm256_storeu_ps(outGr+8*i, resultGr);
+				}
+
+				for (size_t i = iter_AVX * 8; i < iterRem_AVX + iter_AVX*8; i++) {
+					const auto result = (inImg.channels[channelRedN][i] + inImg.channels[channelGreenN][i] + inImg.channels[channelBlueN][i]) * 0.3333333333f;
+
+					if (result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+
+				_mm256_zeroupper();
+			#elif X86_SIMD_LEVEL >= 1
+				const auto maxMask = _mm_set1_ps(255.0f);
+				const auto divMask = _mm_set1_ps(0.3333333333f);
+
+				const auto iter_AVX = (inImg.width * inImg.height) / 4;
+				const auto iterRem_AVX = (inImg.width * inImg.height) % 4;
+
+				for (size_t i = 0; i < iter_AVX; i++) {
+					const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
+					const auto gChan = _mm_loadu_ps(inImg.channels[channelGreenN]+i*4);
+					const auto bChan = _mm_loadu_ps(inImg.channels[channelBlueN]+i*4);
+
+					const auto resultGr = _mm_min_ps(_mm_mul_ps(_mm_add_ps(rChan, _mm_add_ps(gChan, bChan)), divMask), maxMask);
+
+					_mm_storeu_ps(outGr+4*i, resultGr);
+				}
+
+				for (size_t i = iter_AVX * 4; i < iterRem_AVX + iter_AVX*4; i++) {
+					const auto result = (inImg.channels[channelRedN][i] + inImg.channels[channelGreenN][i] + inImg.channels[channelBlueN][i]) * 0.3333333333f;
+
+					if (result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+
+			#else
+				for (size_t i = 0; i < inImg.width * inImg.height; i++) {
+					const auto result = (inImg.channels[channelRedN][i] + inImg.channels[channelGreenN][i] + inImg.channels[channelBlueN][i]) * 0.3333333333f;
+
+					if (result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+			#endif
+			break;
+		}
+		default:
+			break;
+		}
 
 		// Copy channels
 		if (inImg.format == F_RGB || inImg.format == F_BGR || !preserveAlpha) {
