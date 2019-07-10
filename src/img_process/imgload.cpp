@@ -2,7 +2,10 @@
 #include "../../include/cpu_detection.hpp"
 #include <fstream>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
 #include "../../external/stb/stb_image.h"
+#pragma clang diagnostic pop
 
 #ifdef __x86_64__
 	#include <immintrin.h>
@@ -48,8 +51,8 @@ namespace wlib::image
 		int chan;
 		uint8_t* stbpix;
 
-		char bmpIdent[2];
-		f.read(bmpIdent, 2);
+		std::array<char, 2> bmpIdent;
+		f.read(bmpIdent.data(), 2);
 		f.seekg(0);
 
 		switch (requestedFormat)
@@ -110,14 +113,11 @@ namespace wlib::image
 		{
 		case ColorFormat::F_Grayscale:
 			return width * height;
-			break;
 		case ColorFormat::F_GrayAlpha:
 			return width * height * 2;
-			break;
 		case ColorFormat::F_RGB:
 		case ColorFormat::F_BGR:
 			return width * height * 3;
-			break;
 		case ColorFormat::F_Default:
 		case ColorFormat::F_RGBA:
 		case ColorFormat::F_BGRA:

@@ -63,7 +63,7 @@ namespace image
 		inline auto GetWidth()  const noexcept { return width;  }
 		inline auto GetHeight() const noexcept { return height; }
 		inline auto GetFormat() const noexcept { return format; }
-		inline const auto GetPixels() const noexcept { return pixels.data(); }
+		inline auto GetPixels() const noexcept { return pixels.data(); }
 
 		static size_t GetTotalImageSize(const uint64_t width, const uint64_t height, const ColorFormat format) noexcept;
 	};
