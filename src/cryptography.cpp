@@ -341,40 +341,40 @@ namespace crypto
 		throw wlib::module_not_built(errMsg);
 	}
 	#endif
-	uint16_t CRC16ARC(uint8_t* first, uint8_t* last) {
+	uint16_t CRC16ARC(uint8_t* /*first*/, uint8_t* /*last*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	uint16_t CRC16DNP(uint8_t* first, uint8_t* last) {
+	uint16_t CRC16DNP(uint8_t* /*first*/, uint8_t* /*last*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	uint16_t CRC16MAXIM(uint8_t* first, uint8_t* last) {
+	uint16_t CRC16MAXIM(uint8_t* /*first*/, uint8_t* /*last*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	uint16_t CRC16USB(uint8_t* first, uint8_t* last) {
+	uint16_t CRC16USB(uint8_t* /*first*/, uint8_t* /*last*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	uint16_t CRC16X_25(uint8_t* first, uint8_t* last) {
+	uint16_t CRC16X_25(uint8_t* /*first*/, uint8_t* /*last*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	uint32_t CRC32(uint8_t* first, uint8_t* last) {
+	uint32_t CRC32(uint8_t* /*first*/, uint8_t* /*last*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	uint32_t CRC32C(uint8_t* first, uint8_t* last) {
+	uint32_t CRC32C(uint8_t* /*first*/, uint8_t* /*last*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	uint32_t CRC32D(uint8_t* first, uint8_t* last) {
+	uint32_t CRC32D(uint8_t* /*first*/, uint8_t* /*last*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	uint32_t CRC32AUTOSAR(uint8_t* first, uint8_t* last) {
+	uint32_t CRC32AUTOSAR(uint8_t* /*first*/, uint8_t* /*last*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	uint32_t CRC32JAMCRC(uint8_t* first, uint8_t* last) {
+	uint32_t CRC32JAMCRC(uint8_t* /*first*/, uint8_t* /*last*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	uint64_t CRC64XZ(uint8_t* first, uint8_t* last) {
+	uint64_t CRC64XZ(uint8_t* /*first*/, uint8_t* /*last*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	uint64_t CRC64ISO(uint8_t* first, uint8_t* last) {
+	uint64_t CRC64ISO(uint8_t* /*first*/, uint8_t* /*last*/) {
 		throw wlib::module_not_built(errMsg);
 	}
 	#endif // WEIRDLIB_ENABLE_CRYPTOGRAPHY

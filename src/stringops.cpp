@@ -4,9 +4,7 @@
 #include <algorithm>
 #include <cstring>
 
-namespace wlib
-{
-namespace str
+namespace wlib::str
 {
 	#ifdef WEIRDLIB_ENABLE_STRING_OPERATIONS
 	size_t strlen(const char* s) {
@@ -231,21 +229,19 @@ namespace str
 
 	constexpr const char* errMsg = "This function is a stub - stringops module was disabled for this compilation";
 
-	size_t strlen(const char* s) {
+	size_t strlen(const char* /*s*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	bool strcmp(const char* str0, const char* str1) {
+	bool strcmp(const char* /*str0*/, const char* /*str1*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	bool strcmp(const char* str0, const char* str1, const size_t len) {
+	bool strcmp(const char* /*str0*/, const char* /*str1*/, const size_t /*len*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	bool strncmp(const char* str0, const char* str1, const size_t len) {
+	bool strncmp(const char* /*str0*/, const char* /*str1*/, const size_t /*len*/) {
 		throw wlib::module_not_built(errMsg);
 	}
 
 	#endif // WEIRDLIB_ENABLE_STRING_OPERATIONS
 
-} // namespace str
-
-} // wlib
+} // wlib::str
