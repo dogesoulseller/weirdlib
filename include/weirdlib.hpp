@@ -5,6 +5,7 @@
 #include "weirdlib_string.hpp"
 #include "weirdlib_crypto.hpp"
 #include "weirdlib_image.hpp"
+#include "weirdlib_fileops.hpp"
 
 namespace wlib
 {
