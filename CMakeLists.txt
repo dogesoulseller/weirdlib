@@ -3,6 +3,7 @@ project(weirdlib C CXX)
 
 add_compile_definitions(WEIRDLIB_MTMODE_NONE=0 WEIRDLIB_MTMODE_TBB=1 WEIRDLIB_MTMODE_OMP=2)
 
+option(WEIRDLIB_INSTRUMENT_COVERAGE "Enable generating coverage instrumentation" OFF)
 option(WEIRDLIB_BUILD_DOCS "Enable building documentation" ON)
 option(WEIRDLIB_ENABLE_TESTING "Enable building test target" ON)
 option(WEIRDLIB_ENABLE_BENCHMARKS "(Stub) Enable building benchmark target" ON)
@@ -48,9 +49,18 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
 endif(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_RELWITHDEBINFO} -g3 -O2 -Wno-unknown-pragmas")
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -g3 -O2 -Wno-unknown-pragmas")
+	set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -g3 -O2 -Wno-unknown-pragmas")
+	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -g3 -O2 -Wno-unknown-pragmas")
 endif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -mtune=native -mllvm -polly -fstandalone-debug -Wno-c++98-compat-pedantic -Wno-switch-enum -Wno-covered-switch-default -Wno-exit-time-destructors -Wno-missing-variable-declarations -Wno-global-constructors -Wno-c++98-c++11-c++14-compat -Wno-c++98-compat -Wno-pedantic -Wno-c++98-c++11-compat-binary-literal")
+# set(CMAKE_CXX_FLAGS "-march=native -mtune=native -mavx512f -mavx512bw -mavx512dq -mavx512vl -fstandalone-debug")
+
+# Clang instrumentation
+if(WEIRDLIB_INSTRUMENT_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
+endif(WEIRDLIB_INSTRUMENT_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
 # Primary build target
 add_library(weirdlib ${WEIRDLIB_SOURCES})
@@ -69,14 +79,12 @@ if(WEIRDLIB_ENABLE_MULTITHREADING)
 
 endif(WEIRDLIB_ENABLE_MULTITHREADING)
 
-
-
 # Conditionally enable building cryptography module
 if(WEIRDLIB_ENABLE_BUILD_CRYPTO)
 	target_compile_definitions(weirdlib PUBLIC WEIRDLIB_ENABLE_CRYPTOGRAPHY)
 endif(WEIRDLIB_ENABLE_BUILD_CRYPTO)
 
-#Conditionally enable building string operations module
+# Conditionally enable building string operations module
 if(WEIRDLIB_ENABLE_BUILD_STRINGOPS)
 	target_compile_definitions(weirdlib PUBLIC WEIRDLIB_ENABLE_STRING_OPERATIONS)
 endif(WEIRDLIB_ENABLE_BUILD_STRINGOPS)
@@ -86,8 +94,6 @@ if(WEIRDLIB_ENABLE_PREFETCH)
 	target_compile_definitions(weirdlib PUBLIC WLIB_ENABLE_PREFETCH)
 endif(WEIRDLIB_ENABLE_PREFETCH)
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -mtune=native -mllvm -polly -fstandalone-debug -Weverything -Wno-missing-variable-declarations -Wno-global-constructors -Wno-c++98-c++11-c++14-compat -Wno-c++98-compat -Wno-pedantic -Wno-c++98-c++11-compat-binary-literal")
-# set(CMAKE_CXX_FLAGS "-march=native -mtune=native -mavx512f -mavx512bw -mavx512dq -mavx512vl -fstandalone-debug")
 
 # API Documentation
 if(WEIRDLIB_BUILD_DOCS)
@@ -138,4 +144,25 @@ if(WEIRDLIB_ENABLE_TESTING)
 	target_compile_definitions(weirdlib_tests PUBLIC WLIBTEST_TESTING_DIRECTORY=\"${CMAKE_CURRENT_LIST_DIR}/tests/\")
 
 	gtest_add_tests(TARGET weirdlib_tests SOURCES ${WEIRDLIB_TEST_SOURCES} WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/tests/")
+
+	# Coverage information
+	if(WEIRDLIB_INSTRUMENT_COVERAGE)
+		set(TEST_EXECUTABLE_TARGET_NAME weirdlib_tests)
+
+		add_custom_target(wlib-coverage
+			COMMAND LLVM_PROFILE_FILE=${TEST_EXECUTABLE_TARGET_NAME}.profraw $<TARGET_FILE:${TEST_EXECUTABLE_TARGET_NAME}>
+			COMMAND llvm-profdata merge -sparse ${TEST_EXECUTABLE_TARGET_NAME}.profraw -o ${TEST_EXECUTABLE_TARGET_NAME}.profdata
+			COMMAND llvm-cov report $<TARGET_FILE:${TEST_EXECUTABLE_TARGET_NAME}> -instr-profile=${TEST_EXECUTABLE_TARGET_NAME}.profdata
+				-ignore-filename-regex="external|traits" -use-color=true ${WEIRDLIB_SOURCES}
+			DEPENDS ${TEST_EXECUTABLE_TARGET_NAME}
+		)
+
+		add_custom_target(wlib-coverage-html
+			COMMAND llvm-cov show $<TARGET_FILE:${TEST_EXECUTABLE_TARGET_NAME}> -instr-profile=${TEST_EXECUTABLE_TARGET_NAME}.profdata
+				-show-line-counts-or-regions -ignore-filename-regex="external|traits"
+				-output-dir=${CMAKE_CURRENT_LIST_DIR}/coverage -format="html"
+			DEPENDS wlib-coverage
+		)
+	endif(WEIRDLIB_INSTRUMENT_COVERAGE)
+
 endif(WEIRDLIB_ENABLE_TESTING)
