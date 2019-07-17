@@ -27,6 +27,17 @@ const auto mp4FilePath = fileOpDir / "mp4.mp4";
 const auto flvFilePath = fileOpDir / "flv.flv";
 const auto f4vFilePath = fileOpDir / "f4v.f4v";
 const auto webmFilePath = fileOpDir / "webm.webm";
+const auto waveFilePath = fileOpDir / "wav.wav";
+const auto oggFilePath = fileOpDir / "ogg.ogg";
+const auto apeFilePath = fileOpDir / "ape.ape";
+const auto ttaFilePath = fileOpDir / "tta.tta";
+const auto wvpackFilePath = fileOpDir / "wv.wv";
+const auto flacFilePath = fileOpDir / "flac.flac";
+const auto cafFilePath = fileOpDir / "caf.caf";
+const auto ofrFilePath = fileOpDir / "ofr.ofr";
+const auto _3gpFilePath = fileOpDir / "3gp.3gp";
+const auto _3g2FilePath = fileOpDir / "3g2.3g2";
+const auto aiffFilePath = fileOpDir / "aiff.aiff";
 
 TEST(WlibFileop, DetectType) {
 	EXPECT_EQ(wlib::file::DetectFileType(bmpFilePath), wlib::file::FileType::FILETYPE_BMP);
@@ -46,6 +57,7 @@ TEST(WlibFileop, DetectType) {
 
 	EXPECT_EQ(wlib::file::DetectFileType(webpFilePath), wlib::file::FileType::FILETYPE_WEBP);
 	EXPECT_EQ(wlib::file::DetectFileType(aviFilePath), wlib::file::FileType::FILETYPE_AVI);
+	EXPECT_EQ(wlib::file::DetectFileType(waveFilePath), wlib::file::FileType::FILETYPE_WAVE);
 
 	EXPECT_EQ(wlib::file::DetectFileType(pbmFilePath), wlib::file::FileType::FILETYPE_PBM);
 	EXPECT_EQ(wlib::file::DetectFileType(pgmFilePath), wlib::file::FileType::FILETYPE_PGM);
@@ -66,6 +78,25 @@ TEST(WlibFileop, DetectType) {
 	EXPECT_EQ(wlib::file::DetectFileType(f4vFilePath), wlib::file::FileType::FILETYPE_F4V);
 
 	EXPECT_EQ(wlib::file::DetectFileType(webmFilePath), wlib::file::FileType::FILETYPE_WEBM);
+
+	EXPECT_EQ(wlib::file::DetectFileType(oggFilePath), wlib::file::FileType::FILETYPE_OGG);
+
+	EXPECT_EQ(wlib::file::DetectFileType(apeFilePath), wlib::file::FileType::FILETYPE_APE);
+
+	EXPECT_EQ(wlib::file::DetectFileType(ttaFilePath), wlib::file::FileType::FILETYPE_TTA);
+
+	EXPECT_EQ(wlib::file::DetectFileType(wvpackFilePath), wlib::file::FileType::FILETYPE_WAVPACK);
+
+	EXPECT_EQ(wlib::file::DetectFileType(flacFilePath), wlib::file::FileType::FILETYPE_FLAC);
+
+	EXPECT_EQ(wlib::file::DetectFileType(cafFilePath), wlib::file::FileType::FILETYPE_CAF);
+
+	EXPECT_EQ(wlib::file::DetectFileType(ofrFilePath), wlib::file::FileType::FILETYPE_OPTIMFROG);
+
+	EXPECT_EQ(wlib::file::DetectFileType(_3gpFilePath), wlib::file::FileType::FILETYPE_3GP);
+	EXPECT_EQ(wlib::file::DetectFileType(_3g2FilePath), wlib::file::FileType::FILETYPE_3G2);
+
+	EXPECT_EQ(wlib::file::DetectFileType(aiffFilePath), wlib::file::FileType::FILETYPE_AIFF);
 }
 
 TEST(WlibFileop, FiletypeExtension) {
@@ -86,6 +117,7 @@ TEST(WlibFileop, FiletypeExtension) {
 
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_WEBP), ".webp");
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_AVI), ".avi");
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_WAVE), ".wav");
 
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PBM), ".pbm");
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PGM), ".pgm");
@@ -106,4 +138,25 @@ TEST(WlibFileop, FiletypeExtension) {
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_F4V), ".f4v");
 
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_WEBM), ".webm");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_OGG), ".ogg");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_APE), ".ape");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_TTA), ".tta");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_WAVPACK), ".wv");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_FLAC), ".flac");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_CAF), ".caf");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_OPTIMFROG), ".ofr");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_3GP), ".3gp");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_3G2), ".3g2");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_AIFF), ".aiff");
+
 }

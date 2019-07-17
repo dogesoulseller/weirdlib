@@ -52,12 +52,8 @@ namespace wlib::file
 		std::array<uint8_t, 256> header;
 		f.read(reinterpret_cast<char*>(header.data()), 256);
 
-		if (std::search(header.begin(), header.end(), std::default_searcher(mpeg4_1.begin(), mpeg4_1.end())) == header.end()
-		  && std::search(header.begin(), header.end(), std::default_searcher(mpeg4_2.begin(), mpeg4_2.end())) == header.end()) {
-			  return false;
-			}
-
-		return true;
+		return std::search(header.begin(), header.end(), std::default_searcher(mpeg4_1.begin(), mpeg4_1.end())) != header.end()
+			|| std::search(header.begin(), header.end(), std::default_searcher(mpeg4_2.begin(), mpeg4_2.end())) != header.end();
 	}
 
 	static bool isF4V(const std::string& path) {
@@ -68,6 +64,38 @@ namespace wlib::file
 		f.read(reinterpret_cast<char*>(header.data()), 64);
 
 		return std::search(header.begin(), header.end(), std::default_searcher(ident.begin(), ident.end())) != header.end();
+	}
+
+	static bool is3GP(const std::string& path) {
+		std::ifstream f(path, std::ios::binary);
+		std::array<uint8_t, 7> ident {'f', 't', 'y', 'p', '3', 'g', 'p'};
+
+		std::array<uint8_t, 64> header;
+		f.read(reinterpret_cast<char*>(header.data()), 64);
+
+		return std::search(header.begin(), header.end(), std::default_searcher(ident.begin(), ident.end())) != header.end();
+	}
+
+	static bool is3G2(const std::string& path) {
+		std::ifstream f(path, std::ios::binary);
+		std::array<uint8_t, 7> ident {'f', 't', 'y', 'p', '3', 'g', '2'};
+
+		std::array<uint8_t, 64> header;
+		f.read(reinterpret_cast<char*>(header.data()), 64);
+
+		return std::search(header.begin(), header.end(), std::default_searcher(ident.begin(), ident.end())) != header.end();
+	}
+
+	static bool isAIFF(const std::string& path) {
+		std::ifstream f(path, std::ios::binary);
+		std::array<uint8_t, 4> ident {'F', 'O', 'R', 'M'};
+		std::array<uint8_t, 4> ident_aiff {'A', 'I', 'F', 'F'};
+
+		std::array<uint8_t, 128> header;
+		f.read(reinterpret_cast<char*>(header.data()), 128);
+
+		auto isFORM = std::search(header.begin(), header.begin()+4, std::default_searcher(ident.begin(), ident.end())) != header.end();
+		return std::search(header.begin(), header.end(), std::default_searcher(ident_aiff.begin(), ident_aiff.end())) != header.end() && isFORM;
 	}
 
 	FileType DetectFileType(const std::string& path) {
@@ -140,6 +168,10 @@ namespace wlib::file
 			// AVI
 			detectedType = MatchIdentifier(AVI_IDENTIFIER, headerTemp, 8) ? FILETYPE_AVI : detectedType;
 			if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+			// WAVE
+			detectedType = MatchIdentifier(WAVE_IDENTIFIER, headerTemp, 8) ? FILETYPE_WAVE : detectedType;
+			if (detectedType != FILETYPE_UNKNOWN) return detectedType;
 		}
 
 		// FLIF
@@ -162,11 +194,51 @@ namespace wlib::file
 		detectedType = MatchIdentifier(WEBM_IDENTIFIER, headerTemp, 0x18) || MatchIdentifier(WEBM_IDENTIFIER, headerTemp, 0x1F) ? FILETYPE_WEBM : detectedType;
 		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
 
+		// Ogg
+		detectedType = MatchIdentifier(OGG_IDENTIFIER, headerTemp) ? FILETYPE_OGG : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// APE
+		detectedType = MatchIdentifier(APE_IDENTIFIER, headerTemp) ? FILETYPE_APE : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// TTA
+		detectedType = MatchIdentifier(TTA1_IDENTIFIER, headerTemp) || MatchIdentifier(TTA2_IDENTIFIER, headerTemp) ? FILETYPE_TTA : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// WavPack
+		detectedType = MatchIdentifier(WAVPACK_IDENTIFIER, headerTemp) ? FILETYPE_WAVPACK : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// FLAC
+		detectedType = MatchIdentifier(FLAC_IDENTIFIER, headerTemp) ? FILETYPE_FLAC : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// Core Audio
+		detectedType = MatchIdentifier(CAF_IDENTIFIER, headerTemp) ? FILETYPE_CAF : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// OptimFROG
+		detectedType = MatchIdentifier(OPTIMFROG_IDENTIFIER, headerTemp) ? FILETYPE_OPTIMFROG : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
 		// PNM / PAM - keep last, error prone
 		detectedType = MatchIdentifier(PBM_ASCII_IDENTIFIER, headerTemp) || MatchIdentifier(PBM_BIN_IDENTIFIER, headerTemp) ? FILETYPE_PBM : detectedType;
 		detectedType = MatchIdentifier(PGM_ASCII_IDENTIFIER, headerTemp) || MatchIdentifier(PGM_BIN_IDENTIFIER, headerTemp) ? FILETYPE_PGM : detectedType;
 		detectedType = MatchIdentifier(PPM_ASCII_IDENTIFIER, headerTemp) || MatchIdentifier(PPM_BIN_IDENTIFIER, headerTemp) ? FILETYPE_PPM : detectedType;
 		detectedType = MatchIdentifier(PAM_IDENTIFIER, headerTemp) ? FILETYPE_PAM : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// AIFF - keep last, expensive
+		detectedType = isAIFF(path) ? FILETYPE_AIFF : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// 3GP - keep last, expensive
+		detectedType = is3GP(path) ? FILETYPE_3GP : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// 3G2 - keep last, expensive
+		detectedType = is3G2(path) ? FILETYPE_3G2 : detectedType;
 		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
 
 		// F4V - keep last, expensive

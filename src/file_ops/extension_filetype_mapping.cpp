@@ -49,6 +49,28 @@ namespace wlib::file
 			return ".f4v";
 		case FILETYPE_WEBM:
 			return ".webm";
+		case FILETYPE_WAVE:
+			return ".wav";
+		case FILETYPE_OGG:
+			return ".ogg";
+		case FILETYPE_APE:
+			return ".ape";
+		case FILETYPE_TTA:
+			return ".tta";
+		case FILETYPE_WAVPACK:
+			return ".wv";
+		case FILETYPE_FLAC:
+			return ".flac";
+		case FILETYPE_CAF:
+			return ".caf";
+		case FILETYPE_OPTIMFROG:
+			return ".ofr";
+		case FILETYPE_3GP:
+			return ".3gp";
+		case FILETYPE_3G2:
+			return ".3g2";
+		case FILETYPE_AIFF:
+			return ".aiff";
 		case FILETYPE_UNKNOWN:
 		default:
 			return "";
