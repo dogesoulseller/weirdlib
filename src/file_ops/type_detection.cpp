@@ -1,4 +1,6 @@
 #include "../../include/weirdlib_fileops.hpp"
+#include "../../include/cpu_detection.hpp"
+
 #include "magic_numbers.hpp"
 
 #include <string_view>
@@ -25,21 +27,47 @@ namespace wlib::file
 	static bool isSVG(const std::string& path) {
 		std::ifstream f(path, std::ios::ate | std::ios::binary);
 		f.seekg(0);
-		const char* xmlHeader = "<?xml";
-		const char* svgStart = "<svg";
+		std::array<uint8_t, 5> xmlHeader {'<', '?', 'x', 'm', 'l'};
+		std::array<uint8_t, 4> svgStart = {'<', 's', 'v', 'g'};
 
 		std::array<uint8_t, 16384> svgBuffer;
 		std::array<uint8_t, 512> headerStuff;
 		f.read(reinterpret_cast<char*>(headerStuff.data()), 512);
 		f.seekg(0);
-		std::string headerStr(reinterpret_cast<char*>(headerStuff.data()));
 
-		if (headerStr.find(xmlHeader) == std::string::npos) return false;
+		if (std::search(headerStuff.begin(), headerStuff.end(), std::default_searcher(xmlHeader.begin(), xmlHeader.end())) == headerStuff.end()) {
+			return false;
+		}
 
 		f.read(reinterpret_cast<char*>(svgBuffer.data()), 16384);
-		std::string svgStr(reinterpret_cast<char*>(svgBuffer.data()));
 
-		return svgStr.find(svgStart) != std::string::npos;
+		return std::search(svgBuffer.begin(), svgBuffer.end(), std::boyer_moore_horspool_searcher(svgStart.begin(), svgStart.end())) != svgBuffer.end();
+	}
+
+	static bool isMPEG4(const std::string& path) {
+		std::ifstream f(path, std::ios::binary);
+		std::array<uint8_t, 4> mpeg4_1 {'m', 'p', '4', '1'};
+		std::array<uint8_t, 4> mpeg4_2 {'m', 'p', '4', '2'};
+
+		std::array<uint8_t, 256> header;
+		f.read(reinterpret_cast<char*>(header.data()), 256);
+
+		if (std::search(header.begin(), header.end(), std::default_searcher(mpeg4_1.begin(), mpeg4_1.end())) == header.end()
+		  && std::search(header.begin(), header.end(), std::default_searcher(mpeg4_2.begin(), mpeg4_2.end())) == header.end()) {
+			  return false;
+			}
+
+		return true;
+	}
+
+	static bool isF4V(const std::string& path) {
+		std::ifstream f(path, std::ios::binary);
+		std::array<uint8_t, 7> ident {'f', 't', 'y', 'p', 'f', '4', 'v'};
+
+		std::array<uint8_t, 64> header;
+		f.read(reinterpret_cast<char*>(header.data()), 64);
+
+		return std::search(header.begin(), header.end(), std::default_searcher(ident.begin(), ident.end())) != header.end();
 	}
 
 	FileType DetectFileType(const std::string& path) {
@@ -50,8 +78,15 @@ namespace wlib::file
 		// size_t fileSize = f.tellg();
 		f.seekg(0);
 
-		std::array<uint8_t, 16> headerTemp;
-		f.read(reinterpret_cast<char*>(headerTemp.data()), 16);
+		std::array<uint8_t, 64> headerTemp;
+		f.read(reinterpret_cast<char*>(headerTemp.data()), 64);
+
+		// Wait for sync
+		f.sync();
+
+		#if defined(WLIB_ENABLE_PREFETCH)
+			_mm_prefetch(headerTemp.data(), _MM_HINT_T0);
+		#endif
 
 		// BMP
 		detectedType = MatchIdentifier(BMP_IDENTIFIER, headerTemp) ? FILETYPE_BMP : detectedType;
@@ -101,6 +136,10 @@ namespace wlib::file
 			// WebP
 			detectedType = MatchIdentifier(WEBP_IDENTIFIER, headerTemp, 8) ? FILETYPE_WEBP : detectedType;
 			if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+			// AVI
+			detectedType = MatchIdentifier(AVI_IDENTIFIER, headerTemp, 8) ? FILETYPE_AVI : detectedType;
+			if (detectedType != FILETYPE_UNKNOWN) return detectedType;
 		}
 
 		// FLIF
@@ -111,6 +150,18 @@ namespace wlib::file
 		detectedType = MatchIdentifier(PDF_IDENTIFIER, headerTemp) ? FILETYPE_PDF : detectedType;
 		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
 
+		// Matroska
+		detectedType = MatchIdentifier(MATROSKA_IDENTIFIER, headerTemp, 0x18) || MatchIdentifier(MATROSKA_IDENTIFIER, headerTemp, 0x1F) ? FILETYPE_MATROSKA : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// FLV
+		detectedType = MatchIdentifier(FLV_IDENTIFIER, headerTemp) ? FILETYPE_FLV : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// WebM
+		detectedType = MatchIdentifier(WEBM_IDENTIFIER, headerTemp, 0x18) || MatchIdentifier(WEBM_IDENTIFIER, headerTemp, 0x1F) ? FILETYPE_WEBM : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
 		// PNM / PAM - keep last, error prone
 		detectedType = MatchIdentifier(PBM_ASCII_IDENTIFIER, headerTemp) || MatchIdentifier(PBM_BIN_IDENTIFIER, headerTemp) ? FILETYPE_PBM : detectedType;
 		detectedType = MatchIdentifier(PGM_ASCII_IDENTIFIER, headerTemp) || MatchIdentifier(PGM_BIN_IDENTIFIER, headerTemp) ? FILETYPE_PGM : detectedType;
@@ -118,7 +169,15 @@ namespace wlib::file
 		detectedType = MatchIdentifier(PAM_IDENTIFIER, headerTemp) ? FILETYPE_PAM : detectedType;
 		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
 
-		// SVG
+		// F4V - keep last, expensive
+		detectedType = isF4V(path) ? FILETYPE_F4V : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// MPEG-4 - keep last, expensive
+		detectedType = isMPEG4(path) ? FILETYPE_MP4 : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// SVG - keep last, expensive
 		detectedType = isSVG(path) ? FILETYPE_SVG : detectedType;
 		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
 

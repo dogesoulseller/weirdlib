@@ -26,7 +26,13 @@ namespace file
 		FILETYPE_PPM,
 		FILETYPE_PAM,
 		FILETYPE_SVG,
-		FILETYPE_PDF
+		FILETYPE_PDF,
+		FILETYPE_MATROSKA,
+		FILETYPE_AVI,
+		FILETYPE_MP4,
+		FILETYPE_FLV,
+		FILETYPE_F4V,
+		FILETYPE_WEBM
 	};
 
 	/// Detect file type based on identifying features

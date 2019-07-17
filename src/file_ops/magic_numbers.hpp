@@ -27,6 +27,7 @@ namespace wlib::file
 
 	constexpr std::array<uint8_t, 4> RIFF_IDENTIFIER {'R', 'I', 'F', 'F'};
 	constexpr std::array<uint8_t, 4> WEBP_IDENTIFIER {'W', 'E', 'B', 'P'};
+	constexpr std::array<uint8_t, 3> AVI_IDENTIFIER {'A', 'V', 'I'};
 
 	constexpr std::array<uint8_t, 2> PBM_ASCII_IDENTIFIER {'P', '1'};
 	constexpr std::array<uint8_t, 2> PBM_BIN_IDENTIFIER {'P', '4'};
@@ -40,5 +41,11 @@ namespace wlib::file
 	constexpr std::array<uint8_t, 2> PAM_IDENTIFIER {'P', '7'};
 
 	constexpr std::array<uint8_t, 4> FLIF_IDENTIFIER {'F', 'L', 'I', 'F'};
+
+	constexpr std::array<uint8_t, 8> MATROSKA_IDENTIFIER {'m', 'a', 't', 'r', 'o', 's', 'k', 'a'};
+
+	constexpr std::array<uint8_t, 3> FLV_IDENTIFIER {'F', 'L', 'V'};
+
+	constexpr std::array<uint8_t, 4> WEBM_IDENTIFIER {'w', 'e', 'b', 'm'};
 
 } // namespace wlib::file

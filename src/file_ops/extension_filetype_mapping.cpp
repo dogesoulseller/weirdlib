@@ -37,6 +37,18 @@ namespace wlib::file
 			return ".svg";
 		case FILETYPE_PDF:
 			return ".pdf";
+		case FILETYPE_MATROSKA:
+			return ".mkv";
+		case FILETYPE_AVI:
+			return ".avi";
+		case FILETYPE_MP4:
+			return ".mp4";
+		case FILETYPE_FLV:
+			return ".flv";
+		case FILETYPE_F4V:
+			return ".f4v";
+		case FILETYPE_WEBM:
+			return ".webm";
 		case FILETYPE_UNKNOWN:
 		default:
 			return "";

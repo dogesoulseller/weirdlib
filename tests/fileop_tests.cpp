@@ -21,6 +21,12 @@ const auto pamFilePath = fileOpDir / "pam.pam";
 const auto webpFilePath = fileOpDir / "webp.webp";
 const auto flifFilePath = fileOpDir / "flif.flif";
 const auto svgFilePath = fileOpDir / "svg.svg";
+const auto mkvFilePath = fileOpDir / "mkv.mkv";
+const auto aviFilePath = fileOpDir / "avi.avi";
+const auto mp4FilePath = fileOpDir / "mp4.mp4";
+const auto flvFilePath = fileOpDir / "flv.flv";
+const auto f4vFilePath = fileOpDir / "f4v.f4v";
+const auto webmFilePath = fileOpDir / "webm.webm";
 
 TEST(WlibFileop, DetectType) {
 	EXPECT_EQ(wlib::file::DetectFileType(bmpFilePath), wlib::file::FileType::FILETYPE_BMP);
@@ -39,6 +45,7 @@ TEST(WlibFileop, DetectType) {
 	EXPECT_EQ(wlib::file::DetectFileType(psbFilePath), wlib::file::FileType::FILETYPE_PSB);
 
 	EXPECT_EQ(wlib::file::DetectFileType(webpFilePath), wlib::file::FileType::FILETYPE_WEBP);
+	EXPECT_EQ(wlib::file::DetectFileType(aviFilePath), wlib::file::FileType::FILETYPE_AVI);
 
 	EXPECT_EQ(wlib::file::DetectFileType(pbmFilePath), wlib::file::FileType::FILETYPE_PBM);
 	EXPECT_EQ(wlib::file::DetectFileType(pgmFilePath), wlib::file::FileType::FILETYPE_PGM);
@@ -49,6 +56,16 @@ TEST(WlibFileop, DetectType) {
 	EXPECT_EQ(wlib::file::DetectFileType(svgFilePath), wlib::file::FileType::FILETYPE_SVG);
 
 	EXPECT_EQ(wlib::file::DetectFileType(pdfFilePath), wlib::file::FileType::FILETYPE_PDF);
+
+	EXPECT_EQ(wlib::file::DetectFileType(mkvFilePath), wlib::file::FileType::FILETYPE_MATROSKA);
+
+	EXPECT_EQ(wlib::file::DetectFileType(mp4FilePath), wlib::file::FileType::FILETYPE_MP4);
+
+	EXPECT_EQ(wlib::file::DetectFileType(flvFilePath), wlib::file::FileType::FILETYPE_FLV);
+
+	EXPECT_EQ(wlib::file::DetectFileType(f4vFilePath), wlib::file::FileType::FILETYPE_F4V);
+
+	EXPECT_EQ(wlib::file::DetectFileType(webmFilePath), wlib::file::FileType::FILETYPE_WEBM);
 }
 
 TEST(WlibFileop, FiletypeExtension) {
@@ -68,6 +85,7 @@ TEST(WlibFileop, FiletypeExtension) {
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PSB), ".psb");
 
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_WEBP), ".webp");
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_AVI), ".avi");
 
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PBM), ".pbm");
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PGM), ".pgm");
@@ -78,4 +96,14 @@ TEST(WlibFileop, FiletypeExtension) {
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_SVG), ".svg");
 
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PDF), ".pdf");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_MATROSKA), ".mkv");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_MP4), ".mp4");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_FLV), ".flv");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_F4V), ".f4v");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_WEBM), ".webm");
 }
