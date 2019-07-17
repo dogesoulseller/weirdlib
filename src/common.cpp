@@ -1,7 +1,7 @@
 #include "common.hpp"
 #include <thread>
 
-static const auto CPU_CORE_COUNT = std::thread::hardware_concurrency();
+static const auto CPU_CORE_COUNT = static_cast<int>(std::thread::hardware_concurrency());
 
 int getImagePreferredThreadCount(int width, int height) {
 	int numThreadsLocal = -1;
