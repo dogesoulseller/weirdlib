@@ -27,8 +27,8 @@ namespace wlib::file
 	static bool isSVG(const std::string& path) {
 		std::ifstream f(path, std::ios::ate | std::ios::binary);
 		f.seekg(0);
-		std::array<uint8_t, 5> xmlHeader {'<', '?', 'x', 'm', 'l'};
-		std::array<uint8_t, 4> svgStart = {'<', 's', 'v', 'g'};
+		constexpr std::array<uint8_t, 5> xmlHeader {'<', '?', 'x', 'm', 'l'};
+		constexpr std::array<uint8_t, 4> svgStart = {'<', 's', 'v', 'g'};
 
 		std::array<uint8_t, 16384> svgBuffer;
 		std::array<uint8_t, 512> headerStuff;
@@ -46,8 +46,8 @@ namespace wlib::file
 
 	static bool isMPEG4(const std::string& path) {
 		std::ifstream f(path, std::ios::binary);
-		std::array<uint8_t, 4> mpeg4_1 {'m', 'p', '4', '1'};
-		std::array<uint8_t, 4> mpeg4_2 {'m', 'p', '4', '2'};
+		constexpr std::array<uint8_t, 4> mpeg4_1 {'m', 'p', '4', '1'};
+		constexpr std::array<uint8_t, 4> mpeg4_2 {'m', 'p', '4', '2'};
 
 		std::array<uint8_t, 256> header;
 		f.read(reinterpret_cast<char*>(header.data()), 256);
@@ -58,7 +58,7 @@ namespace wlib::file
 
 	static bool isF4V(const std::string& path) {
 		std::ifstream f(path, std::ios::binary);
-		std::array<uint8_t, 7> ident {'f', 't', 'y', 'p', 'f', '4', 'v'};
+		constexpr std::array<uint8_t, 7> ident {'f', 't', 'y', 'p', 'f', '4', 'v'};
 
 		std::array<uint8_t, 64> header;
 		f.read(reinterpret_cast<char*>(header.data()), 64);
@@ -68,7 +68,7 @@ namespace wlib::file
 
 	static bool is3GP(const std::string& path) {
 		std::ifstream f(path, std::ios::binary);
-		std::array<uint8_t, 7> ident {'f', 't', 'y', 'p', '3', 'g', 'p'};
+		constexpr std::array<uint8_t, 7> ident {'f', 't', 'y', 'p', '3', 'g', 'p'};
 
 		std::array<uint8_t, 64> header;
 		f.read(reinterpret_cast<char*>(header.data()), 64);
@@ -78,7 +78,7 @@ namespace wlib::file
 
 	static bool is3G2(const std::string& path) {
 		std::ifstream f(path, std::ios::binary);
-		std::array<uint8_t, 7> ident {'f', 't', 'y', 'p', '3', 'g', '2'};
+		constexpr std::array<uint8_t, 7> ident {'f', 't', 'y', 'p', '3', 'g', '2'};
 
 		std::array<uint8_t, 64> header;
 		f.read(reinterpret_cast<char*>(header.data()), 64);
@@ -88,8 +88,8 @@ namespace wlib::file
 
 	static bool isAIFF(const std::string& path) {
 		std::ifstream f(path, std::ios::binary);
-		std::array<uint8_t, 4> ident {'F', 'O', 'R', 'M'};
-		std::array<uint8_t, 4> ident_aiff {'A', 'I', 'F', 'F'};
+		constexpr std::array<uint8_t, 4> ident {'F', 'O', 'R', 'M'};
+		constexpr std::array<uint8_t, 4> ident_aiff {'A', 'I', 'F', 'F'};
 
 		std::array<uint8_t, 128> header;
 		f.read(reinterpret_cast<char*>(header.data()), 128);
