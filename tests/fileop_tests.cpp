@@ -40,6 +40,7 @@ const auto ofrFilePath = fileOpDir / "ofr.ofr";
 const auto _3gpFilePath = fileOpDir / "3gp.3gp";
 const auto _3g2FilePath = fileOpDir / "3g2.3g2";
 const auto aiffFilePath = fileOpDir / "aiff.aiff";
+const auto randomFilePath = fileOpDir / "random.random";
 
 const std::vector<std::pair<std::filesystem::path, wlib::file::FileType>> FileMappings {
 	std::pair<std::filesystem::path, wlib::file::FileType>(bmpFilePath, wlib::file::FileType::FILETYPE_BMP),
@@ -74,7 +75,10 @@ const std::vector<std::pair<std::filesystem::path, wlib::file::FileType>> FileMa
 	std::pair<std::filesystem::path, wlib::file::FileType>(ofrFilePath, wlib::file::FileType::FILETYPE_OPTIMFROG),
 	std::pair<std::filesystem::path, wlib::file::FileType>(_3gpFilePath, wlib::file::FileType::FILETYPE_3GP),
 	std::pair<std::filesystem::path, wlib::file::FileType>(_3g2FilePath, wlib::file::FileType::FILETYPE_3G2),
-	std::pair<std::filesystem::path, wlib::file::FileType>(aiffFilePath, wlib::file::FileType::FILETYPE_AIFF)
+	std::pair<std::filesystem::path, wlib::file::FileType>(aiffFilePath, wlib::file::FileType::FILETYPE_AIFF),
+
+
+	std::pair<std::filesystem::path, wlib::file::FileType>(randomFilePath, wlib::file::FileType::FILETYPE_UNKNOWN)
 };
 
 TEST(WlibFileop, DetectTypeFStream) {
@@ -163,4 +167,5 @@ TEST(WlibFileop, FiletypeExtension) {
 
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_AIFF), ".aiff");
 
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_UNKNOWN), "");
 }
