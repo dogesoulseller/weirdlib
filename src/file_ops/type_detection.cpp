@@ -99,7 +99,7 @@ namespace wlib::file
 	}
 
 	template<typename FileIterT>
-	bool isSVG(FileIterT dataStart, FileIterT dataEnd) noexcept {
+	bool isSVG(const FileIterT dataStart, const FileIterT dataEnd) noexcept {
 		constexpr std::array<uint8_t, 5> xmlHeader {'<', '?', 'x', 'm', 'l'};
 		constexpr std::array<uint8_t, 4> svgStart = {'<', 's', 'v', 'g'};
 
@@ -114,7 +114,7 @@ namespace wlib::file
 	}
 
 	template<typename FileIterT>
-	bool isMPEG4(FileIterT dataStart, FileIterT dataEnd) noexcept {
+	bool isMPEG4(const FileIterT dataStart, const FileIterT dataEnd) noexcept {
 		constexpr std::array<uint8_t, 4> mpeg4_1 {'m', 'p', '4', '1'};
 		constexpr std::array<uint8_t, 4> mpeg4_2 {'m', 'p', '4', '2'};
 
@@ -125,7 +125,7 @@ namespace wlib::file
 	}
 
 	template<typename FileIterT>
-	bool isF4V(FileIterT dataStart, FileIterT dataEnd) noexcept {
+	bool isF4V(const FileIterT dataStart, const FileIterT dataEnd) noexcept {
 		constexpr std::array<uint8_t, 7> ident {'f', 't', 'y', 'p', 'f', '4', 'v'};
 
 		auto searchEnd = dataStart + (std::min(std::distance(dataStart, dataEnd), std::ptrdiff_t(64)));
@@ -134,7 +134,7 @@ namespace wlib::file
 	}
 
 	template<typename FileIterT>
-	bool is3GP(FileIterT dataStart, FileIterT dataEnd) noexcept {
+	bool is3GP(const FileIterT dataStart, const FileIterT dataEnd) noexcept {
 		constexpr std::array<uint8_t, 7> ident {'f', 't', 'y', 'p', '3', 'g', 'p'};
 
 		auto searchEnd = dataStart + (std::min(std::distance(dataStart, dataEnd), std::ptrdiff_t(64)));
@@ -143,7 +143,7 @@ namespace wlib::file
 	}
 
 	template<typename FileIterT>
-	bool is3G2(FileIterT dataStart, FileIterT dataEnd) noexcept {
+	bool is3G2(const FileIterT dataStart, const FileIterT dataEnd) noexcept {
 		constexpr std::array<uint8_t, 7> ident {'f', 't', 'y', 'p', '3', 'g', '2'};
 
 		auto searchEnd = dataStart + (std::min(std::distance(dataStart, dataEnd), std::ptrdiff_t(64)));
@@ -152,7 +152,7 @@ namespace wlib::file
 	}
 
 	template<typename FileIterT>
-	bool isAIFF(FileIterT dataStart, FileIterT dataEnd) noexcept {
+	bool isAIFF(const FileIterT dataStart, const FileIterT dataEnd) noexcept {
 		constexpr std::array<uint8_t, 4> ident {'F', 'O', 'R', 'M'};
 		constexpr std::array<uint8_t, 4> ident_aiff {'A', 'I', 'F', 'F'};
 
