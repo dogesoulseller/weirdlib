@@ -270,7 +270,7 @@ namespace wlib::file
 		// size_t fileSize = f.tellg();
 		f.seekg(0);
 
-		std::array<uint8_t, 64> headerTemp;
+		alignas(64) std::array<uint8_t, 64> headerTemp;
 		f.read(reinterpret_cast<char*>(headerTemp.data()), 64);
 
 		// Wait for sync
@@ -334,7 +334,7 @@ namespace wlib::file
 	FileType DetectFileType(const uint8_t* fileData, const size_t size) {
 		FileType detectedType = FILETYPE_UNKNOWN;
 
-		std::array<uint8_t, 64> headerTemp;
+		alignas(64) std::array<uint8_t, 64> headerTemp;
 		std::copy(fileData, fileData+std::min(size_t(64u), size), headerTemp.data());
 
 		#if defined(WLIB_ENABLE_PREFETCH)
