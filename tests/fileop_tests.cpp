@@ -2,6 +2,8 @@
 #include "../include/weirdlib.hpp"
 #include <filesystem>
 #include <fstream>
+#include <vector>
+#include <utility>
 
 const std::filesystem::path fileOpDir = std::filesystem::path(WLIBTEST_TESTING_DIRECTORY) / std::filesystem::path("fileop_files");
 
@@ -39,64 +41,66 @@ const auto _3gpFilePath = fileOpDir / "3gp.3gp";
 const auto _3g2FilePath = fileOpDir / "3g2.3g2";
 const auto aiffFilePath = fileOpDir / "aiff.aiff";
 
-TEST(WlibFileop, DetectType) {
-	EXPECT_EQ(wlib::file::DetectFileType(bmpFilePath), wlib::file::FileType::FILETYPE_BMP);
+const std::vector<std::pair<std::filesystem::path, wlib::file::FileType>> FileMappings {
+	std::pair<std::filesystem::path, wlib::file::FileType>(bmpFilePath, wlib::file::FileType::FILETYPE_BMP),
+	std::pair<std::filesystem::path, wlib::file::FileType>(jpgFilePath, wlib::file::FileType::FILETYPE_JPEG),
+	std::pair<std::filesystem::path, wlib::file::FileType>(pngFilePath, wlib::file::FileType::FILETYPE_PNG),
+	std::pair<std::filesystem::path, wlib::file::FileType>(tiffFilePath, wlib::file::FileType::FILETYPE_TIFF),
+	std::pair<std::filesystem::path, wlib::file::FileType>(tgaFilePath, wlib::file::FileType::FILETYPE_TGA),
+	std::pair<std::filesystem::path, wlib::file::FileType>(gifFilePath, wlib::file::FileType::FILETYPE_GIF),
+	std::pair<std::filesystem::path, wlib::file::FileType>(psdFilePath, wlib::file::FileType::FILETYPE_PSD),
+	std::pair<std::filesystem::path, wlib::file::FileType>(psbFilePath, wlib::file::FileType::FILETYPE_PSB),
+	std::pair<std::filesystem::path, wlib::file::FileType>(webpFilePath, wlib::file::FileType::FILETYPE_WEBP),
+	std::pair<std::filesystem::path, wlib::file::FileType>(aviFilePath, wlib::file::FileType::FILETYPE_AVI),
+	std::pair<std::filesystem::path, wlib::file::FileType>(waveFilePath, wlib::file::FileType::FILETYPE_WAVE),
+	std::pair<std::filesystem::path, wlib::file::FileType>(pbmFilePath, wlib::file::FileType::FILETYPE_PBM),
+	std::pair<std::filesystem::path, wlib::file::FileType>(pgmFilePath, wlib::file::FileType::FILETYPE_PGM),
+	std::pair<std::filesystem::path, wlib::file::FileType>(ppmFilePath, wlib::file::FileType::FILETYPE_PPM),
+	std::pair<std::filesystem::path, wlib::file::FileType>(pamFilePath, wlib::file::FileType::FILETYPE_PAM),
+	std::pair<std::filesystem::path, wlib::file::FileType>(flifFilePath, wlib::file::FileType::FILETYPE_FLIF),
+	std::pair<std::filesystem::path, wlib::file::FileType>(svgFilePath, wlib::file::FileType::FILETYPE_SVG),
+	std::pair<std::filesystem::path, wlib::file::FileType>(pdfFilePath, wlib::file::FileType::FILETYPE_PDF),
+	std::pair<std::filesystem::path, wlib::file::FileType>(mkvFilePath, wlib::file::FileType::FILETYPE_MATROSKA),
+	std::pair<std::filesystem::path, wlib::file::FileType>(mp4FilePath, wlib::file::FileType::FILETYPE_MP4),
+	std::pair<std::filesystem::path, wlib::file::FileType>(flvFilePath, wlib::file::FileType::FILETYPE_FLV),
+	std::pair<std::filesystem::path, wlib::file::FileType>(f4vFilePath, wlib::file::FileType::FILETYPE_F4V),
+	std::pair<std::filesystem::path, wlib::file::FileType>(webmFilePath, wlib::file::FileType::FILETYPE_WEBM),
+	std::pair<std::filesystem::path, wlib::file::FileType>(oggFilePath, wlib::file::FileType::FILETYPE_OGG),
+	std::pair<std::filesystem::path, wlib::file::FileType>(apeFilePath, wlib::file::FileType::FILETYPE_APE),
+	std::pair<std::filesystem::path, wlib::file::FileType>(ttaFilePath, wlib::file::FileType::FILETYPE_TTA),
+	std::pair<std::filesystem::path, wlib::file::FileType>(wvpackFilePath, wlib::file::FileType::FILETYPE_WAVPACK),
+	std::pair<std::filesystem::path, wlib::file::FileType>(flacFilePath, wlib::file::FileType::FILETYPE_FLAC),
+	std::pair<std::filesystem::path, wlib::file::FileType>(cafFilePath, wlib::file::FileType::FILETYPE_CAF),
+	std::pair<std::filesystem::path, wlib::file::FileType>(ofrFilePath, wlib::file::FileType::FILETYPE_OPTIMFROG),
+	std::pair<std::filesystem::path, wlib::file::FileType>(_3gpFilePath, wlib::file::FileType::FILETYPE_3GP),
+	std::pair<std::filesystem::path, wlib::file::FileType>(_3g2FilePath, wlib::file::FileType::FILETYPE_3G2),
+	std::pair<std::filesystem::path, wlib::file::FileType>(aiffFilePath, wlib::file::FileType::FILETYPE_AIFF)
+};
 
-	EXPECT_EQ(wlib::file::DetectFileType(jpgFilePath), wlib::file::FileType::FILETYPE_JPEG);
+TEST(WlibFileop, DetectTypeFStream) {
+	for (const auto& [fPath, fType] : FileMappings) {
+		EXPECT_EQ(wlib::file::DetectFileType(fPath), fType) << "Expected type of file at " << fPath << " to be equal to enum value " << fType;
+	}
+}
 
-	EXPECT_EQ(wlib::file::DetectFileType(pngFilePath), wlib::file::FileType::FILETYPE_PNG);
+TEST(WlibFileop, DetectTypeMemory) {
+	for (const auto& [fPath, fType] : FileMappings) {
+		std::vector<uint8_t> fileBytes;
 
-	EXPECT_EQ(wlib::file::DetectFileType(tiffFilePath), wlib::file::FileType::FILETYPE_TIFF);
+		ASSERT_TRUE(std::filesystem::exists(fPath)) << fPath << " does not exist";
 
-	EXPECT_EQ(wlib::file::DetectFileType(tgaFilePath), wlib::file::FileType::FILETYPE_TGA);
+		std::ifstream f(fPath, std::ios::binary | std::ios::ate);
+		ASSERT_TRUE(f.good()) << "Failed to open file " << fPath;
 
-	EXPECT_EQ(wlib::file::DetectFileType(gifFilePath), wlib::file::FileType::FILETYPE_GIF);
+		auto fileSize = f.tellg();
+		ASSERT_GT(fileSize, 0) << "File at " << fPath << " is empty";
+		f.seekg(0);
 
-	EXPECT_EQ(wlib::file::DetectFileType(psdFilePath), wlib::file::FileType::FILETYPE_PSD);
-	EXPECT_EQ(wlib::file::DetectFileType(psbFilePath), wlib::file::FileType::FILETYPE_PSB);
+		fileBytes.resize(fileSize);
+		f.read(reinterpret_cast<char*>(fileBytes.data()), fileSize);
 
-	EXPECT_EQ(wlib::file::DetectFileType(webpFilePath), wlib::file::FileType::FILETYPE_WEBP);
-	EXPECT_EQ(wlib::file::DetectFileType(aviFilePath), wlib::file::FileType::FILETYPE_AVI);
-	EXPECT_EQ(wlib::file::DetectFileType(waveFilePath), wlib::file::FileType::FILETYPE_WAVE);
-
-	EXPECT_EQ(wlib::file::DetectFileType(pbmFilePath), wlib::file::FileType::FILETYPE_PBM);
-	EXPECT_EQ(wlib::file::DetectFileType(pgmFilePath), wlib::file::FileType::FILETYPE_PGM);
-	EXPECT_EQ(wlib::file::DetectFileType(ppmFilePath), wlib::file::FileType::FILETYPE_PPM);
-	EXPECT_EQ(wlib::file::DetectFileType(pamFilePath), wlib::file::FileType::FILETYPE_PAM);
-
-	EXPECT_EQ(wlib::file::DetectFileType(flifFilePath), wlib::file::FileType::FILETYPE_FLIF);
-	EXPECT_EQ(wlib::file::DetectFileType(svgFilePath), wlib::file::FileType::FILETYPE_SVG);
-
-	EXPECT_EQ(wlib::file::DetectFileType(pdfFilePath), wlib::file::FileType::FILETYPE_PDF);
-
-	EXPECT_EQ(wlib::file::DetectFileType(mkvFilePath), wlib::file::FileType::FILETYPE_MATROSKA);
-
-	EXPECT_EQ(wlib::file::DetectFileType(mp4FilePath), wlib::file::FileType::FILETYPE_MP4);
-
-	EXPECT_EQ(wlib::file::DetectFileType(flvFilePath), wlib::file::FileType::FILETYPE_FLV);
-
-	EXPECT_EQ(wlib::file::DetectFileType(f4vFilePath), wlib::file::FileType::FILETYPE_F4V);
-
-	EXPECT_EQ(wlib::file::DetectFileType(webmFilePath), wlib::file::FileType::FILETYPE_WEBM);
-
-	EXPECT_EQ(wlib::file::DetectFileType(oggFilePath), wlib::file::FileType::FILETYPE_OGG);
-
-	EXPECT_EQ(wlib::file::DetectFileType(apeFilePath), wlib::file::FileType::FILETYPE_APE);
-
-	EXPECT_EQ(wlib::file::DetectFileType(ttaFilePath), wlib::file::FileType::FILETYPE_TTA);
-
-	EXPECT_EQ(wlib::file::DetectFileType(wvpackFilePath), wlib::file::FileType::FILETYPE_WAVPACK);
-
-	EXPECT_EQ(wlib::file::DetectFileType(flacFilePath), wlib::file::FileType::FILETYPE_FLAC);
-
-	EXPECT_EQ(wlib::file::DetectFileType(cafFilePath), wlib::file::FileType::FILETYPE_CAF);
-
-	EXPECT_EQ(wlib::file::DetectFileType(ofrFilePath), wlib::file::FileType::FILETYPE_OPTIMFROG);
-
-	EXPECT_EQ(wlib::file::DetectFileType(_3gpFilePath), wlib::file::FileType::FILETYPE_3GP);
-	EXPECT_EQ(wlib::file::DetectFileType(_3g2FilePath), wlib::file::FileType::FILETYPE_3G2);
-
-	EXPECT_EQ(wlib::file::DetectFileType(aiffFilePath), wlib::file::FileType::FILETYPE_AIFF);
+		EXPECT_EQ(wlib::file::DetectFileType(fileBytes.data(), fileSize), fType) << "Expected type of file at " << fPath << " to be equal to enum value " << fType;
+	}
 }
 
 TEST(WlibFileop, FiletypeExtension) {

@@ -52,6 +52,12 @@ namespace file
 	/// @return {@link FileType} enum value
 	FileType DetectFileType(const std::string& path);
 
+	/// Detect file type based on identifying features
+	/// @param fileData pointer to start of file data
+	/// @param size maximum number of bytes to access
+	/// @return {@link FileType} enum value
+	FileType DetectFileType(const uint8_t* fileData, const size_t size);
+
 	/// Get extension (including .) corresponding to file type
 	/// @param type file type to get extension for
 	/// @return extension
