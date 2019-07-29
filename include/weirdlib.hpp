@@ -6,6 +6,7 @@
 #include "weirdlib_crypto.hpp"
 #include "weirdlib_image.hpp"
 #include "weirdlib_fileops.hpp"
+#include "weirdlib_anxiety.hpp"
 
 namespace wlib
 {
