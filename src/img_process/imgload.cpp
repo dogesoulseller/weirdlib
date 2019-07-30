@@ -1,6 +1,9 @@
 #include "../../include/weirdlib_image.hpp"
 #include "../../include/cpu_detection.hpp"
+#include "../../include/weirdlib_traits.hpp"
 #include <fstream>
+
+#ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Weverything"
@@ -137,5 +140,39 @@ namespace wlib::image
 			return 0;
 		}
 	}
-
 } // namespace wlib::image
+#else
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wterminate"
+namespace wlib::image
+{
+	constexpr const char* errMsg = "This function is a stub - image ops module was disabled for this compilation";
+
+	Image::Image(const std::string& /*path*/, bool /*isRawData*/, const uint64_t /*_width*/, const uint64_t /*_height*/, ColorFormat /*requestedFormat*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	Image::Image(const uint8_t* /*_pixels*/, const uint64_t /*_width*/, const uint64_t /*_height*/, const ColorFormat /*_format*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	Image::Image(const float* /*_pixels*/, const uint64_t /*_width*/, const uint64_t /*_height*/, const ColorFormat /*_format*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	void Image::LoadImage(const std::string& /*path*/, bool /*isRawData*/, const uint64_t /*_width*/, const uint64_t /*_height*/, ColorFormat /*requestedFormat*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	void Image::LoadImage(const uint8_t* /*_pixels*/, const uint64_t /*_width*/, const uint64_t /*_height*/, const ColorFormat /*_format*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	void Image::LoadImage(const float* /*_pixels*/, const uint64_t /*_width*/, const uint64_t /*_height*/, const ColorFormat /*_format*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	size_t Image::GetTotalImageSize(const uint64_t /*width*/, const uint64_t /*height*/, const ColorFormat /*format*/) noexcept {
+		throw wlib::module_not_built(errMsg);
+	}
+} // namespace wlib::image
+#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
+#endif

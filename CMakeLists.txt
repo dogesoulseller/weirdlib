@@ -9,6 +9,7 @@ option(WEIRDLIB_ENABLE_TESTING "Enable building test target" ON)
 option(WEIRDLIB_ENABLE_BENCHMARKS "(Stub) Enable building benchmark target" ON)
 option(WEIRDLIB_ENABLE_BUILD_STRINGOPS "Enable building of string module" ON)
 option(WEIRDLIB_ENABLE_BUILD_CRYPTO "Enable building of crypto module" ON)
+option(WERIDLIB_ENABLE_BUILD_IMAGEOPS "Enable building image operations module" ON)
 option(WEIRDLIB_ENABLE_PREFETCH "Enable use of prefetch instructions in optimized code.
 This can lead to potential performance improvements, or massive slowdowns in some cases (Intel Ivy Bridge[43 cycles], AMD Jaguar[~100 cycles])" ON)
 
@@ -97,6 +98,11 @@ endif(WEIRDLIB_ENABLE_BUILD_CRYPTO)
 if(WEIRDLIB_ENABLE_BUILD_STRINGOPS)
 	target_compile_definitions(weirdlib PUBLIC WEIRDLIB_ENABLE_STRING_OPERATIONS)
 endif(WEIRDLIB_ENABLE_BUILD_STRINGOPS)
+
+# Conditionally enable building image operations module
+if(WERIDLIB_ENABLE_BUILD_IMAGEOPS)
+	target_compile_definitions(weirdlib PUBLIC WEIRDLIB_ENABLE_IMAGE_OPERATIONS)
+endif(WERIDLIB_ENABLE_BUILD_IMAGEOPS)
 
 # Conditionally enable use of prefetch instructions
 if(WEIRDLIB_ENABLE_PREFETCH)

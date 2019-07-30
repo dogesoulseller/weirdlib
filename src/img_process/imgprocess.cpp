@@ -1,9 +1,13 @@
 #include "../../include/weirdlib_image.hpp"
+#include "../../include/weirdlib_traits.hpp"
 #include "../../include/cpu_detection.hpp"
+
 #include "../common.hpp"
 #include <cmath>
 #include <algorithm>
 #include <thread>
+
+#ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
 
 #if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
 #include <tbb/tbb.h>
@@ -628,5 +632,54 @@ namespace wlib::image
 
 		in.format = F_BGRA;
 	}
-
 } // namespace wlib::image
+#else
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wterminate"
+
+namespace wlib::image
+{
+	constexpr const char* errMsg = "This function is a stub - image ops module was disabled for this compilation";
+
+	ImageSoA::ImageSoA(const Image& /*img*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	ImageSoA::ImageSoA(const ImageSoA& /*img*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	ImageSoA& ImageSoA::operator=(const ImageSoA& /*img*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	ImageSoA::~ImageSoA() {
+		throw wlib::module_not_built(errMsg);
+	}
+	Image ImageSoA::ConvertToImage() {
+		throw wlib::module_not_built(errMsg);
+	}
+	ImageSoA& ConvertToGrayscale(ImageSoA& /*inImg*/, bool /*preserveAlpha*/, GrayscaleMethod /*method*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	void ConvertUint8ToFloat(const uint8_t* /*in*/, float* /*out*/, size_t /*fileSize*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	void ConvertToRGB(ImageSoA& /*in*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	void ConvertToBGR(ImageSoA& /*in*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	void ConvertToRGBA(ImageSoA& /*in*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	void ConvertToBGRA(ImageSoA& /*in*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+} // namespace wlib::image
+
+#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
+
+#endif
