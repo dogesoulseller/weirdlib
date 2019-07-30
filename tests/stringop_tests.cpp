@@ -1,8 +1,8 @@
+#ifdef WEIRDLIB_ENABLE_STRING_OPERATIONS
 #include <gtest/gtest.h>
 #include <cstring>
 #include "../include/weirdlib.hpp"
 
-#ifdef WEIRDLIB_ENABLE_STRING_OPERATIONS
 
 const char* loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 "Sed feugiat, orci eu varius efficitur, arcu ex condimentum leo, et auctor felis nisi ut sapien. Aliquam at rutrum ante. Vivamus nisl neque, condimentum sed tincidunt eget, pellentesque sed enim. Phasellus mollis enim nibh. Suspendisse potenti. Morbi interdum consectetur commodo. Morbi ac feugiat dolor. Vestibulum nunc erat, pharetra non eros id, pharetra pretium tortor.Curabitur elementum,"

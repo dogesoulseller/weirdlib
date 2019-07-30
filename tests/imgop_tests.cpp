@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
 #include <gtest/gtest.h>
 #include "../include/weirdlib.hpp"
 #include <filesystem>
@@ -114,3 +115,5 @@ TEST(ImgOps, ColorOrderConversion) {
 	EXPECT_EQ(testSoANA.channels[2][0], testImg.GetPixels()[0]);
 	EXPECT_EQ(testSoANA.channels[3][0], 255.0f);
 }
+
+#endif

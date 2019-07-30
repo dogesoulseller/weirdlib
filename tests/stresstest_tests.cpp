@@ -1,7 +1,7 @@
+#ifdef WEIRDLIB_ENABLE_ANXIETY
 #include <gtest/gtest.h>
 #include "../include/weirdlib_anxiety.hpp"
 
-#ifdef WEIRDLIB_ENABLE_ANXIETY
 TEST(Anxiety, Sqrt) {
 	EXPECT_NO_FATAL_FAILURE(wlib::anxiety::StressSquareRoot(std::chrono::milliseconds(100), 2));
 	EXPECT_NO_FATAL_FAILURE(wlib::anxiety::StressSquareRoot(10, 1));
