@@ -221,4 +221,5 @@ namespace wlib::anxiety
 	void StressInverseSquareRoot(size_t durationMS, size_t threadCount) {
 		StressInverseSquareRoot(std::chrono::milliseconds(durationMS), threadCount);
 	}
+
 } // namespace wlib::anxiety

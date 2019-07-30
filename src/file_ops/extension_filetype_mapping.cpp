@@ -76,4 +76,5 @@ namespace wlib::file
 			return "";
 		}
 	}
+
 } // namespace wlib::file

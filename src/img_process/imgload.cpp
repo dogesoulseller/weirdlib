@@ -51,10 +51,6 @@ namespace wlib::image
 		int chan;
 		uint8_t* stbpix;
 
-		std::array<char, 2> bmpIdent;
-		f.read(bmpIdent.data(), 2);
-		f.seekg(0);
-
 		switch (requestedFormat)
 		{
 		case ColorFormat::F_Grayscale:
@@ -126,4 +122,5 @@ namespace wlib::image
 			return 0;
 		}
 	}
+
 } // namespace wlib::image

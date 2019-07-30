@@ -79,7 +79,6 @@ namespace wlib::image
 			alignas(64) auto c2 = new float[width*height];
 			auto source = img.GetPixels();
 
-
 			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
 			tbb::parallel_for(tbb::blocked_range<size_t>(0, width*height, 10000), [&c0, &c1, &c2, &source](tbb::blocked_range<size_t>& i){
 				for (size_t j = i.begin(); j != i.end(); j++) {
@@ -629,6 +628,5 @@ namespace wlib::image
 
 		in.format = F_BGRA;
 	}
-
 
 } // namespace wlib::image

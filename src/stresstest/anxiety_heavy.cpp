@@ -54,8 +54,8 @@ namespace wlib::anxiety
 		}
 	}
 
-
 	void StressFMA(size_t durationMS, size_t threadCount) {
 		StressFMA(std::chrono::milliseconds(durationMS), threadCount);
 	}
+
 } // namespace wlib::anxiety

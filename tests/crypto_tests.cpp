@@ -49,8 +49,6 @@ TEST(WlibCrypto, CRC16X_25) {
 }
 
 
-
-
 TEST(WlibCrypto, CRC32) {
 	EXPECT_EQ(wlib::crypto::CRC32(CRCTestVector.data(), CRCTestVector.data()+CRCTestVector.size()), 0xF6D84F7A);
 }
@@ -70,8 +68,6 @@ TEST(WlibCrypto, CRC32AUTOSAR) {
 TEST(WlibCrypto, CRC32JAMCRC) {
 	EXPECT_EQ(wlib::crypto::CRC32JAMCRC(CRCTestVector.data(), CRCTestVector.data()+CRCTestVector.size()), 0x0927B085);
 }
-
-
 
 
 TEST(WlibCrypto, CRC64XZ) {

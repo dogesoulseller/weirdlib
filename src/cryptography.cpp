@@ -8,9 +8,7 @@
 	#include <immintrin.h>
 #endif
 
-namespace wlib
-{
-namespace crypto
+namespace wlib::crypto
 {
 	#ifdef WEIRDLIB_ENABLE_CRYPTOGRAPHY
 	template<uint16_t rev_polynomial>
@@ -204,7 +202,6 @@ namespace crypto
 
 		return output;
 	}
-
 	#endif
 
 
@@ -261,8 +258,6 @@ namespace crypto
 	}
 
 
-
-
 	uint16_t CRC16ARC(uint8_t* first, uint8_t* last) {
 		return CRC16_base<0x0000, 0x0000>(first, last, CRC16ARCLookupTable);
 	}
@@ -284,8 +279,6 @@ namespace crypto
 	}
 
 
-
-
 	uint32_t CRC32(uint8_t* first, uint8_t* last) {
 		return CRC32_base(first, last, CRC32LookupTable);
 	}
@@ -305,8 +298,6 @@ namespace crypto
 	uint32_t CRC32JAMCRC(uint8_t* first, uint8_t* last) {
 		return CRC32_base<0xFFFFFFFF, 0x00000000>(first, last, CRC32LookupTable);	// JAMCRC uses the same polynomial as the ISO standard
 	}
-
-
 
 
 	uint64_t CRC64XZ(uint8_t* first, uint8_t* last) {
@@ -378,6 +369,4 @@ namespace crypto
 		throw wlib::module_not_built(errMsg);
 	}
 	#endif // WEIRDLIB_ENABLE_CRYPTOGRAPHY
-	} // namespace crypto
-
-} // namespace wlib
+} // namespace wlib::crypto
