@@ -1,5 +1,6 @@
 #include "../../include/weirdlib_anxiety.hpp"
 #include "../../include/cpu_detection.hpp"
+#include "../../include/weirdlib_traits.hpp"
 #include <random>
 #include <cmath>
 #include <array>
@@ -8,6 +9,8 @@
 
 namespace wlib::anxiety
 {
+	#ifdef WEIRDLIB_ENABLE_ANXIETY
+
 	static inline std::uniform_real_distribution<double> float_dist(1.0, std::numeric_limits<double>::max());
 	static inline std::uniform_real_distribution<float> spfloat_dist(1.0, std::numeric_limits<float>::max());
 	static std::chrono::time_point<std::chrono::high_resolution_clock> startTimePoint;
@@ -221,5 +224,22 @@ namespace wlib::anxiety
 	void StressInverseSquareRoot(size_t durationMS, size_t threadCount) {
 		StressInverseSquareRoot(std::chrono::milliseconds(durationMS), threadCount);
 	}
+
+	#else
+	constexpr const char* errMsg = "This function is a stub - stress test module was disabled for this compilation";
+
+	void StressSquareRoot(std::chrono::milliseconds /*duration*/, size_t /*threadCount*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	void StressSquareRoot(size_t /*durationMS*/, size_t /*threadCount*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	void StressInverseSquareRoot(std::chrono::milliseconds /*duration*/, size_t /*threadCount*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	void StressInverseSquareRoot(size_t /*durationMS*/, size_t /*threadCount*/) {
+		throw wlib::module_not_built(errMsg);
+	}
+	#endif
 
 } // namespace wlib::anxiety
