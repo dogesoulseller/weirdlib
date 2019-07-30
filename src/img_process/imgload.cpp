@@ -78,7 +78,22 @@ namespace wlib::image
 
 		ConvertUint8ToFloat(stbpix, pixels.data(), GetTotalImageSize(width, height, format));
 
-		// TODO: Convert to BGR[A] if requested
+		switch (requestedFormat)
+		{
+		case F_BGR:
+			for (size_t i = 0; i < GetTotalImageSize(width, height, format); i+=3) {
+				std::swap(pixels[0+i], pixels[2+i]);
+			}
+			break;
+		case F_BGRA:
+			for (size_t i = 0; i < GetTotalImageSize(width, height, format); i+=4) {
+				std::swap(pixels[0+i], pixels[2+i]);
+			}
+		default:
+			break;
+		}
+
+		free(stbpix);
 	}
 
 	void Image::LoadImage(const uint8_t* _pixels, const uint64_t _width, const uint64_t _height, const ColorFormat _format) {
