@@ -4,7 +4,7 @@
 
 #ifdef WEIRDLIB_ENABLE_STRING_OPERATIONS
 
-const char* lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+const char* loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 "Sed feugiat, orci eu varius efficitur, arcu ex condimentum leo, et auctor felis nisi ut sapien. Aliquam at rutrum ante. Vivamus nisl neque, condimentum sed tincidunt eget, pellentesque sed enim. Phasellus mollis enim nibh. Suspendisse potenti. Morbi interdum consectetur commodo. Morbi ac feugiat dolor. Vestibulum nunc erat, pharetra non eros id, pharetra pretium tortor.Curabitur elementum,"
 "massa id sagittis interdum, urna metus interdum urna, eu scelerisque eros ex non ligula. Donec feugiat nisi velit, ac lobortis elit volutpat et. Suspendisse eu dui mattis, accumsan sem in, hendrerit nulla. In metus ligula, ullamcorper ut semper ut, fringilla commodo velit. Proin consectetur, mi a congue eleifend, leo ex sollicitudin ex, sit amet tincidunt libero velit ut arcu."
 "Maecenas laoreet ex leo, quis finibus nisl dictum quis. Nullam et consequat nunc. Donec tempus nisi vitae tortor blandit, quis pulvinar magna feugiat. Donec sodales eu urna in suscipit. Vivamus commodo efficitur urna, id varius velit cursus a. Sed consequat arcu vitae dui sagittis consequat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus volutpat dictum neque."
@@ -22,91 +22,80 @@ const char* lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing el
 "pulvinar. Quisque sagittis justo in dapibus dapibus. Quisque id nibh eu dui sagittis venenatis vehicula vel enim. Sed non commodo augue. Donec eu justo sit amet tellus bibendum commodo vitae at nunc. Maecenas dui est, eleifend vitae metus vitae, pretium sodales lectus. Mauris rutrum, nibh ac tempor ultricies, mauris turpis semper metus, sed auctor ipsum ex quis tellus. In ultricies dapibus dui, condimentum imperdiet nulla tincidunt ac."
 " Aenean commodo et tortor ac efficitur. Curabitur tempor lacinia ex aliquet varius. Mauris dapibus diam nunc, vitae ornare urna accumsan a. Pellentesque aliquam leo tellus, ut finibus enim elementum quis. Sed tincidunt tortor eu lacinia scelerisque. Nam lacinia nibh dui, vitae suscipit dolor scelerisque sit amet. Phasellus sit amet lobortis odio, eu lacinia lectus. Proin mattis sit amet felis nec vulputate.";
 
-const char* teststring_matches = "This is a comparison string that matches the other string perfectly";
-const char* teststring_not_matches0 = "This is a comparison string that does not match the other string perfectly";
-const char* teststring_not_matches1 = "This is a comparison string that seod not match the other string perfectly";
-const char* teststring_not_matches_short = "This is a comparison string that doesn't match the other string perfectly";
+const char* testringMatches = "This is a comparison string that matches the other string perfectly";
+const char* teststringNotMatches0 = "This is a comparison string that does not match the other string perfectly";
+const char* teststringNotMatches1 = "This is a comparison string that seod not match the other string perfectly";
+const char* teststringNotMatchesShort = "This is a comparison string that doesn't match the other string perfectly";
 
-const char* teststring_zerolen = "";
+const char* teststringEmpty = "";
 
 
-TEST(StringOps, strlen) {
-	const size_t len_reference = std::strlen(teststring_matches);
-	const size_t len_actual = wlib::str::strlen(teststring_matches);
+TEST(StringOps, Strlen) {
+	// Matching
+	const size_t lenReference = std::strlen(testringMatches);
+	const size_t lenActual = wlib::str::strlen(testringMatches);
+	EXPECT_EQ(lenReference, lenActual) << "String lengths do not match";
 
-	EXPECT_EQ(len_reference, len_actual) << "String lengths do not match";
+	// Matching large size
+	const size_t lenReference_vlong = std::strlen(loremIpsum);
+	const size_t lenActual_vlong = wlib::str::strlen(loremIpsum);
+	EXPECT_EQ(lenReference_vlong, lenActual_vlong) << "String lengths do not match";
+
+	// Zero-length matches
+	const size_t lenReference_zeroLen = std::strlen(teststringEmpty);
+	const size_t lenActual_zeroLen = wlib::str::strlen(teststringEmpty);
+	EXPECT_EQ(lenReference_zeroLen, lenActual_zeroLen) << "String lengths do not match";
 }
 
-TEST(StringOps, strlen_verylong) {
-	const size_t len_reference = std::strlen(lorem_ipsum);
-	const size_t len_actual = wlib::str::strlen(lorem_ipsum);
 
-	EXPECT_EQ(len_reference, len_actual) << "String lengths do not match";
-}
-
-TEST(StringOps, strlen_empty) {
-	const size_t len_reference = std::strlen(teststring_zerolen);
-	const size_t len_actual = wlib::str::strlen(teststring_zerolen);
-
-	EXPECT_EQ(len_reference, len_actual) << "String lengths do not match";
-}
-
-TEST(StringOps, strcmp_equal) {
-	const char* str0 = teststring_matches;
-	const char* str1 = teststring_matches;
+TEST(StringOps, Strcmp) {
+	// Matching
+	const char* str0 = testringMatches;
+	const char* str1 = testringMatches;
 	EXPECT_TRUE(wlib::str::strcmp(str0, str1)) << "The string comparison failed";
-}
 
-TEST(StringOps, strcmp_not_equal) {
-	const char* str0 = teststring_not_matches0;
-	const char* str1 = teststring_not_matches1;
-	EXPECT_FALSE(wlib::str::strcmp(str0, str1)) << "The string comparison did not fail";
-}
+	// Not matching
+	const char* str0_ne = teststringNotMatches0;
+	const char* str1_ne = teststringNotMatches1;
+	EXPECT_FALSE(wlib::str::strcmp(str0_ne, str1_ne)) << "The string comparison did not fail";
 
-TEST(StringOps, strcmp_difflen) {
-	const char* str0 = teststring_not_matches0;
-	const char* str1 = teststring_not_matches_short;
-	EXPECT_FALSE(wlib::str::strcmp(str0, str1)) << "The string comparison did not fail";
-}
+	// Different lengths
+	const char* str0_difflen = teststringNotMatches0;
+	const char* str1_difflen = teststringNotMatchesShort;
+	EXPECT_FALSE(wlib::str::strcmp(str0_difflen, str1_difflen)) << "The string comparison did not fail";
 
-TEST(StringOps, strcmp_empty_0) {
-	const char* str0 = teststring_zerolen;
-	const char* str1 = teststring_matches;
-	EXPECT_FALSE(wlib::str::strcmp(str0, str1)) << "The string comparison did not fail";
-}
+	// Left empty
+	const char* str0_empty0 = teststringEmpty;
+	const char* str1_empty0 = testringMatches;
+	EXPECT_FALSE(wlib::str::strcmp(str0_empty0, str1_empty0)) << "The string comparison did not fail";
 
-TEST(StringOps, strcmp_empty_1) {
-	const char* str0 = teststring_matches;
-	const char* str1 = teststring_zerolen;
-	EXPECT_FALSE(wlib::str::strcmp(str0, str1)) << "The string comparison did not fail";
-}
+	// Right empty
+	const char* str0_empty1 = testringMatches;
+	const char* str1_empty1 = teststringEmpty;
+	EXPECT_FALSE(wlib::str::strcmp(str0_empty1, str1_empty1)) << "The string comparison did not fail";
 
-TEST(StringOps, strcmp_empty_both) {
-	const char* str0 = teststring_zerolen;
-	const char* str1 = teststring_zerolen;
-	EXPECT_TRUE(wlib::str::strcmp(str0, str1)) << "The string comparison failed";
-}
+	// Both empty
+	const char* str0_empty2 = teststringEmpty;
+	const char* str1_empty2 = teststringEmpty;
+	EXPECT_TRUE(wlib::str::strcmp(str0_empty2, str1_empty2)) << "The string comparison failed";
 
-TEST(StringOps, strncmp_equal) {
-	const char* str0 = teststring_matches;
-	const char* str1 = teststring_matches;
-	EXPECT_TRUE(wlib::str::strncmp(str0, str1, strlen(str0))) << "The string comparison failed";
-}
+	// Matching strncmp
+	const char* str0_ncmpeq = testringMatches;
+	const char* str1_ncmpeq = testringMatches;
+	EXPECT_TRUE(wlib::str::strncmp(str0_ncmpeq, str1_ncmpeq, strlen(str0_ncmpeq))) << "The string comparison failed";
 
-TEST(StringOps, strncmp_equal_different) {
-	const char* str0 = teststring_not_matches0;
-	const char* str1 = teststring_not_matches1;
-	EXPECT_TRUE(wlib::str::strncmp(str0, str1, 32u)) << "The string comparison failed";
-}
+	// Matching strncmp with different length
+	const char* str0_eqdiff = teststringNotMatches0;
+	const char* str1_eqdiff = teststringNotMatches1;
+	EXPECT_TRUE(wlib::str::strncmp(str0_eqdiff, str1_eqdiff, 32u)) << "The string comparison failed";
 
-TEST(StringOps, strncmp_not_equal) {
-	const char* str0 = teststring_not_matches0;
-	const char* str1 = teststring_not_matches1;
-	EXPECT_FALSE(wlib::str::strncmp(str0, str1, 40u)) << "The string comparison did not fail";
-}
+	// Not matching
+	const char* str0_neq = teststringNotMatches0;
+	const char* str1_neq = teststringNotMatches1;
+	EXPECT_FALSE(wlib::str::strncmp(str0_neq, str1_neq, 40u)) << "The string comparison did not fail";
 
-TEST(StringOps, strncmp_from_constchar) {
-	EXPECT_TRUE(wlib::str::strncmp(teststring_matches, teststring_matches, wlib::str::strlen(teststring_matches))) << "The string comparison failed";
+	// From constchar
+	EXPECT_TRUE(wlib::str::strncmp(testringMatches, testringMatches, wlib::str::strlen(testringMatches))) << "The string comparison failed";
 }
 
 #endif //WEIRDLIB_ENABLE_STRING_OPERATIONS
