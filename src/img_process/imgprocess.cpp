@@ -328,7 +328,6 @@ namespace wlib::image
 			#endif
 			break;
 		}
-		// TODO: Change division to multiplication
 		case GrayscaleMethod::Lightness:
 		{
 			// Processing with SIMD
