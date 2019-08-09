@@ -232,7 +232,7 @@ namespace bop
 			if constexpr (std::is_same_v<T, uint16_t>) {
 				asm (
 					"bsf ax, ax;"
-					"cmovz ax, bx"
+					"cmovz ax, bx;"
 					: "=a"(output)
 					: "a"(x), "b"(0)
 				);
@@ -240,7 +240,7 @@ namespace bop
 			} else if constexpr (std::is_same_v<T, uint32_t>) {
 				asm (
 					"bsf eax, eax;"
-					"cmovz eax, ebx"
+					"cmovz eax, ebx;"
 					: "=a"(output)
 					: "a"(x), "b"(0)
 				);
@@ -248,7 +248,7 @@ namespace bop
 			} else if constexpr (std::is_same_v<T, uint64_t>) {
 				asm (
 					"bsf rax, rax;"
-					"cmovz rax, rbx"
+					"cmovz rax, rbx;"
 					: "=a"(output)
 					: "a"(x), "b"(0)
 				);

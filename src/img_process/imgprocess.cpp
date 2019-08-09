@@ -604,6 +604,7 @@ namespace wlib::image
 			std::uninitialized_fill(tmp, tmp + in.width * in.height, 255.0f);
 			in.channels.push_back(tmp);
 		}
+		break;
 		default:
 			break;
 		}
@@ -626,6 +627,7 @@ namespace wlib::image
 			std::uninitialized_fill(tmp, tmp + in.width * in.height, 255.0f);
 			in.channels.push_back(tmp);
 		}
+		break;
 		default:
 			break;
 		}

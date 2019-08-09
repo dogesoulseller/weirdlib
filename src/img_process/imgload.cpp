@@ -92,6 +92,7 @@ namespace wlib::image
 			for (size_t i = 0; i < GetTotalImageSize(width, height, format); i+=4) {
 				std::swap(pixels[0+i], pixels[2+i]);
 			}
+			break;
 		default:
 			break;
 		}
