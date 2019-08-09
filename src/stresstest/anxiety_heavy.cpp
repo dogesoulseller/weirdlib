@@ -13,17 +13,23 @@ namespace wlib::anxiety
 	static inline std::uniform_real_distribution<double> float_dist(std::numeric_limits<double>::min(), std::numeric_limits<double>::max());
 	static std::chrono::time_point<std::chrono::high_resolution_clock> startTimePoint;
 
-	double performFMA(std::mt19937_64& rng) {
-		volatile __m256d reg00 = _mm256_set1_pd(float_dist(rng));
-		volatile __m256d reg01 = _mm256_set1_pd(float_dist(rng));
-		volatile __m256d reg02 = _mm256_set1_pd(float_dist(rng));
+	static double performFMA(std::mt19937_64& rng) {
+		#if X86_SIMD_LEVEL >= 7
+		[[maybe_unused]] volatile __m256d reg00 = _mm256_set1_pd(float_dist(rng));
+		[[maybe_unused]] volatile __m256d reg01 = _mm256_set1_pd(float_dist(rng));
+		[[maybe_unused]] volatile __m256d reg02 = _mm256_set1_pd(float_dist(rng));
 
-		volatile __m256d reg10 = _mm256_set1_pd(float_dist(rng));
-		volatile __m256d reg11 = _mm256_set1_pd(float_dist(rng));
-		volatile __m256d reg12 = _mm256_set1_pd(float_dist(rng));
+		[[maybe_unused]] volatile __m256d reg10 = _mm256_set1_pd(float_dist(rng));
+		[[maybe_unused]] volatile __m256d reg11 = _mm256_set1_pd(float_dist(rng));
+		[[maybe_unused]] volatile __m256d reg12 = _mm256_set1_pd(float_dist(rng));
 
-		volatile __m256d reg20 = _mm256_fmadd_pd(reg00, reg01, reg02);
-		volatile __m256d reg21 = _mm256_fmadd_pd(reg10, reg11, reg12);
+		[[maybe_unused]] volatile __m256d reg20 = _mm256_fmadd_pd(reg00, reg01, reg02);
+		[[maybe_unused]] volatile __m256d reg21 = _mm256_fmadd_pd(reg10, reg11, reg12);
+		#else
+		[[maybe_unused]] volatile auto reg00 = std::fma(float_dist(rng), float_dist(rng), float_dist(rng));
+		[[maybe_unused]] volatile auto reg01 = std::fma(float_dist(rng), float_dist(rng), float_dist(rng));
+		[[maybe_unused]] volatile auto reg02 = std::fma(float_dist(rng), float_dist(rng), float_dist(rng));
+		#endif
 		return float_dist(rng);
 	}
 
