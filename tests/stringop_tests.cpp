@@ -4,7 +4,7 @@
 #include "../include/weirdlib.hpp"
 
 
-const char* loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+static const char* loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 "Sed feugiat, orci eu varius efficitur, arcu ex condimentum leo, et auctor felis nisi ut sapien. Aliquam at rutrum ante. Vivamus nisl neque, condimentum sed tincidunt eget, pellentesque sed enim. Phasellus mollis enim nibh. Suspendisse potenti. Morbi interdum consectetur commodo. Morbi ac feugiat dolor. Vestibulum nunc erat, pharetra non eros id, pharetra pretium tortor.Curabitur elementum,"
 "massa id sagittis interdum, urna metus interdum urna, eu scelerisque eros ex non ligula. Donec feugiat nisi velit, ac lobortis elit volutpat et. Suspendisse eu dui mattis, accumsan sem in, hendrerit nulla. In metus ligula, ullamcorper ut semper ut, fringilla commodo velit. Proin consectetur, mi a congue eleifend, leo ex sollicitudin ex, sit amet tincidunt libero velit ut arcu."
 "Maecenas laoreet ex leo, quis finibus nisl dictum quis. Nullam et consequat nunc. Donec tempus nisi vitae tortor blandit, quis pulvinar magna feugiat. Donec sodales eu urna in suscipit. Vivamus commodo efficitur urna, id varius velit cursus a. Sed consequat arcu vitae dui sagittis consequat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vivamus volutpat dictum neque."
@@ -22,12 +22,12 @@ const char* loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing eli
 "pulvinar. Quisque sagittis justo in dapibus dapibus. Quisque id nibh eu dui sagittis venenatis vehicula vel enim. Sed non commodo augue. Donec eu justo sit amet tellus bibendum commodo vitae at nunc. Maecenas dui est, eleifend vitae metus vitae, pretium sodales lectus. Mauris rutrum, nibh ac tempor ultricies, mauris turpis semper metus, sed auctor ipsum ex quis tellus. In ultricies dapibus dui, condimentum imperdiet nulla tincidunt ac."
 " Aenean commodo et tortor ac efficitur. Curabitur tempor lacinia ex aliquet varius. Mauris dapibus diam nunc, vitae ornare urna accumsan a. Pellentesque aliquam leo tellus, ut finibus enim elementum quis. Sed tincidunt tortor eu lacinia scelerisque. Nam lacinia nibh dui, vitae suscipit dolor scelerisque sit amet. Phasellus sit amet lobortis odio, eu lacinia lectus. Proin mattis sit amet felis nec vulputate.";
 
-const char* testringMatches = "This is a comparison string that matches the other string perfectly";
-const char* teststringNotMatches0 = "This is a comparison string that does not match the other string perfectly";
-const char* teststringNotMatches1 = "This is a comparison string that seod not match the other string perfectly";
-const char* teststringNotMatchesShort = "This is a comparison string that doesn't match the other string perfectly";
+static const char* testringMatches = "This is a comparison string that matches the other string perfectly";
+static const char* teststringNotMatches0 = "This is a comparison string that does not match the other string perfectly";
+static const char* teststringNotMatches1 = "This is a comparison string that seod not match the other string perfectly";
+static const char* teststringNotMatchesShort = "This is a comparison string that doesn't match the other string perfectly";
 
-const char* teststringEmpty = "";
+static const char* teststringEmpty = "";
 
 
 TEST(StringOps, Strlen) {

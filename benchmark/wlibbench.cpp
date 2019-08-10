@@ -13,13 +13,13 @@
 #include <functional>
 #include <tuple>
 
-alignas(64) char lipsumString[10000000];
+alignas(64) static char lipsumString[10000000];
 
-const char* lipsumLongName = "loremipsum-thicc.txt";
-const char* imageVeryLargeName = "image-vlarge.jpg";
-const char* imageLargeName = "image-large.jpg";
-const char* imageMediumName = "image-medium.jpg";
-const char* imageSmallName = "image-small.jpg";
+static const char* lipsumLongName = "loremipsum-thicc.txt";
+static const char* imageVeryLargeName = "image-vlarge.jpg";
+static const char* imageLargeName = "image-large.jpg";
+static const char* imageMediumName = "image-medium.jpg";
+static const char* imageSmallName = "image-small.jpg";
 
 static std::filesystem::path lipsumLongPath;
 static std::filesystem::path imageVeryLargePath;
