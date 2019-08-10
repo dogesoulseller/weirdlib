@@ -343,7 +343,7 @@ namespace wlib::file
 
 		// TGA
 		{
-			std::array<uint8_t, 16> tgaFooterTemp;
+			std::array<uint8_t, 18> tgaFooterTemp;
 			std::copy(fileData+size-18, fileData+size, tgaFooterTemp.data());
 			detectedType = MatchIdentifier(TGA_IDENTIFIER, tgaFooterTemp) ? FILETYPE_TGA : detectedType;
 			if (detectedType != FILETYPE_UNKNOWN) return detectedType;
