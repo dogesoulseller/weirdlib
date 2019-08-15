@@ -48,12 +48,19 @@ namespace wlib::file
 		std::ifstream f(path, std::ios::binary);
 		constexpr std::array<uint8_t, 4> mpeg4_1 {'m', 'p', '4', '1'};
 		constexpr std::array<uint8_t, 4> mpeg4_2 {'m', 'p', '4', '2'};
+		constexpr std::array<uint8_t, 4> moovatom {'m', 'o', 'o', 'v'};
 
 		std::array<uint8_t, 256> header;
 		f.read(reinterpret_cast<char*>(header.data()), 256);
 
-		return std::search(header.begin(), header.end(), std::default_searcher(mpeg4_1.begin(), mpeg4_1.end())) != header.end()
-			|| std::search(header.begin(), header.end(), std::default_searcher(mpeg4_2.begin(), mpeg4_2.end())) != header.end();
+		// Most common format
+		const bool tryGeneral = std::search(header.begin(), header.end(), std::default_searcher(mpeg4_1.begin(), mpeg4_1.end())) != header.end()
+			^ std::search(header.begin(), header.end(), std::default_searcher(mpeg4_2.begin(), mpeg4_2.end())) != header.end();
+
+		// Less common streaming format
+		const bool tryMoovAtom = std::search(header.begin(), header.end(), std::default_searcher(moovatom.begin(), moovatom.end())) != header.end();
+
+		return tryGeneral || tryMoovAtom;
 	}
 
 	static bool isF4V(const std::string& path) noexcept {
@@ -117,11 +124,18 @@ namespace wlib::file
 	bool isMPEG4(const FileIterT dataStart, const FileIterT dataEnd) noexcept {
 		constexpr std::array<uint8_t, 4> mpeg4_1 {'m', 'p', '4', '1'};
 		constexpr std::array<uint8_t, 4> mpeg4_2 {'m', 'p', '4', '2'};
+		constexpr std::array<uint8_t, 4> moovatom {'m', 'o', 'o', 'v'};
 
 		auto searchEnd = dataStart + (std::min(std::distance(dataStart, dataEnd), std::ptrdiff_t(256)));
 
-		return std::search(dataStart, searchEnd, std::default_searcher(mpeg4_1.begin(), mpeg4_1.end())) != searchEnd
-			|| std::search(dataStart, searchEnd, std::default_searcher(mpeg4_2.begin(), mpeg4_2.end())) != searchEnd;
+		// Most common format
+		const bool tryGeneral = std::search(dataStart, searchEnd, std::default_searcher(mpeg4_1.begin(), mpeg4_1.end())) != searchEnd
+			^ std::search(dataStart, searchEnd, std::default_searcher(mpeg4_2.begin(), mpeg4_2.end())) != searchEnd;
+
+		// Less common streaming format
+		const bool tryMoovAtom = std::search(dataStart, searchEnd, std::default_searcher(moovatom.begin(), moovatom.end())) != searchEnd;
+
+		return tryGeneral || tryMoovAtom;
 	}
 
 	template<typename FileIterT>
