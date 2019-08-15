@@ -15,10 +15,12 @@ option(WEIRDLIB_ENABLE_MULTITHREADING "Enable use of external threading library"
 option(WEIRDLIB_INSTRUMENT_COVERAGE "Enable generating coverage instrumentation" OFF)
 option(WEIRDLIB_BUILD_DOCS "Enable building documentation" ON)
 option(WEIRDLIB_ENABLE_TESTING "Enable building test target" ON)
-option(WEIRDLIB_ENABLE_BENCHMARKS "(Stub) Enable building benchmark target" ON)
+option(WEIRDLIB_ENABLE_BENCHMARKS "Enable building benchmark target" ON)
+option(WEIRDLIB_ENABLE_APPLICATIONS "Enable building example applications" ON)
 option(WEIRDLIB_ENABLE_BUILD_STRINGOPS "Enable building of string module" ON)
 option(WEIRDLIB_ENABLE_BUILD_CRYPTO "Enable building of crypto module" ON)
 option(WERIDLIB_ENABLE_BUILD_IMAGEOPS "Enable building image operations module" ON)
+option(WERIDLIB_ENABLE_BUILD_FILEOPS "Enable building file operations module" ON)
 option(WERIDLIB_ENABLE_BUILD_ANXIETY "Enable building stress test module" ON)
 option(WEIRDLIB_FORCE_MAXIMUM_ARCHITECTURE_EXTENSIONS "Enable all instruction set extensions regardless of target system (MMX to all AVX-512 subsets)" OFF)
 option(WEIRDLIB_ENABLE_PREFETCH "Enable use of prefetch instructions in optimized code.
@@ -241,3 +243,8 @@ if (WEIRDLIB_ENABLE_TESTING)
 		)
 	endif(WEIRDLIB_INSTRUMENT_COVERAGE)
 endif (WEIRDLIB_ENABLE_TESTING)
+
+
+if(WEIRDLIB_ENABLE_APPLICATIONS)
+	add_subdirectory(apps)
+endif(WEIRDLIB_ENABLE_APPLICATIONS)

@@ -1,4 +1,4 @@
-Get-ChildItem ./src,./include -Recurse -Include *.cpp,*.hpp |
+Get-ChildItem ./src,./include,./apps/src -Recurse -Include *.cpp,*.hpp |
 	ForEach-Object {
 
 		Write-Host ''
