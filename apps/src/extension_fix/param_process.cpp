@@ -12,6 +12,8 @@ std::unordered_map<ParameterName, std::string> GetParameters(std::vector<std::st
 	std::unordered_map<ParameterName, std::string> Parameters;
 	Parameters.insert(std::pair(RECURSION_DEPTH, "-1"));
 	Parameters.insert(std::pair(OUTPUT_DIR, "efix"));
+	Parameters.insert(std::pair(PREPEND_STRING, ""));
+	Parameters.insert(std::pair(APPEND_STRING, "_other"));
 
 	for (size_t i = 2; i < args.size(); i++) {
 		if (args[i] == "-d" || args[i] == "--depth") {
@@ -36,8 +38,27 @@ std::unordered_map<ParameterName, std::string> GetParameters(std::vector<std::st
 			i++;
 
 			Parameters.insert_or_assign(OUTPUT_DIR, args[i]);
+		} else if (args[i] == "--append-string") {
+			if (i == args.size()-1) {
+				std::cerr << "No append string passed\n";
+				std::exit(2);
+			}
+
+			i++;
+
+			Parameters.insert_or_assign(APPEND_STRING, args[i]);
+
+		} else if (args[i] == "--prepend-string") {
+			if (i == args.size()-1) {
+				std::cerr << "No prepend string passed\n";
+				std::exit(2);
+			}
+
+			i++;
+
+			Parameters.insert_or_assign(PREPEND_STRING, args[i]);
 		} else {
-			std::cerr << "Unknown switch " << args[i] << '\n';
+			std::cerr << "Unknown option " << args[i] << '\n';
 			std::exit(2);
 		}
 	}

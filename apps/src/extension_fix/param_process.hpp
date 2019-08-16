@@ -11,10 +11,11 @@
 enum ParameterName
 {
 	RECURSION_DEPTH,
-	OUTPUT_DIR
+	OUTPUT_DIR,
+	PREPEND_STRING,
+	APPEND_STRING
 };
 
 bool StringIsInteger(const std::string& str);
-
 
 std::unordered_map<ParameterName, std::string> GetParameters(std::vector<std::string>& args);

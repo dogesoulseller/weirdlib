@@ -44,6 +44,9 @@ int main(int argc, char* argv[]) {
 	std::string _recdepthAsString = Parameters.at(RECURSION_DEPTH);
 	std::from_chars(_recdepthAsString.data(), _recdepthAsString.data()+_recdepthAsString.length(), _recdepth, 10);
 
+	const std::string stringToPrepend = Parameters.at(PREPEND_STRING);
+	const std::string stringToAppend  = Parameters.at(APPEND_STRING);
+
 	const auto maxRecursionDepth = static_cast<size_t>(_recdepth);
 
 	// Check if input is file or directory
@@ -65,7 +68,7 @@ int main(int argc, char* argv[]) {
 			const auto newFilename = outputDir + "/" + filenameStem + newExtension;
 			std::filesystem::copy_file(inputPath, newFilename);
 		} catch (std::exception&) {
-			const auto newFilename = outputDir + "/" + filenameStem + "_other" + newExtension;
+			const auto newFilename = outputDir + "/" + stringToPrepend + filenameStem + stringToAppend + newExtension;
 			std::filesystem::copy_file(inputPath, newFilename);
 		}
 
@@ -116,7 +119,7 @@ int main(int argc, char* argv[]) {
 					std::filesystem::copy_file(f.path(), newFilename);
 				} catch (std::exception&) {
 					try {
-						const auto newFilename = outputDir + "/" + filenameStem.get() + "_other" + newExtension.get();
+						const auto newFilename = outputDir + "/" + stringToPrepend + filenameStem.get() + stringToAppend + newExtension.get();
 						std::filesystem::copy_file(f.path(), newFilename);
 					} catch (std::exception&) {
 						return;
