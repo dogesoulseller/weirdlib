@@ -5,3 +5,4 @@ docs/latex
 .swp
 intc
 coverage
+*.code-workspace
