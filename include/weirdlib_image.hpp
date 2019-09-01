@@ -97,5 +97,7 @@ namespace image
 	void ConvertToRGB(ImageSoA&);
 	void ConvertToBGRA(ImageSoA&);
 
+	void NegateValues(ImageSoA&, bool withAlpha = false);
+
 } // namespace image
 } // namespace wlib

@@ -3,6 +3,7 @@
 #include "../include/weirdlib.hpp"
 #include <filesystem>
 #include <future>
+#include <random>
 
 constexpr const char* wlibTestDir = WLIBTEST_TESTING_DIRECTORY;
 
@@ -114,6 +115,37 @@ TEST(ImgOps, ColorOrderConversion) {
 	EXPECT_EQ(testSoANA.channels[1][0], testImg.GetPixels()[1]);
 	EXPECT_EQ(testSoANA.channels[2][0], testImg.GetPixels()[0]);
 	EXPECT_EQ(testSoANA.channels[3][0], 255.0f);
+}
+
+constexpr size_t PixelSampleCount = 50000;
+
+TEST(ImgOps, NegateValues) {
+	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	ASSERT_TRUE(std::filesystem::exists(imgPath));
+	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
+	wlib::image::ImageSoA testSoA_Alpha(testImg);
+	wlib::image::ImageSoA testSoA_NoAlpha(testImg);
+	wlib::image::ImageSoA testSoABase(testImg);
+
+	EXPECT_NO_FATAL_FAILURE(wlib::image::NegateValues(testSoA_Alpha, true));
+	EXPECT_NO_FATAL_FAILURE(wlib::image::NegateValues(testSoA_NoAlpha, false));
+
+	std::random_device dev;
+	std::mt19937_64 rng(dev());
+	std::uniform_int_distribution<uint64_t> dist(0, testSoABase.width * testSoABase.height - 1);
+
+	std::array<uint64_t, PixelSampleCount> Samples;
+	std::generate(Samples.begin(), Samples.end(), [&dist, &rng](){return dist(rng);});
+
+	for (size_t i = 0; i < Samples.size(); i++) {
+		for (size_t c = 0; c < testSoA_NoAlpha.channels.size() - 1; c++) {
+			EXPECT_FLOAT_EQ(testSoA_NoAlpha.channels[c][Samples[i]], 255.0f - testSoABase.channels[c][Samples[i]]);
+		}
+
+		for (size_t c = 0; c < testSoA_Alpha.channels.size(); c++) {
+			EXPECT_FLOAT_EQ(testSoA_Alpha.channels[c][Samples[i]], 255.0f - testSoABase.channels[c][Samples[i]]);
+		}
+	}
 }
 
 #endif

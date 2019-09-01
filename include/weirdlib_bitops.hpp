@@ -326,7 +326,7 @@ namespace bop
 			temp--;
 		}
 
-		return temp;
+		return static_cast<uint32_t>(temp);
 	}
 
 	/// Count set bits

@@ -100,10 +100,10 @@ TEST(WlibFileop, DetectTypeMemory) {
 		ASSERT_GT(fileSize, 0) << "File at " << fPath << " is empty";
 		f.seekg(0);
 
-		fileBytes.resize(fileSize);
+		fileBytes.resize(static_cast<size_t>(fileSize));
 		f.read(reinterpret_cast<char*>(fileBytes.data()), fileSize);
 
-		EXPECT_EQ(wlib::file::DetectFileType(fileBytes.data(), fileSize), fType) << "Expected type of file at " << fPath << " to be equal to enum value " << fType;
+		EXPECT_EQ(wlib::file::DetectFileType(fileBytes.data(), static_cast<size_t>(fileSize)), fType) << "Expected type of file at " << fPath << " to be equal to enum value " << fType;
 	}
 }
 

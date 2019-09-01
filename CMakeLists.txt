@@ -111,8 +111,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" 
 	# Clang-specific settings
 	if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 		# Enable warnings in Clang and disable multiple unwanted ones
-		string(APPEND CMAKE_C_FLAGS_DEBUG " -Weverything -Wno-padded -Wno-c++98-compat -Wno-c++98-c++11-compat -Wno-c++98-c++11-c++14-compat -Wno-weak-vtables -Wno-global-constructors -Wno-switch-enum -Wno-unknown-pragmas -Wno-covered-switch-default -Wno-ctad-maybe-unsupported -Wno-c++98-c++11-compat-binary-literal -Wno-exit-time-destructors ")
-		string(APPEND CMAKE_CXX_FLAGS_DEBUG " -Weverything -Wno-padded -Wno-c++98-compat -Wno-c++98-c++11-compat -Wno-c++98-c++11-c++14-compat -Wno-weak-vtables -Wno-global-constructors -Wno-switch-enum -Wno-unknown-pragmas -Wno-covered-switch-default -Wno-ctad-maybe-unsupported -Wno-c++98-c++11-compat-binary-literal -Wno-exit-time-destructors ")
+		string(APPEND CMAKE_C_FLAGS_DEBUG " -Weverything -Wno-sign-conversion -Wno-implicit-int-conversion -Wno-padded -Wno-c++98-compat -Wno-c++98-c++11-compat -Wno-c++98-c++11-c++14-compat -Wno-weak-vtables -Wno-global-constructors -Wno-switch-enum -Wno-unknown-pragmas -Wno-covered-switch-default -Wno-ctad-maybe-unsupported -Wno-c++98-c++11-compat-binary-literal -Wno-exit-time-destructors ")
+		string(APPEND CMAKE_CXX_FLAGS_DEBUG " -Weverything -Wno-sign-conversion -Wno-implicit-int-conversion -Wno-padded -Wno-c++98-compat -Wno-c++98-c++11-compat -Wno-c++98-c++11-c++14-compat -Wno-weak-vtables -Wno-global-constructors -Wno-switch-enum -Wno-unknown-pragmas -Wno-covered-switch-default -Wno-ctad-maybe-unsupported -Wno-c++98-c++11-compat-binary-literal -Wno-exit-time-destructors ")
 
 		# Enable standalone debug information
 		string(APPEND CMAKE_C_FLAGS_DEBUG " -fstandalone-debug ")
