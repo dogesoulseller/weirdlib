@@ -7,6 +7,7 @@
 #include "weirdlib_image.hpp"
 #include "weirdlib_fileops.hpp"
 #include "weirdlib_anxiety.hpp"
+#include "weirdlib_containers.hpp"
 
 namespace wlib
 {

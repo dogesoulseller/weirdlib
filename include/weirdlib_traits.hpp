@@ -36,7 +36,17 @@ namespace traits
 	constexpr inline bool is_string_based_v = is_string_based<T>::value;
 
 
+	template<typename T, typename AttemptDerives = void>
+	struct is_hashable : std::false_type{};
 
+	/// Is valid for any type that can be hashed with std::hash
+	/// @see has_hash_v
+	template<typename T>
+	struct is_hashable<T,
+		std::void_t<decltype(std::hash<T>{}(std::declval<T>()))>> : std::true_type{};
+
+	template<typename T>
+	constexpr inline bool is_hashable_v = is_hashable<T>::value;
 
 } // traits
 
