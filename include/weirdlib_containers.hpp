@@ -11,8 +11,106 @@
 
 namespace wlib
 {
+	//NOTE: This serves as a placeholder so doxygen generates documentation
+
+	/// Simple, vector-based associative container for use in rarely changing maps which benefit from fast access <br>
+	/// Two specializations exist:
+	///     - for simple data that can be easily compared
+	///     - for complex data that can be hashed
+	/// @tparam KeyT type of key
+	/// @tparam ValueT type of value
+	/// @tparam Enable SFINAE helper
 	template<typename KeyT, typename ValueT, typename Enable = void>
-	class unordered_flat_map;
+	class unordered_flat_map
+	{
+		private:
+
+		/// Based on type's size, first pair type is `std::pair<KeyT, size_t>` or `KeyT`
+		std::vector<std::pair<KeyT, ValueT>> m_kvpairs;
+
+		size_t findByKey(const KeyT& key) const noexcept;
+
+		public:
+		/// Default constructor
+		unordered_flat_map() = default;
+
+		/// Copy constructor
+		unordered_flat_map(const unordered_flat_map&) = default;
+
+		/// Move constructor
+		unordered_flat_map(unordered_flat_map&&) = default;
+
+		/// Initializer list constructor
+		template<typename PairT>
+		unordered_flat_map(std::initializer_list<PairT> l);
+
+		/// Copy assignment operator
+		unordered_flat_map& operator=(const unordered_flat_map&) = default;
+
+		/// Move assignment operator
+		unordered_flat_map& operator=(unordered_flat_map&&) = default;
+
+		/// Get total count of key-value pair
+		/// @return Element count
+		[[nodiscard]] size_t size() const noexcept;
+
+		/// Get preallocated element count
+		/// @return Preallocated element count
+		[[nodiscard]] size_t capacity() const noexcept;
+
+		/// Free excess preallocated memory
+		void shrink_to_fit();
+
+		/// Remove all key-value pairs without freeing preallocated memory
+		void clear() noexcept;
+
+		/// Preallocate memory for `size` elements
+		/// @param size new size
+		void reserve(size_t size);
+
+		/// Get max element count possible for container
+		/// @return max element count
+		[[nodiscard]] size_t max_size() const noexcept;
+
+		/// Look up reference to value with `key`
+		/// @return value reference
+		/// @param key key to search for
+		const ValueT& at(const KeyT& key) const;
+
+		/// Look up reference to value with `key` <br>
+		/// @return value reference
+		/// @param key key to search for
+		/// @see at
+		const ValueT& operator[](const KeyT& key) const;
+
+		/// Check if value with `key` exists in container
+		/// @return result of search
+		/// @param key key to search for
+		bool exists(const KeyT& key) const noexcept;
+
+		/// Check if `value` exists in container
+		/// @return result of search
+		/// @param value value to search for
+		bool exists_val(const ValueT& value) const noexcept;
+
+		/// Insert key-value pair into map <br>
+		/// If value already exists, it is not overwritten
+		/// @see insert_or_assign
+		/// @param key key to insert
+		/// @param value value to insert
+		void insert(const KeyT& key, const ValueT& value);
+
+		/// Insert key-value pair into map <br>
+		/// If value already exists, it is overwritten
+		/// @see insert
+		/// @param key key to insert
+		/// @param value value to insert
+		void insert_or_assign(const KeyT& key, const ValueT& value);
+
+		/// Remove item at `key`
+		/// @param key key to remove from map
+		void erase(const KeyT& key);
+	};
 
 	/// Simple version
 	template<typename KeyT, typename ValueT>

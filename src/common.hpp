@@ -33,4 +33,8 @@
 	const __m128d SIMD128D_zeroMask = _mm_set1_pd(0.0);
 #endif
 
+/// Get optimal thread count for processing image of given size
+/// @param width image width
+/// @param height image height
+/// @return thread count
 int getImagePreferredThreadCount(int width, int height);

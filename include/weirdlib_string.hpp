@@ -6,8 +6,8 @@
 namespace wlib
 {
 
-/// Operations on strings that mimic the C standard library
-/// In some cases, they might be faster than the standard library's implementation
+/// Operations on strings that mimic the C standard library <br>
+/// In some cases, they might be faster than the standard library's implementation <br>
 /// In other cases, they might be slower or equal
 namespace str
 {
