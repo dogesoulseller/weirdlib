@@ -1,6 +1,9 @@
 #pragma once
 #include <cstdint>
 #include <array>
+#include <vector>
+#include <string>
+#include <sstream>
 
 namespace wlib
 {
@@ -9,6 +12,10 @@ namespace wlib
 /// SecureRandomInteger / Seed functions are only valid when the appropriate compiler defines are set
 namespace crypto
 {
+	static constexpr std::array<uint32_t, 5> SHA1_DIGEST_BASE = {0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0};
+	static constexpr size_t SHA1_BLOCK_INTS = 16;	// number of 32bit integers per SHA1 block
+	static constexpr size_t SHA1_BLOCK_BYTES = SHA1_BLOCK_INTS * 4;
+
 	#if defined(__RDRND__)
 
 	/// Generate random 16-bit integer
@@ -111,6 +118,37 @@ namespace crypto
 	/// @param last pointer (exclusive) to end of byte array
 	/// @return CRC64/GO-ISO value
 	uint64_t CRC64ISO(uint8_t* first, uint8_t* last);
+
+	/// SHA-1 generator <br>
+	/// This version does not use Intel SHA Extensions yet<br>
+	/// WARNING: SHA1 is no longer considered safe for cryptography. Use the SHA3 family if possible, or at least SHA2
+	class SHA1
+	{
+		public:
+		SHA1();
+		void reset();
+		void update(const std::string& str);
+		void update(std::istream& str);
+		std::string finalize_to_string();
+
+		private:
+
+		uint32_t blk(const std::array<uint32_t, SHA1_BLOCK_INTS>& block, const size_t i);
+
+		void R0(const std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i);
+		void R1(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i);
+		void R2(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i);
+		void R3(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i);
+		void R4(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i);
+
+		void transform(std::array<uint32_t, SHA1_BLOCK_INTS>& block);
+
+		std::array<uint32_t, SHA1_BLOCK_INTS> buffer_to_block();
+
+		std::array<uint32_t, 5> digest;
+		std::string buffer;
+		size_t transform_count;
+	};
 
 } // namespace crypto
 

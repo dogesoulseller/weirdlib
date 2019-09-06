@@ -3,6 +3,7 @@
 #include <cstring>
 #include <random>
 #include "../include/weirdlib.hpp"
+#include "../src/common.hpp"
 #include <vector>
 #include <string>
 
@@ -76,6 +77,24 @@ TEST(WlibCrypto, CRC64XZ) {
 
 TEST(WlibCrypto, CRC64ISO) {
 	EXPECT_NO_THROW(wlib::crypto::CRC64ISO(CRCTestVector.data(), CRCTestVector.data()+CRCTestVector.size()));
+}
+
+TEST(WlibCrypto, SHA1) {
+	wlib::crypto::SHA1 shagen;
+	wlib::crypto::SHA1 shagen_empty;
+
+	// Result from wikipedia
+	shagen.update("The quick brown fox jumps over the lazy dog");
+	auto result_fox = shagen.finalize_to_string();
+	EXPECT_EQ(result_fox, std::string("2fd4e1c67a2d28fced849ee1bb76e7391b93eb12"));
+
+	shagen.reset();
+
+	// Empty string should be equal to no input
+	shagen.update("");
+	auto result_empty = shagen.finalize_to_string();
+	auto result_null = shagen_empty.finalize_to_string();
+	EXPECT_EQ(result_empty, result_null);
 }
 
 #endif
