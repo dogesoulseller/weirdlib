@@ -8,12 +8,12 @@
 namespace wlib
 {
 
-/// Functions that deal with cryptography and hashing
+/// Functions that deal with cryptography and hashing <br>
 /// SecureRandomInteger / Seed functions are only valid when the appropriate compiler defines are set
 namespace crypto
 {
 	static constexpr std::array<uint32_t, 5> SHA1_DIGEST_BASE = {0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0};
-	static constexpr size_t SHA1_BLOCK_INTS = 16;	// number of 32bit integers per SHA1 block
+	static constexpr size_t SHA1_BLOCK_INTS = 16;	// Number of 32bit integers per SHA1 block
 	static constexpr size_t SHA1_BLOCK_BYTES = SHA1_BLOCK_INTS * 4;
 
 	#if defined(__RDRND__)
@@ -110,7 +110,7 @@ namespace crypto
 	/// Generate a CRC64/XZ hash
 	/// @param first pointer (inclusive) to start of byte array
 	/// @param last pointer (exclusive) to end of byte array
-	/// @return CRC64/JAMCRC value
+	/// @return CRC64/XZ value
 	uint64_t CRC64XZ(uint8_t* first, uint8_t* last);
 
 	/// Generate a CRC64/GO-ISO hash

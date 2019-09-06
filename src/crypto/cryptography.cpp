@@ -1,8 +1,8 @@
-#include "../include/weirdlib_crypto.hpp"
-#include "../include/weirdlib_traits.hpp"
+#include "../../include/weirdlib_crypto.hpp"
+#include "../../include/weirdlib_traits.hpp"
 
 #include <numeric>
-#include "../include/cpu_detection.hpp"
+#include "../../include/cpu_detection.hpp"
 
 #ifdef __x86_64__
 	#include <immintrin.h>
