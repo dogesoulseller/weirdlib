@@ -8,6 +8,7 @@
 #include "weirdlib_fileops.hpp"
 #include "weirdlib_anxiety.hpp"
 #include "weirdlib_containers.hpp"
+#include "weirdlib_math.hpp"
 
 namespace wlib
 {
