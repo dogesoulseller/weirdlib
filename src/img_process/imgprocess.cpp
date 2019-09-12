@@ -527,7 +527,37 @@ namespace wlib::image
 	}
 
 	void ConvertUint8ToFloat(const uint8_t* in, float* out, size_t fileSize) {
-		#if X86_SIMD_LEVEL >= 5
+		#if X86_SIMD_LEVEL >= 9
+			size_t iters = fileSize / 16;
+			size_t itersRem = fileSize % 16;
+
+			for (size_t i = 0; i < iters; i++) {
+				const __m128i pix_AVX512_8 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in + i*16));
+				const __m512i pix_AVX512_32 = _mm512_cvtepu8_epi32(pix_AVX512_8);
+				const __m512 pixf_AVX512 = _mm512_cvtepi32_ps(pix_AVX512_32);
+				_mm512_storeu_ps(out + i*16, pixf_AVX512);
+			}
+
+			for (size_t i = iters * 16; i < iters * 16 + itersRem; i++) {
+				out[i] = static_cast<float>(in[i]);
+			}
+		#elif X86_SIMD_LEVEL >= 8
+			size_t iters = fileSize / 8;
+			size_t itersRem = fileSize % 8;
+
+			for (size_t i = 0; i < iters; i++) {
+				const __m128i pix_AVX_8 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in + i*8));
+				const __m256i pix_AVX_32 = _mm256_cvtepu8_epi32(pix_AVX_8);
+				const __m256 pixf_AVX = _mm256_cvtepi32_ps(pix_AVX_32);
+				_mm256_storeu_ps(out + i*8, pixf_AVX);
+			}
+
+			_mm256_zeroupper();
+
+			for (size_t i = iters * 8; i < iters * 8 + itersRem; i++) {
+				out[i] = static_cast<float>(in[i]);
+			}
+		#elif X86_SIMD_LEVEL >= 5
 			size_t iters = fileSize / 4;
 			size_t itersRem = fileSize % 4;
 
