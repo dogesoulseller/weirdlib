@@ -38,7 +38,7 @@ namespace wlib
 		unordered_flat_map(const unordered_flat_map&) = default;
 
 		/// Move constructor
-		unordered_flat_map(unordered_flat_map&&) = default;
+		unordered_flat_map(unordered_flat_map&&) noexcept = default;
 
 		/// Initializer list constructor
 		template<typename PairT>
@@ -48,7 +48,7 @@ namespace wlib
 		unordered_flat_map& operator=(const unordered_flat_map&) = default;
 
 		/// Move assignment operator
-		unordered_flat_map& operator=(unordered_flat_map&&) = default;
+		unordered_flat_map& operator=(unordered_flat_map&&) noexcept = default;
 
 		/// Get total count of key-value pair
 		/// @return Element count
@@ -133,7 +133,7 @@ namespace wlib
 		public:
 		unordered_flat_map() = default;
 		unordered_flat_map(const unordered_flat_map&) = default;
-		unordered_flat_map(unordered_flat_map&&) = default;
+		unordered_flat_map(unordered_flat_map&&) noexcept = default;
 
 		template<typename PairT>
 		unordered_flat_map(std::initializer_list<PairT> l) : m_kvpairs{} {
@@ -146,7 +146,7 @@ namespace wlib
 		}
 
 		unordered_flat_map& operator=(const unordered_flat_map&) = default;
-		unordered_flat_map& operator=(unordered_flat_map&&) = default;
+		unordered_flat_map& operator=(unordered_flat_map&&) noexcept = default;
 
 		[[nodiscard]] size_t size() const noexcept {
 			return m_kvpairs.size();
@@ -245,9 +245,9 @@ namespace wlib
 		public:
 		unordered_flat_map() = default;
 		unordered_flat_map(const unordered_flat_map&) = default;
-		unordered_flat_map(unordered_flat_map&&) = default;
+		unordered_flat_map(unordered_flat_map&&) noexcept = default;
 		unordered_flat_map& operator=(const unordered_flat_map&) = default;
-		unordered_flat_map& operator=(unordered_flat_map&&) = default;
+		unordered_flat_map& operator=(unordered_flat_map&&) noexcept = default;
 
 
 		template<typename PairT>
