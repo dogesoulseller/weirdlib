@@ -22,6 +22,7 @@ option(WEIRDLIB_ENABLE_BUILD_CRYPTO "Enable building of crypto module" ON)
 option(WERIDLIB_ENABLE_BUILD_IMAGEOPS "Enable building image operations module" ON)
 option(WERIDLIB_ENABLE_BUILD_FILEOPS "Enable building file operations module" ON)
 option(WERIDLIB_ENABLE_BUILD_ANXIETY "Enable building stress test module" ON)
+option(WEIRDLIB_ENABLE_CUDA "Enable building CUDA library modules" ON)
 option(WEIRDLIB_FORCE_MAXIMUM_ARCHITECTURE_EXTENSIONS "Enable all instruction set extensions regardless of target system (MMX to all AVX-512 subsets)" OFF)
 option(WEIRDLIB_ENABLE_PREFETCH "Enable use of prefetch instructions in optimized code.
 This can lead to potential performance improvements, or massive slowdowns in some cases (Intel Ivy Bridge[43 cycles], AMD Jaguar[~100 cycles])" ON)
@@ -147,17 +148,30 @@ string(APPEND CMAKE_CXX_FLAGS " ${WEIRDLIB_ADDITIONAL_CXX_FLAGS} ")
 message(STATUS "Configuring main library")
 
 # Library sources and headers
-file(GLOB_RECURSE WEIRDLIB_SOURCES "include/*.hpp" "src/*.c*" "src/*.h*")
-
+file(GLOB_RECURSE WEIRDLIB_SOURCES "src/*.cpp" "src/*.hpp")
+file(GLOB WEIRDLIB_INCLUDE_SOURCES "include/*.hpp")
 # Primary build target
-add_library(weirdlib ${WEIRDLIB_SOURCES})
+add_library(weirdlib ${WEIRDLIB_SOURCES} ${WEIRDLIB_INCLUDE_SOURCES})
 set_target_properties(weirdlib PROPERTIES
 	CXX_STANDARD 17
 	CXX_STANDARD_REQUIRED ON
 )
 
+# CUDA components
+if(WEIRDLIB_ENABLE_CUDA)
+	add_compile_definitions(WLIB_ENABLE_CUDA)
+	enable_language(CUDA)
 
+	file(GLOB_RECURSE WEIRDLIB_CUDA_SOURCES "include/cuda/*" "src/cuda/*.cu" "src/cuda/*.cuh")
 
+	add_library(weirdlib_cuda ${WEIRDLIB_CUDA_SOURCES})
+
+	set_target_properties(weirdlib_cuda PROPERTIES
+		CUDA_SEPARABLE_COMPILATION ON)
+
+	target_link_libraries(weirdlib weirdlib_cuda Threads::Threads ${WEIRDLIB_LINKER_LIBRARIES})
+
+endif(WEIRDLIB_ENABLE_CUDA)
 
 ##|-----------------------------|##
 ##| DOCUMENTATION CONFIGURATION |##

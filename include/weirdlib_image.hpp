@@ -128,6 +128,10 @@ namespace image
 		/// @param format image format @{link ColorFormat}
 		/// @return pixel count
 		static size_t GetTotalImageSize(const uint64_t width, const uint64_t height, const ColorFormat format) noexcept;
+
+		/// Get pixel values as 8-bit integers
+		/// @return vector of pixels represented as 8-bit unsigned integers in AoS order
+		std::vector<uint8_t> GetPixelsAsInt();
 	};
 
 	/// Class representing a 2D image in Structure of Arrays format (i.e. RRR GGG BBB) <br>
@@ -140,8 +144,8 @@ namespace image
 		ColorFormat format;
 		std::vector<float*> channels;
 
-		/// Does not allow a default constructor
-		ImageSoA() = delete;
+		/// Object is in invalid state after default construction
+		ImageSoA() = default;
 
 		/// Construct from AoS @{link Image}
 		ImageSoA(const Image&);
@@ -158,6 +162,44 @@ namespace image
 		/// @return AoS @{link Image}
 		Image ConvertToImage();
 	};
+
+	namespace cu
+	{
+		/// Class representing a 2D image in Structure of Arrays format, stored on the GPU (i.e. RRR GGG BBB) <br>
+		class ImageSoACUDA
+		{
+			public:
+			uint64_t width;
+			uint64_t height;
+			ColorFormat format;
+			std::vector<float*> channels;
+
+			/// Object is in invalid state after default construction
+			ImageSoACUDA() = default;
+
+			/// Construct from CPU AoS @{link Image}
+			ImageSoACUDA(const Image&);
+
+			/// Construct from CPU SoA @{link ImageSoA}
+			ImageSoACUDA(const ImageSoA&);
+
+			/// Copy constructor
+			ImageSoACUDA(const ImageSoACUDA&);
+
+			/// Copy assignment operator
+			ImageSoACUDA& operator=(const ImageSoACUDA&);
+
+			~ImageSoACUDA();
+
+			/// Convert to SoA image in CPU memory
+			ImageSoA ConvertToImageSoA();
+
+			/// Convert to AoS image in CPU memory
+			Image ConvertToImage();
+		};
+
+	} // namespace cu
+
 
 	/// Convert image into a grayscale representation using various methods described in @{link GrayscaleMethod}
 	/// @param inImg image to be modified

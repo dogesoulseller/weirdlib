@@ -117,7 +117,7 @@ TEST(ImgOps, ColorOrderConversion) {
 	EXPECT_EQ(testSoANA.channels[3][0], 255.0f);
 }
 
-constexpr size_t PixelSampleCount = 50000;
+constexpr size_t PixelSampleCount = 3000;
 
 TEST(ImgOps, NegateValues) {
 	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");

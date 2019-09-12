@@ -173,8 +173,8 @@ namespace wlib::image
 		}
 
 		for (size_t i = 0; i < channels.size(); i++) {
-			auto chan = new float[Image::GetTotalImageSize(width, height, format)];
-			std::copy(img.channels[i], img.channels[i] + Image::GetTotalImageSize(width, height, format), chan);
+			auto chan = new float[width * height];
+			std::copy(img.channels[i], img.channels[i] + width * height, chan);
 			channels[i] = chan;
 		}
 
@@ -547,6 +547,18 @@ namespace wlib::image
 				out[i] = static_cast<float>(in[i]);
 			}
 		#endif
+	}
+
+	std::vector<uint8_t> Image::GetPixelsAsInt() {
+		alignas(64) std::vector<uint8_t> pixelsOut;
+		size_t dataLength = Image::GetTotalImageSize(width, height, format);
+		pixelsOut.resize(dataLength);
+
+		for (size_t i = 0; i < dataLength; i++) {
+			pixelsOut[i] = static_cast<uint8_t>(pixels[i]);
+		}
+
+		return pixelsOut;
 	}
 
 	void ConvertToRGB(ImageSoA& in) {
