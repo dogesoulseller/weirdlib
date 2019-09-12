@@ -258,7 +258,7 @@ namespace wlib::image
 		case GrayscaleMethod::Luminosity:
 		{
 			// Processing with SIMD
-			#if X86_SIMD_LEVEL >= 7
+			#if X86_SIMD_LEVEL >= LV_AVX
 				const auto redMul = _mm256_set1_ps(0.2126f);
 				const auto greenMul = _mm256_set1_ps(0.7152f);
 				const auto blueMul = _mm256_set1_ps(0.0722f);
@@ -290,7 +290,7 @@ namespace wlib::image
 				}
 
 				_mm256_zeroupper();
-			#elif X86_SIMD_LEVEL >= 1
+			#elif X86_SIMD_LEVEL >= LV_SSE
 				const auto redMul = _mm_set1_ps(0.2126f);
 				const auto greenMul = _mm_set1_ps(0.7152f);
 				const auto blueMul = _mm_set1_ps(0.0722f);
@@ -334,7 +334,7 @@ namespace wlib::image
 		case GrayscaleMethod::Lightness:
 		{
 			// Processing with SIMD
-			#if X86_SIMD_LEVEL >= 7
+			#if X86_SIMD_LEVEL >= LV_AVX
 				const auto maxMask = _mm256_set1_ps(255.0f);
 				const auto divMask = _mm256_set1_ps(0.5f);
 
@@ -371,7 +371,7 @@ namespace wlib::image
 				}
 
 				_mm256_zeroupper();
-			#elif X86_SIMD_LEVEL >= 1
+			#elif X86_SIMD_LEVEL >= LV_SSE
 				const auto maxMask = _mm_set1_ps(255.0f);
 				const auto divMask = _mm_set1_ps(0.5f);
 
@@ -421,7 +421,7 @@ namespace wlib::image
 		case GrayscaleMethod::Average:
 		{
 			// Processing with SIMD
-			#if X86_SIMD_LEVEL >= 7
+			#if X86_SIMD_LEVEL >= LV_AVX
 				const auto maxMask = _mm256_set1_ps(255.0f);
 				const auto divMask = _mm256_set1_ps(0.3333333333f);
 
@@ -453,7 +453,7 @@ namespace wlib::image
 				}
 
 				_mm256_zeroupper();
-			#elif X86_SIMD_LEVEL >= 1
+			#elif X86_SIMD_LEVEL >= LV_SSE
 				const auto maxMask = _mm_set1_ps(255.0f);
 				const auto divMask = _mm_set1_ps(0.3333333333f);
 
@@ -527,7 +527,7 @@ namespace wlib::image
 	}
 
 	void ConvertUint8ToFloat(const uint8_t* in, float* out, size_t fileSize) {
-		#if X86_SIMD_LEVEL >= 9
+		#if X86_SIMD_LEVEL >= LV_AVX512
 			size_t iters = fileSize / 16;
 			size_t itersRem = fileSize % 16;
 
@@ -541,7 +541,7 @@ namespace wlib::image
 			for (size_t i = iters * 16; i < iters * 16 + itersRem; i++) {
 				out[i] = static_cast<float>(in[i]);
 			}
-		#elif X86_SIMD_LEVEL >= 8
+		#elif X86_SIMD_LEVEL >= LV_AVX2
 			size_t iters = fileSize / 8;
 			size_t itersRem = fileSize % 8;
 
@@ -557,7 +557,7 @@ namespace wlib::image
 			for (size_t i = iters * 8; i < iters * 8 + itersRem; i++) {
 				out[i] = static_cast<float>(in[i]);
 			}
-		#elif X86_SIMD_LEVEL >= 5
+		#elif X86_SIMD_LEVEL >= LV_SSE41
 			size_t iters = fileSize / 4;
 			size_t itersRem = fileSize % 4;
 

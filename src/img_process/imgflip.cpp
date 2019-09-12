@@ -3,7 +3,7 @@
 
 namespace wlib::image
 {
-	#if X86_SIMD_LEVEL >= 9
+	#if X86_SIMD_LEVEL >= LV_AVX512
 	static void FV_AVX512_GRAY_IGNORE_ALPHA(ImageSoA& in) {
 		const size_t SIMDIter = (in.width * in.height) / 16;
 		const size_t SIMDIRem = (in.width * in.height) % 16;
@@ -59,7 +59,7 @@ namespace wlib::image
 		}
 
 	}
-	#elif X86_SIMD_LEVEL >= 7
+	#elif X86_SIMD_LEVEL >= LV_AVX
 	static void FV_AVX_GRAY_IGNORE_ALPHA(ImageSoA& in) {
 		const size_t SIMDIter = (in.width * in.height) / 8;
 		const size_t SIMDIRem = (in.width * in.height) % 8;
@@ -115,7 +115,7 @@ namespace wlib::image
 		}
 
 	}
-	#elif X86_SIMD_LEVEL >= 1
+	#elif X86_SIMD_LEVEL >= LV_SSE
 	static void FV_SSE_GRAY_IGNORE_ALPHA(ImageSoA& in) {
 		const size_t SIMDIter = (in.width * in.height) / 4;
 		const size_t SIMDIRem = (in.width * in.height) % 4;
@@ -198,42 +198,42 @@ namespace wlib::image
 	void NegateValues(ImageSoA& in, bool withAlpha) {
 		if (!withAlpha) {
 			if (in.channels.size() == 2) {	// GA
-				#if X86_SIMD_LEVEL >= 9
+				#if X86_SIMD_LEVEL >= LV_AVX512
 				FV_AVX512_GRAY_IGNORE_ALPHA(in);
-				#elif X86_SIMD_LEVEL >= 7
+				#elif X86_SIMD_LEVEL >= LV_AVX
 				FV_AVX_GRAY_IGNORE_ALPHA(in);
-				#elif X86_SIMD_LEVEL >= 1
+				#elif X86_SIMD_LEVEL >= LV_SSE
 				FV_SSE_GRAY_IGNORE_ALPHA(in);
 				#else
 				FV_GENERIC_GRAY_IGNORE_ALPHA(in);
 				#endif
 			} else if (in.channels.size() == 4) {	// xxxA
-				#if X86_SIMD_LEVEL >= 9
+				#if X86_SIMD_LEVEL >= LV_AVX512
 				FV_AVX512_RGB_IGNORE_ALPHA(in);
-				#elif X86_SIMD_LEVEL >= 7
+				#elif X86_SIMD_LEVEL >= LV_AVX
 				FV_AVX_RGB_IGNORE_ALPHA(in);
-				#elif X86_SIMD_LEVEL >= 1
+				#elif X86_SIMD_LEVEL >= LV_SSE
 				FV_SSE_RGB_IGNORE_ALPHA(in);
 				#else
 				FV_GENERIC_RGB_IGNORE_ALPHA(in);
 				#endif
 			} else {
-				#if X86_SIMD_LEVEL >= 9
+				#if X86_SIMD_LEVEL >= LV_AVX512
 				FV_AVX512_ALL_PROCESS_ALPHA(in);
-				#elif X86_SIMD_LEVEL >= 7
+				#elif X86_SIMD_LEVEL >= LV_AVX
 				FV_AVX_ALL_PROCESS_ALPHA(in);
-				#elif X86_SIMD_LEVEL >= 1
+				#elif X86_SIMD_LEVEL >= LV_SSE
 				FV_SSE_ALL_PROCESS_ALPHA(in);
 				#else
 				FV_GENERIC_ALL_PROCESS_ALPHA(in);
 				#endif
 			}
 		} else {
-			#if X86_SIMD_LEVEL >= 9
+			#if X86_SIMD_LEVEL >= LV_AVX512
 			FV_AVX512_ALL_PROCESS_ALPHA(in);
-			#elif X86_SIMD_LEVEL >= 7
+			#elif X86_SIMD_LEVEL >= LV_AVX
 			FV_AVX_ALL_PROCESS_ALPHA(in);
-			#elif X86_SIMD_LEVEL >= 1
+			#elif X86_SIMD_LEVEL >= LV_SSE
 			FV_SSE_ALL_PROCESS_ALPHA(in);
 			#else
 			FV_GENERIC_ALL_PROCESS_ALPHA(in);

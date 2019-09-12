@@ -1,4 +1,14 @@
 #pragma once
+#define LV_NOSIMD 0
+#define LV_SSE 1
+#define LV_SSE2 2
+#define LV_SSE3 3
+#define LV_SSSE3 4
+#define LV_SSE41 5
+#define LV_SSE42 6
+#define LV_AVX 7
+#define LV_AVX2 8
+#define LV_AVX512 9
 
 /**
  *	Check CPU feature set available in target platform and define it in a simpler way
@@ -18,7 +28,7 @@
 
 // Detect x86 SIMD capabilities
 #if defined(__AVX512F__)	// AVX512 is more complex and requires further detection
-	#define X86_SIMD_LEVEL 9
+	#define X86_SIMD_LEVEL LV_AVX512
 	// Byte and Word
 	#if defined(__AVX512BW__)
 		#define AVX512_BW
@@ -34,23 +44,23 @@
 		#define AVX512_VL
 	#endif
 #elif defined(__AVX2__)
-	#define X86_SIMD_LEVEL 8
+	#define X86_SIMD_LEVEL LV_AVX2
 #elif defined(__AVX__)
-	#define X86_SIMD_LEVEL 7
+	#define X86_SIMD_LEVEL LV_AVX
 #elif defined(__SSE4_2__)
-	#define X86_SIMD_LEVEL 6
+	#define X86_SIMD_LEVEL LV_SSE42
 #elif defined(__SSE4_1__)
-	#define X86_SIMD_LEVEL 5
+	#define X86_SIMD_LEVEL LV_SSE41
 #elif defined(__SSSE3__)
-	#define X86_SIMD_LEVEL 4
+	#define X86_SIMD_LEVEL LV_SSSE3
 #elif defined(__SSE3__)
-	#define X86_SIMD_LEVEL 3
+	#define X86_SIMD_LEVEL LV_SSE3
 #elif defined(__SSE2__) || defined(__x86_64__)	// x64 guarantees at least SSE2 presence
-	#define X86_SIMD_LEVEL 2
+	#define X86_SIMD_LEVEL LV_SSE2
 #elif defined(__SSE__)
-	#define X86_SIMD_LEVEL 1
+	#define X86_SIMD_LEVEL LV_SSE
 #else
-	#define X86_SIMD_LEVEL 0
+	#define X86_SIMD_LEVEL LV_NOSIMD
 #endif
 
 // Detect FMA presence separately (because AMD)

@@ -123,7 +123,7 @@ namespace bop
 				);
 				return output;
 			}
-		#elif defined(__BMI__) || X86_SIMD_LEVEL > 8
+		#elif defined(__BMI__) || X86_SIMD_LEVEL >= LV_AVX2
 			if constexpr (std::is_same_v<T, uint32_t>) {
 				return _tzcnt_u32(x);
 			} else if constexpr (std::is_same_v<T, uint64_t>) {
@@ -189,7 +189,7 @@ namespace bop
 				);
 				return output;
 			}
-		#elif (defined(__ABM__) || defined(__BMI__)) || X86_SIMD_LEVEL > 8
+		#elif (defined(__ABM__) || defined(__BMI__)) || X86_SIMD_LEVEL >= LV_AVX2
 			if constexpr (std::is_same_v<T, uint32_t>) {
 				return _lzcnt_u32(x);
 			} else if constexpr (std::is_same_v<T, uint64_t>) {

@@ -37,7 +37,7 @@ namespace wlib::str
 					}
 				}
 			}
-		#elif X86_SIMD_LEVEL >= 8 	// AVX2
+		#elif X86_SIMD_LEVEL >= LV_AVX2
 			// Move through bytes with a 32-byte stride
 			if (reinterpret_cast<const size_t>(s) % 32 == 0) {
 				while (true) {
@@ -66,7 +66,7 @@ namespace wlib::str
 					}
 				}
 			}
-		#elif X86_SIMD_LEVEL >= 2 // SSE2
+		#elif X86_SIMD_LEVEL >= LV_SSE2
 			// Move through bytes with a 16-byte stride
 			if (reinterpret_cast<const size_t>(s) % 16 == 0) {
 				while (true) {
@@ -166,7 +166,7 @@ namespace wlib::str
 
 		#endif
 
-		#if X86_SIMD_LEVEL >= 8 // AVX2
+		#if X86_SIMD_LEVEL >= LV_AVX2
 
 		if (len >= 32) {
 			iters = len / 32;
@@ -193,7 +193,7 @@ namespace wlib::str
 
 		#endif
 
-		#if X86_SIMD_LEVEL >= 2 // SSE2
+		#if X86_SIMD_LEVEL >= LV_SSE2
 
 		if (len >= 16) {
 			iters = len / 16;
