@@ -11,19 +11,19 @@ namespace cu
 {
 	template<GrayscaleMethod method = GrayscaleMethod::Luminosity>
 	__global__ void kernel_ConvertGrayscaleRGB(const float* __restrict__ r, const float* __restrict__ g, const float* __restrict__ b, float* __restrict__ outGray) {
-		const int pixelID = getGlobalIdx_2x1();
+		const int pixelID = getGlobalIdx_1x1();
 		outGray[pixelID] = fminf(fmaf(r[pixelID], 0.2126f, fmaf(g[pixelID], 0.7152f, b[pixelID] * 0.0722f)), 255.0f);
 	}
 
 	template<>
 	__global__ void kernel_ConvertGrayscaleRGB<GrayscaleMethod::Lightness>(const float* __restrict__ r, const float* __restrict__ g, const float* __restrict__ b, float* __restrict__ outGray) {
-		const int pixelID = getGlobalIdx_2x1();
+		const int pixelID = getGlobalIdx_1x1();
 		outGray[pixelID] = fmaxf(r[pixelID], fmaxf(g[pixelID], b[pixelID]));
 	}
 
 	template<>
 	__global__ void kernel_ConvertGrayscaleRGB<GrayscaleMethod::Average>(const float* __restrict__ r, const float* __restrict__ g, const float* __restrict__ b, float* __restrict__ outGray) {
-		const int pixelID = getGlobalIdx_2x1();
+		const int pixelID = getGlobalIdx_1x1();
 		outGray[pixelID] = (r[pixelID] + g[pixelID] + b[pixelID]) * (1.0f/3.0f);
 	}
 
@@ -34,7 +34,7 @@ namespace cu
 		}
 
 		float* outGray;
-		size_t channelSize = inImg.width * inImg.height * sizeof(float);
+		const size_t channelSize = inImg.width * inImg.height * sizeof(float);
 		cudaMalloc(&outGray, channelSize);
 
 		float* red;
@@ -51,18 +51,22 @@ namespace cu
 			blue = inImg.channels[0];
 		}
 
+		const size_t blockSize = getBlockSize(inImg.width * inImg.height);
+		const size_t gridSize = inImg.width * inImg.height / blockSize;
+
 		cudaStream_t stream;
 		cudaStreamCreate(&stream);
+
 		switch (method)
 		{
 		case GrayscaleMethod::Luminosity:
-			kernel_ConvertGrayscaleRGB<GrayscaleMethod::Luminosity><<<dim3(inImg.width, inImg.height), 1, 0, stream>>>(red, green, blue, outGray);
+			kernel_ConvertGrayscaleRGB<GrayscaleMethod::Luminosity><<<gridSize, blockSize, 0, stream>>>(red, green, blue, outGray);
 			break;
 		case GrayscaleMethod::Lightness:
-			kernel_ConvertGrayscaleRGB<GrayscaleMethod::Lightness><<<dim3(inImg.width, inImg.height), 1, 0, stream>>>(red, green, blue, outGray);
+			kernel_ConvertGrayscaleRGB<GrayscaleMethod::Lightness><<<gridSize, blockSize, 0, stream>>>(red, green, blue, outGray);
 			break;
 		case GrayscaleMethod::Average:
-			kernel_ConvertGrayscaleRGB<GrayscaleMethod::Average><<<dim3(inImg.width, inImg.height), 1, 0, stream>>>(red, green, blue, outGray);
+			kernel_ConvertGrayscaleRGB<GrayscaleMethod::Average><<<gridSize, blockSize, 0, stream>>>(red, green, blue, outGray);
 			break;
 		}
 		cudaStreamDestroy(stream);

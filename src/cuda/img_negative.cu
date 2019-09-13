@@ -10,11 +10,14 @@ namespace image
 namespace cu
 {
 	__global__ void kernel_NegateChannelValues(float* __restrict__ inout) {
-		const int threadID = getGlobalIdx_2x1();
+		const int threadID = getGlobalIdx_1x1();
 		inout[threadID] = 255.0f - inout[threadID];
 	}
 
 	void NegateValues(ImageSoACUDA& in, bool withAlpha) {
+		const size_t blockSize = getBlockSize(in.width * in.height);
+		const size_t gridSize = in.width * in.height / blockSize;
+
 		switch (in.format)
 		{
 		case F_BGR:
@@ -24,7 +27,7 @@ namespace cu
 			for (size_t i = 0; i < in.channels.size(); i++) {
 				cudaStream_t stream;
 				cudaStreamCreate(&stream);
-				kernel_NegateChannelValues<<<dim3(in.width, in.height), 1, 0, stream>>>(in.channels[i]);
+				kernel_NegateChannelValues<<<gridSize, blockSize, 0, stream>>>(in.channels[i]);
 				cudaStreamDestroy(stream);
 			}
 		}
@@ -36,14 +39,14 @@ namespace cu
 				for (size_t i = 0; i < in.channels.size()-1; i++) {
 					cudaStream_t stream;
 					cudaStreamCreate(&stream);
-					kernel_NegateChannelValues<<<dim3(in.width, in.height), 1, 0, stream>>>(in.channels[i]);
+					kernel_NegateChannelValues<<<gridSize, blockSize, 0, stream>>>(in.channels[i]);
 					cudaStreamDestroy(stream);
 				}
 			} else {
 				for (size_t i = 0; i < in.channels.size(); i++) {
 					cudaStream_t stream;
 					cudaStreamCreate(&stream);
-					kernel_NegateChannelValues<<<dim3(in.width, in.height), 1, 0, stream>>>(in.channels[i]);
+					kernel_NegateChannelValues<<<gridSize, blockSize, 0, stream>>>(in.channels[i]);
 					cudaStreamDestroy(stream);
 				}
 			}
