@@ -69,4 +69,20 @@ TEST(CUDAImage, NegateValues) {
 
 }
 
+TEST(CUDAImage, Histogram) {
+	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	ASSERT_TRUE(std::filesystem::exists(imgPath));
+
+	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
+	wlib::image::cu::ImageSoACUDA testRGBA(testImg);
+
+	auto histogram = wlib::image::cu::GetHistogram(testRGBA);
+
+	EXPECT_TRUE(histogram.Gray.empty());
+	EXPECT_FALSE(histogram.Red.empty());
+	EXPECT_FALSE(histogram.Green.empty());
+	EXPECT_FALSE(histogram.Blue.empty());
+	EXPECT_FALSE(histogram.Alpha.empty());
+}
+
 #endif

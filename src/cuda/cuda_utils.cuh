@@ -79,4 +79,26 @@ inline int getImageSplit(const int imgHeight) {
 		return 1;
 	}
 }
+
+inline size_t getBlockSize(const size_t imgHeight) {
+	if (imgHeight % 256 == 0) {
+		return 256;
+	} else if (imgHeight % 128 == 0) {
+		return 128;
+	} else if (imgHeight % 64 == 0) {
+		return 64;
+	} else if (imgHeight % 32 == 0) {
+		return 32;
+	} else if (imgHeight % 16 == 0) {
+		return 16;
+	} else if (imgHeight % 8 == 0) {
+		return 8;
+	} else if (imgHeight % 4 == 0) {
+		return 4;
+	} else if (imgHeight % 2 == 0) {
+		return 2;
+	} else {
+		return 1;
+	}
+}
 #endif
