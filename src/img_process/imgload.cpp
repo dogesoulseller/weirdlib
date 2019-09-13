@@ -16,7 +16,7 @@
 
 namespace wlib::image
 {
-	Image::Image(const std::string& path, bool isRawData, const uint64_t _width, const uint64_t _height, ColorFormat requestedFormat) {
+	Image::Image(const std::string& path, const bool isRawData, const uint64_t _width, const uint64_t _height, const ColorFormat requestedFormat) {
 		LoadImage(path, isRawData,_width, _height, requestedFormat);
 	}
 
@@ -29,7 +29,7 @@ namespace wlib::image
 	}
 
 
-	void Image::LoadImage(const std::string& path, bool isRawData, const uint64_t _width, const uint64_t _height, ColorFormat requestedFormat) {
+	void Image::LoadImage(const std::string& path, const bool isRawData, const uint64_t _width, const uint64_t _height, const ColorFormat requestedFormat) {
 		std::ifstream f(path, std::ios::binary | std::ios::ate);
 		size_t fileSize = f.tellg();
 		f.seekg(0);
@@ -152,7 +152,7 @@ namespace wlib::image
 {
 	constexpr const char* errMsg = "This function is a stub - image ops module was disabled for this compilation";
 
-	Image::Image(const std::string& /*path*/, bool /*isRawData*/, const uint64_t /*_width*/, const uint64_t /*_height*/, ColorFormat /*requestedFormat*/) {
+	Image::Image(const std::string& /*path*/, const bool /*isRawData*/, const uint64_t /*_width*/, const uint64_t /*_height*/, const ColorFormat /*requestedFormat*/) {
 		throw wlib::module_not_built(errMsg);
 	}
 	Image::Image(const uint8_t* /*_pixels*/, const uint64_t /*_width*/, const uint64_t /*_height*/, const ColorFormat /*_format*/) {
@@ -161,7 +161,7 @@ namespace wlib::image
 	Image::Image(const float* /*_pixels*/, const uint64_t /*_width*/, const uint64_t /*_height*/, const ColorFormat /*_format*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	void Image::LoadImage(const std::string& /*path*/, bool /*isRawData*/, const uint64_t /*_width*/, const uint64_t /*_height*/, ColorFormat /*requestedFormat*/) {
+	void Image::LoadImage(const std::string& /*path*/, const bool /*isRawData*/, const uint64_t /*_width*/, const uint64_t /*_height*/, const ColorFormat /*requestedFormat*/) {
 		throw wlib::module_not_built(errMsg);
 	}
 	void Image::LoadImage(const uint8_t* /*_pixels*/, const uint64_t /*_width*/, const uint64_t /*_height*/, const ColorFormat /*_format*/) {

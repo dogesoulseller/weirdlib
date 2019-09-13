@@ -159,7 +159,7 @@ namespace wlib::anxiety
 		return output[0];
 	}
 
-	void StressSquareRoot(std::chrono::milliseconds duration, size_t threadCount) {
+	void StressSquareRoot(const std::chrono::milliseconds duration, const size_t threadCount) {
 		std::vector<std::thread> hogThreads;
 		hogThreads.reserve(threadCount);
 
@@ -188,11 +188,11 @@ namespace wlib::anxiety
 		}
 	}
 
-	void StressSquareRoot(size_t durationMS, size_t threadCount) {
+	void StressSquareRoot(const size_t durationMS, const size_t threadCount) {
 		StressSquareRoot(std::chrono::milliseconds(durationMS), threadCount);
 	}
 
-	void StressInverseSquareRoot(std::chrono::milliseconds duration, size_t threadCount) {
+	void StressInverseSquareRoot(const std::chrono::milliseconds duration, const size_t threadCount) {
 		std::vector<std::thread> hogThreads;
 		hogThreads.reserve(threadCount);
 
@@ -221,23 +221,23 @@ namespace wlib::anxiety
 		}
 	}
 
-	void StressInverseSquareRoot(size_t durationMS, size_t threadCount) {
+	void StressInverseSquareRoot(const size_t durationMS, const size_t threadCount) {
 		StressInverseSquareRoot(std::chrono::milliseconds(durationMS), threadCount);
 	}
 
 	#else
 	constexpr const char* errMsg = "This function is a stub - stress test module was disabled for this compilation";
 
-	void StressSquareRoot(std::chrono::milliseconds /*duration*/, size_t /*threadCount*/) {
+	void StressSquareRoot(const std::chrono::milliseconds /*duration*/, const size_t /*threadCount*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	void StressSquareRoot(size_t /*durationMS*/, size_t /*threadCount*/) {
+	void StressSquareRoot(const size_t /*durationMS*/, const size_t /*threadCount*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	void StressInverseSquareRoot(std::chrono::milliseconds /*duration*/, size_t /*threadCount*/) {
+	void StressInverseSquareRoot(const std::chrono::milliseconds /*duration*/, const size_t /*threadCount*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	void StressInverseSquareRoot(size_t /*durationMS*/, size_t /*threadCount*/) {
+	void StressInverseSquareRoot(const size_t /*durationMS*/, const size_t /*threadCount*/) {
 		throw wlib::module_not_built(errMsg);
 	}
 	#endif

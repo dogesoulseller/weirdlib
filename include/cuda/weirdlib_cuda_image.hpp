@@ -25,13 +25,13 @@ namespace cu
 	/// @param preserveAlpha whether alpha should be kept or discarded
 	/// @param method grayscale calculation method
 	/// @return reference to modified input image
-	ImageSoACUDA& ConvertToGrayscale(ImageSoACUDA& inImg, bool preserveAlpha = false, GrayscaleMethod method = GrayscaleMethod::Luminosity);
+	ImageSoACUDA& ConvertToGrayscale(ImageSoACUDA& inImg, const bool preserveAlpha = false, const GrayscaleMethod method = GrayscaleMethod::Luminosity);
 
 	/// Convert all color values (in GPU memory) to their image negative version <br>
 	/// Effectively does max_val - current_val
 	/// @param in input image
 	/// @param withAlpha whether to preserve alpha channel
-	void NegateValues(ImageSoACUDA& in, bool withAlpha = false);
+	void NegateValues(ImageSoACUDA& in, const bool withAlpha = false);
 
 	/// Get histogram data for each channel
 	/// @param in input image

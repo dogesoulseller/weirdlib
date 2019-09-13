@@ -66,7 +66,7 @@ namespace wlib
 
 		/// Preallocate memory for `size` elements
 		/// @param size new size
-		void reserve(size_t size);
+		void reserve(const size_t size);
 
 		/// Get max element count possible for container
 		/// @return max element count
@@ -277,7 +277,7 @@ namespace wlib
 			m_kvpairs.clear();
 		}
 
-		void reserve(size_t size) {
+		void reserve(const size_t size) {
 			m_kvpairs.reserve(size);
 		}
 

@@ -33,7 +33,7 @@ namespace wlib::anxiety
 		return float_dist(rng);
 	}
 
-	void StressFMA(std::chrono::milliseconds duration, size_t threadCount) {
+	void StressFMA(const std::chrono::milliseconds duration, const size_t threadCount) {
 		std::vector<std::thread> hogThreads;
 		hogThreads.reserve(threadCount);
 
@@ -62,17 +62,17 @@ namespace wlib::anxiety
 		}
 	}
 
-	void StressFMA(size_t durationMS, size_t threadCount) {
+	void StressFMA(const size_t durationMS, const size_t threadCount) {
 		StressFMA(std::chrono::milliseconds(durationMS), threadCount);
 	}
 
 	#else
 	constexpr const char* errMsg = "This function is a stub - stress test module was disabled for this compilation";
 
-	void StressFMA(std::chrono::milliseconds /*duration*/, size_t /*threadCount*/) {
+	void StressFMA(const std::chrono::milliseconds /*duration*/, const size_t /*threadCount*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	void StressFMA(size_t /*durationMS*/, size_t /*threadCount*/) {
+	void StressFMA(const size_t /*durationMS*/, const size_t /*threadCount*/) {
 		throw wlib::module_not_built(errMsg);
 	}
 	#endif

@@ -57,7 +57,7 @@ namespace image
 		/// @param width width in pixels
 		/// @param height height in pixels
 		/// @param requestedFormat format to convert to on load, or in case of raw data, to interpret as
-		Image(const std::string& path, bool isRawData = false, const uint64_t width = 0, const uint64_t height = 0, ColorFormat requestedFormat = F_Default);
+		Image(const std::string& path, const bool isRawData = false, const uint64_t width = 0, const uint64_t height = 0, const ColorFormat requestedFormat = F_Default);
 
 		/// Constructor from in-memory 8-bit per color pixel data
 		/// @param width width in pixels
@@ -92,7 +92,7 @@ namespace image
 		/// @param width width in pixels
 		/// @param height height in pixels
 		/// @param requestedFormat format to convert to on load, or in case of raw data, to interpret as
-		void LoadImage(const std::string& path, bool isRawData = false, const uint64_t width = 0, const uint64_t height = 0, ColorFormat requestedFormat = F_Default);
+		void LoadImage(const std::string& path, const bool isRawData = false, const uint64_t width = 0, const uint64_t height = 0, const ColorFormat requestedFormat = F_Default);
 
 		/// Load image from in-memory 8-bit per color pixel data
 		/// @param width width in pixels
@@ -206,13 +206,13 @@ namespace image
 	/// @param preserveAlpha whether alpha should be kept or discarded
 	/// @param method grayscale calculation method
 	/// @return reference to modified input image
-	ImageSoA& ConvertToGrayscale(ImageSoA& inImg, bool preserveAlpha = false, GrayscaleMethod method = GrayscaleMethod::Luminosity);
+	ImageSoA& ConvertToGrayscale(ImageSoA& inImg, const bool preserveAlpha = false, const GrayscaleMethod method = GrayscaleMethod::Luminosity);
 
 	/// Function converting 8bpc into 32bpc float
 	/// @param in pointer to raw image data
 	/// @param out caller-managed pointer to destination
 	/// @param fileSize total number of pixels
-	void ConvertUint8ToFloat(const uint8_t* in, float* out, size_t fileSize);
+	void ConvertUint8ToFloat(const uint8_t* in, float* out, const size_t fileSize);
 
 	/// Convert input image to RGBA
 	/// @param in input image
@@ -234,7 +234,7 @@ namespace image
 	/// Effectively does max_val - current_val
 	/// @param in input image
 	/// @param withAlpha whether to preserve alpha channel
-	void NegateValues(ImageSoA& in, bool withAlpha = false);
+	void NegateValues(ImageSoA& in, const bool withAlpha = false);
 
 } // namespace image
 } // namespace wlib

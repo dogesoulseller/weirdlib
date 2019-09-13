@@ -10,7 +10,7 @@ namespace image
 {
 namespace cu
 {
-	__global__ void kernel_ChannelHistogram(float* __restrict__ input, uint64_t* __restrict__ channelOutput) {
+	__global__ void kernel_ChannelHistogram(const float* __restrict__ input, uint64_t* __restrict__ channelOutput) {
 		const int threadId = getGlobalIdx_1x1();
 
 		atomicAdd((unsigned long long int*)&channelOutput[(int)input[threadId]], 1ULL);

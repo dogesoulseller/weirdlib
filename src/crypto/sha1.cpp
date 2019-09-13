@@ -28,13 +28,13 @@ namespace wlib::crypto
 			reset();
 		}
 
-		void SHA1::reset() {
+		void SHA1::reset() noexcept {
 			digest = SHA1_DIGEST_BASE;
 			transform_count = 0;
 			buffer.clear();
 		}
 
-		std::array<uint32_t, SHA1_BLOCK_INTS> SHA1::buffer_to_block() {
+		std::array<uint32_t, SHA1_BLOCK_INTS> SHA1::buffer_to_block() noexcept {
 			std::array<uint32_t, SHA1_BLOCK_INTS> block;
 
 			for (size_t i = 0; i < block.size(); i++) {
@@ -100,40 +100,40 @@ namespace wlib::crypto
 			return result.str();
 		}
 
-		uint32_t SHA1::blk(const std::array<uint32_t, SHA1_BLOCK_INTS>& block, const size_t i) {
+		uint32_t SHA1::blk(const std::array<uint32_t, SHA1_BLOCK_INTS>& block, const size_t i) noexcept {
 			return wlib::bop::rotate_left(block[(i+13)&15] ^ block[(i+8)&15] ^ block[(i+2)&15] ^ block[i], 1);
 		}
 
-		void SHA1::R0(const std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) {
+		void SHA1::R0(const std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept {
 			z += ((w&(x^y))^y) + block[i] + SHA1_R0_R1_CONSTANT + wlib::bop::rotate_left(v, 5);
     		w = wlib::bop::rotate_left(w, 30);
 		}
 
-		void SHA1::R1(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) {
+		void SHA1::R1(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept {
 			block[i] = blk(block, i);
     		z += ((w&(x^y))^y) + block[i] + SHA1_R0_R1_CONSTANT + wlib::bop::rotate_left(v, 5);
     		w = wlib::bop::rotate_left(w, 30);
 		}
 
-		void SHA1::R2(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) {
+		void SHA1::R2(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept {
 			block[i] = blk(block, i);
     		z += (w^x^y) + block[i] + SHA1_R2_CONSTANT + wlib::bop::rotate_left(v, 5);
     		w = wlib::bop::rotate_left(w, 30);
 		}
 
-		void SHA1::R3(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) {
+		void SHA1::R3(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept {
 			block[i] = blk(block, i);
     		z += (((w|x)&y)|(w&x)) + block[i] + SHA1_R3_CONSTANT + wlib::bop::rotate_left(v, 5);
     		w = wlib::bop::rotate_left(w, 30);
 		}
 
-		void SHA1::R4(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) {
+		void SHA1::R4(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept {
 			block[i] = blk(block, i);
     		z += (w^x^y) + block[i] + SHA1_R4_CONSTANT + wlib::bop::rotate_left(v, 5);
     		w = wlib::bop::rotate_left(w, 30);
 		}
 
-		void SHA1::transform(std::array<uint32_t, SHA1_BLOCK_INTS>& block) {
+		void SHA1::transform(std::array<uint32_t, SHA1_BLOCK_INTS>& block) noexcept {
 			uint32_t a = digest[0];
 			uint32_t b = digest[1];
 			uint32_t c = digest[2];

@@ -14,7 +14,7 @@ namespace cu
 		inout[threadID] = 255.0f - inout[threadID];
 	}
 
-	void NegateValues(ImageSoACUDA& in, bool withAlpha) {
+	void NegateValues(ImageSoACUDA& in, const bool withAlpha) {
 		const size_t blockSize = getBlockSize(in.width * in.height);
 		const size_t gridSize = in.width * in.height / blockSize;
 

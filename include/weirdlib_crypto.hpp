@@ -51,73 +51,73 @@ namespace crypto
 	/// @param first pointer (inclusive) to start of byte array
 	/// @param last pointer (exclusive) to end of byte array
 	/// @return CRC16/ARC value
-	uint16_t CRC16ARC(uint8_t* first, uint8_t* last);
+	uint16_t CRC16ARC(const uint8_t* first, const uint8_t* last);
 
 	/// Generate a CRC16/DNP hash
 	/// @param first pointer (inclusive) to start of byte array
 	/// @param last pointer (exclusive) to end of byte array
 	/// @return CRC16/DNP value
-	uint16_t CRC16DNP(uint8_t* first, uint8_t* last);
+	uint16_t CRC16DNP(const uint8_t* first, const uint8_t* last);
 
 	/// Generate a CRC16/MAXIM hash
 	/// @param first pointer (inclusive) to start of byte array
 	/// @param last pointer (exclusive) to end of byte array
 	/// @return CRC16/MAXIM value
-	uint16_t CRC16MAXIM(uint8_t* first, uint8_t* last);
+	uint16_t CRC16MAXIM(const uint8_t* first, const uint8_t* last);
 
 	/// Generate a CRC16/USB hash
 	/// @param first pointer (inclusive) to start of byte array
 	/// @param last pointer (exclusive) to end of byte array
 	/// @return CRC16/USB value
-	uint16_t CRC16USB(uint8_t* first, uint8_t* last);
+	uint16_t CRC16USB(const uint8_t* first, const uint8_t* last);
 
 	/// Generate a CRC16/X-25 hash
 	/// @param first pointer (inclusive) to start of byte array
 	/// @param last pointer (exclusive) to end of byte array
 	/// @return CRC16/X-25 value
-	uint16_t CRC16X_25(uint8_t* first, uint8_t* last);
+	uint16_t CRC16X_25(const uint8_t* first, const uint8_t* last);
 
 	/// Generate a CRC32 hash (ISO-HDLC)
 	/// @param first pointer (inclusive) to start of byte array
 	/// @param last pointer (exclusive) to end of byte array
 	/// @return CRC32 value
-	uint32_t CRC32(uint8_t* first, uint8_t* last);
+	uint32_t CRC32(const uint8_t* first, const uint8_t* last);
 
 	/// Generate a CRC32C hash (Castagnolli)
 	/// @param first pointer (inclusive) to start of byte array
 	/// @param last pointer (exclusive) to end of byte array
 	/// @return CRC32C value
-	uint32_t CRC32C(uint8_t* first, uint8_t* last);
+	uint32_t CRC32C(const uint8_t* first, const uint8_t* last);
 
 	/// Generate a CRC32D hash (BASE91-D)
 	/// @param first pointer (inclusive) to start of byte array
 	/// @param last pointer (exclusive) to end of byte array
 	/// @return CRC32D value
-	uint32_t CRC32D(uint8_t* first, uint8_t* last);
+	uint32_t CRC32D(const uint8_t* first, const uint8_t* last);
 
 	/// Generate a CRC32/AUTOSAR hash
 	/// @param first pointer (inclusive) to start of byte array
 	/// @param last pointer (exclusive) to end of byte array
 	/// @return CRC32/AUTOSAR value
-	uint32_t CRC32AUTOSAR(uint8_t* first, uint8_t* last);
+	uint32_t CRC32AUTOSAR(const uint8_t* first, const uint8_t* last);
 
 	/// Generate a CRC32/JAMCRC hash
 	/// @param first pointer (inclusive) to start of byte array
 	/// @param last pointer (exclusive) to end of byte array
 	/// @return CRC32/JAMCRC value
-	uint32_t CRC32JAMCRC(uint8_t* first, uint8_t* last);
+	uint32_t CRC32JAMCRC(const uint8_t* first, const uint8_t* last);
 
 	/// Generate a CRC64/XZ hash
 	/// @param first pointer (inclusive) to start of byte array
 	/// @param last pointer (exclusive) to end of byte array
 	/// @return CRC64/XZ value
-	uint64_t CRC64XZ(uint8_t* first, uint8_t* last);
+	uint64_t CRC64XZ(const uint8_t* first, const uint8_t* last);
 
 	/// Generate a CRC64/GO-ISO hash
 	/// @param first pointer (inclusive) to start of byte array
 	/// @param last pointer (exclusive) to end of byte array
 	/// @return CRC64/GO-ISO value
-	uint64_t CRC64ISO(uint8_t* first, uint8_t* last);
+	uint64_t CRC64ISO(const uint8_t* first, const uint8_t* last);
 
 	/// SHA-1 generator <br>
 	/// This version does not use Intel SHA Extensions yet<br>
@@ -126,24 +126,24 @@ namespace crypto
 	{
 		public:
 		SHA1();
-		void reset();
+		void reset() noexcept;
 		void update(const std::string& str);
 		void update(std::istream& str);
 		std::string finalize_to_string();
 
 		private:
 
-		uint32_t blk(const std::array<uint32_t, SHA1_BLOCK_INTS>& block, const size_t i);
+		uint32_t blk(const std::array<uint32_t, SHA1_BLOCK_INTS>& block, const size_t i) noexcept;
 
-		void R0(const std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i);
-		void R1(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i);
-		void R2(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i);
-		void R3(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i);
-		void R4(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i);
+		void R0(const std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept;
+		void R1(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept;
+		void R2(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept;
+		void R3(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept;
+		void R4(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept;
 
-		void transform(std::array<uint32_t, SHA1_BLOCK_INTS>& block);
+		void transform(std::array<uint32_t, SHA1_BLOCK_INTS>& block) noexcept;
 
-		std::array<uint32_t, SHA1_BLOCK_INTS> buffer_to_block();
+		std::array<uint32_t, SHA1_BLOCK_INTS> buffer_to_block() noexcept;
 
 		std::array<uint32_t, 5> digest;
 		std::string buffer;

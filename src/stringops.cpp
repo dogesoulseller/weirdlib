@@ -15,7 +15,7 @@ namespace wlib::str
 				while (true) {
 					const __m512i chars = _mm512_load_si512(s + offset);
 
-					int64_t mask = _mm512_cmpeq_epi8_mask(chars, SIMD512B_zeroMask);
+					const int64_t mask = _mm512_cmpeq_epi8_mask(chars, SIMD512B_zeroMask);
 					if (mask == 0) {
 						offset += 64;
 						continue;
@@ -28,7 +28,7 @@ namespace wlib::str
 				while (true) {
 					const __m512i chars = _mm512_loadu_si512(s + offset);
 
-					int64_t mask = _mm512_cmpeq_epi8_mask(chars, SIMD512B_zeroMask);
+					const int64_t mask = _mm512_cmpeq_epi8_mask(chars, SIMD512B_zeroMask);
 					if (mask == 0) {
 						offset += 64;
 						continue;
@@ -103,8 +103,8 @@ namespace wlib::str
 	}
 
 	bool strcmp(const char* str0, const char* str1) {
-		size_t str0Size = strlen(str0);
-		size_t str1Size = strlen(str1);
+		const size_t str0Size = strlen(str0);
+		const size_t str1Size = strlen(str1);
 
 		// If both strings are empty...
 		if (str0Size == 0 && str1Size == 0) {
@@ -129,8 +129,8 @@ namespace wlib::str
             return true;
         }
 
-		size_t str0Size = strlen(str0);
-		size_t str1Size = strlen(str1);
+		const size_t str0Size = strlen(str0);
+		const size_t str1Size = strlen(str1);
 
 		// If both strings are empty...
 		if (str0Size == 0 && str1Size == 0) {

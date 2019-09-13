@@ -233,7 +233,7 @@ namespace wlib::image
 		return imgOut;
 	}
 
-	ImageSoA& ConvertToGrayscale(ImageSoA& inImg, bool preserveAlpha, GrayscaleMethod method) {
+	ImageSoA& ConvertToGrayscale(ImageSoA& inImg, const bool preserveAlpha, const GrayscaleMethod method) {
 		// Converting to grayscale from grayscale...
 		if (inImg.format == F_GrayAlpha || inImg.format == F_Grayscale) {
 			return inImg;
@@ -526,7 +526,7 @@ namespace wlib::image
 		return inImg;
 	}
 
-	void ConvertUint8ToFloat(const uint8_t* in, float* out, size_t fileSize) {
+	void ConvertUint8ToFloat(const uint8_t* in, float* out, const size_t fileSize) {
 		#if X86_SIMD_LEVEL >= LV_AVX512
 			size_t iters = fileSize / 16;
 			size_t itersRem = fileSize % 16;
@@ -703,10 +703,10 @@ namespace wlib::image
 	Image ImageSoA::ConvertToImage() {
 		throw wlib::module_not_built(errMsg);
 	}
-	ImageSoA& ConvertToGrayscale(ImageSoA& /*inImg*/, bool /*preserveAlpha*/, GrayscaleMethod /*method*/) {
+	ImageSoA& ConvertToGrayscale(ImageSoA& /*inImg*/, const bool /*preserveAlpha*/, const GrayscaleMethod /*method*/) {
 		throw wlib::module_not_built(errMsg);
 	}
-	void ConvertUint8ToFloat(const uint8_t* /*in*/, float* /*out*/, size_t /*fileSize*/) {
+	void ConvertUint8ToFloat(const uint8_t* /*in*/, float* /*out*/, const size_t /*fileSize*/) {
 		throw wlib::module_not_built(errMsg);
 	}
 	void ConvertToRGB(ImageSoA& /*in*/) {

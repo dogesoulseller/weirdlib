@@ -28,7 +28,7 @@ namespace cu
 	}
 
 
-	ImageSoACUDA& ConvertToGrayscale(ImageSoACUDA& inImg, bool preserveAlpha, GrayscaleMethod method) {
+	ImageSoACUDA& ConvertToGrayscale(ImageSoACUDA& inImg, const bool preserveAlpha, const GrayscaleMethod method) {
 		if (inImg.format == F_GrayAlpha || inImg.format == F_Grayscale) {
 			return inImg;
 		}

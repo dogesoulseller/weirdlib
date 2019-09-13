@@ -3,7 +3,7 @@
 
 static const auto CPU_CORE_COUNT = static_cast<int>(std::thread::hardware_concurrency());
 
-int getImagePreferredThreadCount(int width, int height) {
+int getImagePreferredThreadCount(const int width, const int height) {
 	int numThreadsLocal = -1;
 	numThreadsLocal = width * height >= 3000*3000 ? CPU_CORE_COUNT : numThreadsLocal;
 	numThreadsLocal = width * height >= 2000*2000 && CPU_CORE_COUNT >= 8 ? 8 : numThreadsLocal;
