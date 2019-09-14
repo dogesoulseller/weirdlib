@@ -6,6 +6,7 @@
 #include <cmath>
 #include <algorithm>
 #include <thread>
+#include <array>
 
 #ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
 
@@ -526,6 +527,7 @@ namespace wlib::image
 		return inImg;
 	}
 
+	// TODO: Work on 16 bytes simultaneously instead of reading the same chunk four times
 	void ConvertUint8ToFloat(const uint8_t* in, float* out, const size_t fileSize) {
 		#if X86_SIMD_LEVEL >= LV_AVX512
 			size_t iters = fileSize / 16;
@@ -584,9 +586,62 @@ namespace wlib::image
 		size_t dataLength = Image::GetTotalImageSize(width, height, format);
 		pixelsOut.resize(dataLength);
 
+		#if X86_SIMD_LEVEL >= LV_SSSE3
+		// Works on 16 source floats at a time
+		// Doing this allows full utilization of an XMM register for stores
+		size_t iters = dataLength / 16;
+		size_t itersRem = dataLength % 16;
+
+		// Mask for moving least significant byte of 32-bit integers to start of register
+		const __m128i shufmask = _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 8, 4, 0);
+
+		alignas(16) std::array<uint8_t, 16> out_tmp;
+
+		for (size_t i = 0; i < iters; i++) {
+			// Load 16 floats into registers
+			__m128 in0 = _mm_loadu_ps(pixels.data() + i*16);
+			__m128 in1 = _mm_loadu_ps(pixels.data() + i*16 + 4);
+			__m128 in2 = _mm_loadu_ps(pixels.data() + i*16 + 8);
+			__m128 in3 = _mm_loadu_ps(pixels.data() + i*16 + 12);
+
+			// Batch convert 4 floats into 32-bit integers
+			__m128i converted0_32 = _mm_cvtps_epi32(in0);
+			__m128i converted1_32 = _mm_cvtps_epi32(in1);
+			__m128i converted2_32 = _mm_cvtps_epi32(in2);
+			__m128i converted3_32 = _mm_cvtps_epi32(in3);
+
+			// Perform shuffle that moves the least significant byte of 32-bit integers to the start of each register.
+			// Because the color values are capped at 255 (maximum value representable by a single byte), it
+			// effectively packs the set of 16 total values into 32-bit collections at the bottom of each register
+			__m128i converted0 = _mm_shuffle_epi8(converted0_32, shufmask);
+			__m128i converted1 = _mm_shuffle_epi8(converted1_32, shufmask);
+			__m128i converted2 = _mm_shuffle_epi8(converted2_32, shufmask);
+			__m128i converted3 = _mm_shuffle_epi8(converted3_32, shufmask);
+
+			// Merge packed values:
+			// Unpack first two values, creating XX10
+			__m128i low0 = _mm_unpacklo_epi32(converted0, converted1);
+			// Unpack remaining two values, creating 32XX
+			__m128i low1 = _mm_unpacklo_epi32(converted2, converted3);
+
+			// Merge two registers with data in their lower halves, forming 3210 in a single register
+			__m128 output = _mm_shuffle_ps(reinterpret_cast<__m128i>(low0), reinterpret_cast<__m128i>(low1), 0b01000100);
+
+			_mm_store_ps(reinterpret_cast<float*>(out_tmp.data()), output);
+
+			std::memcpy(pixelsOut.data()+i*16, out_tmp.data(), 16);
+		}
+
+		for (size_t i = iters * 16; i < iters * 16 + itersRem; i++) {
+			pixelsOut[i] = static_cast<uint8_t>(pixels[i]);
+		}
+
+		#else
 		for (size_t i = 0; i < dataLength; i++) {
 			pixelsOut[i] = static_cast<uint8_t>(pixels[i]);
 		}
+
+		#endif
 
 		return pixelsOut;
 	}

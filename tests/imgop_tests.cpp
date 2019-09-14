@@ -4,6 +4,9 @@
 #include <filesystem>
 #include <future>
 #include <random>
+#include <algorithm>
+#include <vector>
+#include <fstream>
 
 constexpr const char* wlibTestDir = WLIBTEST_TESTING_DIRECTORY;
 
@@ -146,6 +149,23 @@ TEST(ImgOps, NegateValues) {
 			EXPECT_FLOAT_EQ(testSoA_Alpha.channels[c][Samples[i]], 255.0f - testSoABase.channels[c][Samples[i]]);
 		}
 	}
+}
+
+TEST(ImgOps, FloatToUint8) {
+	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	ASSERT_TRUE(std::filesystem::exists(imgPath));
+
+	std::ifstream rawfile(imgPath, std::ios::binary | std::ios::ate);
+	size_t fileSize = rawfile.tellg();
+	rawfile.seekg(0);
+
+	std::vector<uint8_t> pixelsRef(fileSize);
+	rawfile.read(reinterpret_cast<char*>(pixelsRef.data()), fileSize);
+
+	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
+	auto pixels = testImg.GetPixelsAsInt();
+
+	EXPECT_TRUE(std::equal(pixelsRef.cbegin(), pixelsRef.cend(), pixels.cbegin()));
 }
 
 #endif
