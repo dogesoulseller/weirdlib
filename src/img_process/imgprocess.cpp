@@ -549,18 +549,18 @@ namespace wlib::image
 
 			for (size_t i = 0; i < iters; i++) {
 				// Work on 32 bytes at once
-				const __m256i pixin = _mm256_stream_load_si256(reinterpret_cast<const __m256i*>(in + i*32));
+				const __m256i pixin = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(in + i*32));
 				// 128-bit lane swapped bytes
 				const __m256i pixin_swap = _mm256_permute2x128_si256(pixin, pixin, 1);
 
 				// First 8 bytes
 				__m128i pixin_0 = _mm256_castsi256_si128(pixin);
 				// Second 8 bytes
-				__m128i pixin_1 = _mm256_castsi256_si128(_mm256_srli_si256(pixin, 8));
+				__m128i pixin_1 = _mm_bsrli_si128(_mm256_castsi256_si128(pixin), 8);
 				// Third 8 bytes
 				__m128i pixin_2 = _mm256_castsi256_si128(pixin_swap);
 				// Last 8 bytes
-				__m128i pixin_3 = _mm256_castsi256_si128(_mm256_srli_si256(pixin_swap, 8));
+				__m128i pixin_3 = _mm_bsrli_si128(_mm256_castsi256_si128(pixin_swap), 8);
 
 				// Extend 8-bit values to 32-bit
 				__m256i pix_0 = _mm256_cvtepu8_epi32(pixin_0);
