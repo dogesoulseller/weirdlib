@@ -4,15 +4,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 
-
 ##|-----------------------|##
 ##| COMPILATION SELECTION |##
 ##|-----------------------|##
 
 add_compile_definitions(WEIRDLIB_MTMODE_NONE=0 WEIRDLIB_MTMODE_TBB=1 WEIRDLIB_MTMODE_OMP=2)
 
-option(WEIRDLIB_ENABLE_MULTITHREADING "Enable use of external threading library" ON)
-option(WEIRDLIB_INSTRUMENT_COVERAGE "Enable generating coverage instrumentation" OFF)
 option(WEIRDLIB_BUILD_DOCS "Enable building documentation" ON)
 option(WEIRDLIB_ENABLE_TESTING "Enable building test target" ON)
 option(WEIRDLIB_ENABLE_BENCHMARKS "Enable building benchmark target" ON)
@@ -23,7 +20,11 @@ option(WERIDLIB_ENABLE_BUILD_IMAGEOPS "Enable building image operations module" 
 option(WERIDLIB_ENABLE_BUILD_FILEOPS "Enable building file operations module" ON)
 option(WERIDLIB_ENABLE_BUILD_ANXIETY "Enable building stress test module" ON)
 option(WEIRDLIB_ENABLE_CUDA "Enable building CUDA library modules" ON)
+
+option(WEIRDLIB_INSTRUMENT_COVERAGE "Enable generating coverage instrumentation" OFF)
+option(WEIRDLIB_ENABLE_MULTITHREADING "Enable use of external threading library" ON)
 option(WEIRDLIB_FORCE_MAXIMUM_ARCHITECTURE_EXTENSIONS "Enable all instruction set extensions regardless of target system (MMX to all AVX-512 subsets)" OFF)
+option(WEIRDLIB_BUILD_NATIVE "Enable building version specific to host system (with -march=native and -mtune=native) on gnu-compatible compilers" ON)
 option(WEIRDLIB_ENABLE_PREFETCH "Enable use of prefetch instructions in optimized code.
 This can lead to potential performance improvements, or massive slowdowns in some cases (Intel Ivy Bridge[43 cycles], AMD Jaguar[~100 cycles])" ON)
 
@@ -58,7 +59,6 @@ set(WEIRDLIB_ADDITIONAL_CXX_FLAGS "")
 
 
 
-
 ##|----------------|##
 ##| MULTITHREADING |##
 ##|----------------|##
@@ -85,7 +85,6 @@ if(WEIRDLIB_ENABLE_MULTITHREADING)
 	endif()
 
 endif(WEIRDLIB_ENABLE_MULTITHREADING)
-
 
 
 
@@ -134,10 +133,15 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" 
 		string(APPEND CMAKE_CXX_FLAGS " -mmmx -msse -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -mavx -mavx2 -mavx512f -mavx512pf -mavx512er -mavx512cd -mavx512vl -mavx512bw -mavx512dq -mavx512ifma -mavx512vbmi -mavx512bitalg -mavx512vpopcntdq -mpclmul -mfma -mbmi -mbmi2 -mlzcnt -mtbm -mpopcnt -maes -msha ")
 	endif(WEIRDLIB_FORCE_MAXIMUM_ARCHITECTURE_EXTENSIONS)
 
+	# Enable native build
+	if(WEIRDLIB_BUILD_NATIVE)
+		string(APPEND CMAKE_C_FLAGS " -march=native -mtune=native ")
+		string(APPEND CMAKE_CXX_FLAGS " -march=native -mtune=native ")
+	endif(WEIRDLIB_BUILD_NATIVE)
+
 endif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
 message(STATUS "Flags: ${CMAKE_CXX_FLAGS}")
 string(APPEND CMAKE_CXX_FLAGS " ${WEIRDLIB_ADDITIONAL_CXX_FLAGS} ")
-
 
 
 
@@ -150,6 +154,7 @@ message(STATUS "Configuring main library")
 # Library sources and headers
 file(GLOB_RECURSE WEIRDLIB_SOURCES "src/*.cpp" "src/*.hpp")
 file(GLOB WEIRDLIB_INCLUDE_SOURCES "include/*.hpp")
+
 # Primary build target
 add_library(weirdlib ${WEIRDLIB_SOURCES} ${WEIRDLIB_INCLUDE_SOURCES})
 set_target_properties(weirdlib PROPERTIES
@@ -167,10 +172,10 @@ if(WEIRDLIB_ENABLE_CUDA)
 	add_library(weirdlib_cuda ${WEIRDLIB_CUDA_SOURCES})
 
 	set_target_properties(weirdlib_cuda PROPERTIES
-		CUDA_SEPARABLE_COMPILATION ON)
+		CUDA_SEPARABLE_COMPILATION ON
+	)
 
-	target_link_libraries(weirdlib weirdlib_cuda Threads::Threads ${WEIRDLIB_LINKER_LIBRARIES})
-
+	target_link_libraries(weirdlib weirdlib_cuda Threads::Threads ${WEIRDLIB_LINKER_LIBRARIES} ${CUDA_LIBRARIES} cuda)
 endif(WEIRDLIB_ENABLE_CUDA)
 
 ##|-----------------------------|##
@@ -196,7 +201,6 @@ endif(WEIRDLIB_BUILD_DOCS)
 
 
 
-
 ##|--------------------------|##
 ##| BENCHMARKS CONFIGURATION |##
 ##|--------------------------|##
@@ -210,7 +214,6 @@ set_target_properties(wlib_bench PROPERTIES
 	CXX_STANDARD_REQUIRED ON
 )
 target_link_libraries(wlib_bench weirdlib Threads::Threads ${WEIRDLIB_LINKER_LIBRARIES})
-
 
 
 
