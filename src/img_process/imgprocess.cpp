@@ -544,33 +544,81 @@ namespace wlib::image
 				out[i] = static_cast<float>(in[i]);
 			}
 		#elif X86_SIMD_LEVEL >= LV_AVX2
-			size_t iters = fileSize / 8;
-			size_t itersRem = fileSize % 8;
+			size_t iters = fileSize / 32;
+			size_t itersRem = fileSize % 32;
 
 			for (size_t i = 0; i < iters; i++) {
-				const __m128i pix_AVX_8 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in + i*8));
-				const __m256i pix_AVX_32 = _mm256_cvtepu8_epi32(pix_AVX_8);
-				const __m256 pixf_AVX = _mm256_cvtepi32_ps(pix_AVX_32);
-				_mm256_storeu_ps(out + i*8, pixf_AVX);
+				// Work on 32 bytes at once
+				const __m256i pixin = _mm256_stream_load_si256(reinterpret_cast<const __m256i*>(in + i*32));
+				// 128-bit lane swapped bytes
+				const __m256i pixin_swap = _mm256_permute2x128_si256(pixin, pixin, 1);
+
+				// First 8 bytes
+				__m128i pixin_0 = _mm256_castsi256_si128(pixin);
+				// Second 8 bytes
+				__m128i pixin_1 = _mm256_castsi256_si128(_mm256_srli_si256(pixin, 8));
+				// Third 8 bytes
+				__m128i pixin_2 = _mm256_castsi256_si128(pixin_swap);
+				// Last 8 bytes
+				__m128i pixin_3 = _mm256_castsi256_si128(_mm256_srli_si256(pixin_swap, 8));
+
+				// Extend 8-bit values to 32-bit
+				__m256i pix_0 = _mm256_cvtepu8_epi32(pixin_0);
+				__m256i pix_1 = _mm256_cvtepu8_epi32(pixin_1);
+				__m256i pix_2 = _mm256_cvtepu8_epi32(pixin_2);
+				__m256i pix_3 = _mm256_cvtepu8_epi32(pixin_3);
+
+				// Convert 32-bit values to floats
+				__m256 pixf_0 = _mm256_cvtepi32_ps(pix_0);
+				__m256 pixf_1 = _mm256_cvtepi32_ps(pix_1);
+				__m256 pixf_2 = _mm256_cvtepi32_ps(pix_2);
+				__m256 pixf_3 = _mm256_cvtepi32_ps(pix_3);
+
+				_mm256_storeu_ps(out + i * 32, pixf_0);
+				_mm256_storeu_ps(out + i * 32+8, pixf_1);
+				_mm256_storeu_ps(out + i * 32+16, pixf_2);
+				_mm256_storeu_ps(out + i * 32+24, pixf_3);
 			}
 
 			_mm256_zeroupper();
 
-			for (size_t i = iters * 8; i < iters * 8 + itersRem; i++) {
+			for (size_t i = iters * 32; i < iters * 32 + itersRem; i++) {
 				out[i] = static_cast<float>(in[i]);
 			}
 		#elif X86_SIMD_LEVEL >= LV_SSE41
-			size_t iters = fileSize / 4;
-			size_t itersRem = fileSize % 4;
+			size_t iters = fileSize / 16;
+			size_t itersRem = fileSize % 16;
+
+			const __m128i shufmask0 = _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 1, 0);
+			const __m128i shufmask1 = _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4);
+			const __m128i shufmask2 = _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 10, 9, 8);
+			const __m128i shufmask3 = _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 14, 13, 12);
 
 			for (size_t i = 0; i < iters; i++) {
-				__m128i pix_SSE = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in + i*4));
-				pix_SSE = _mm_cvtepu8_epi32(pix_SSE);
-				__m128 pixf_SSE = _mm_cvtepi32_ps(pix_SSE);
-				_mm_storeu_ps(out + i*4, pixf_SSE);
+				__m128i pixin = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in + i*16));
+
+				__m128i pix0 = _mm_shuffle_epi8(pixin, shufmask0);
+				__m128i pix1 = _mm_shuffle_epi8(pixin, shufmask1);
+				__m128i pix2 = _mm_shuffle_epi8(pixin, shufmask2);
+				__m128i pix3 = _mm_shuffle_epi8(pixin, shufmask3);
+
+				pix0 = _mm_cvtepu8_epi32(pix0);
+				pix1 = _mm_cvtepu8_epi32(pix1);
+				pix2 = _mm_cvtepu8_epi32(pix2);
+				pix3 = _mm_cvtepu8_epi32(pix3);
+
+				__m128 pixf0 = _mm_cvtepi32_ps(pix0);
+				__m128 pixf1 = _mm_cvtepi32_ps(pix1);
+				__m128 pixf2 = _mm_cvtepi32_ps(pix2);
+				__m128 pixf3 = _mm_cvtepi32_ps(pix3);
+
+				_mm_storeu_ps(out + i*16, pixf0);
+				_mm_storeu_ps(out + i*16+4, pixf1);
+				_mm_storeu_ps(out + i*16+8, pixf2);
+				_mm_storeu_ps(out + i*16+12, pixf3);
 			}
 
-			for (size_t i = iters * 4; i < iters * 4 + itersRem; i++) {
+			for (size_t i = iters * 16; i < iters * 16 + itersRem; i++) {
 				out[i] = static_cast<float>(in[i]);
 			}
 
