@@ -18,7 +18,7 @@ namespace cu
 	template<>
 	__global__ void kernel_ConvertGrayscaleRGB<GrayscaleMethod::Lightness>(const float* __restrict__ r, const float* __restrict__ g, const float* __restrict__ b, float* __restrict__ outGray) {
 		const int pixelID = getGlobalIdx_1x1();
-		outGray[pixelID] = fmaxf(r[pixelID], fmaxf(g[pixelID], b[pixelID]));
+		outGray[pixelID] = ((fmaxf(fmaxf(r[pixelID], g[pixelID]), b[pixelID])) + (fminf(fminf(r[pixelID], g[pixelID]), b[pixelID]))) * 0.5f;
 	}
 
 	template<>
