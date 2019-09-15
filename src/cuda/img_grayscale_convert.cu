@@ -27,6 +27,12 @@ namespace cu
 		outGray[pixelID] = (r[pixelID] + g[pixelID] + b[pixelID]) * (1.0f/3.0f);
 	}
 
+	template<>
+	__global__ void kernel_ConvertGrayscaleRGB<GrayscaleMethod::LuminosityBT601>(const float* __restrict__ r, const float* __restrict__ g, const float* __restrict__ b, float* __restrict__ outGray) {
+		const int pixelID = getGlobalIdx_1x1();
+		outGray[pixelID] = fminf(fmaf(r[pixelID], 0.299f, fmaf(g[pixelID], 0.587f, b[pixelID] * 0.114f)), 255.0f);
+	}
+
 
 	ImageSoACUDA& ConvertToGrayscale(ImageSoACUDA& inImg, const bool preserveAlpha, const GrayscaleMethod method) {
 		if (inImg.format == F_GrayAlpha || inImg.format == F_Grayscale) {
@@ -67,6 +73,9 @@ namespace cu
 			break;
 		case GrayscaleMethod::Average:
 			kernel_ConvertGrayscaleRGB<GrayscaleMethod::Average><<<gridSize, blockSize, 0, stream>>>(red, green, blue, outGray);
+			break;
+		case GrayscaleMethod::LuminosityBT601:
+			kernel_ConvertGrayscaleRGB<GrayscaleMethod::Luminosity><<<gridSize, blockSize, 0, stream>>>(red, green, blue, outGray);
 			break;
 		}
 		cudaStreamDestroy(stream);

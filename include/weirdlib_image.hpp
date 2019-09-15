@@ -28,14 +28,16 @@ namespace image
 	};
 
 	/// Method for computing grayscale <br>
-	/// Luminosity: accounts for human perception of colors (default) <br>
+	/// Luminosity: accounts for human perception of colors (default) (BT.709) <br>
 	/// Lightness: average of maximum and minimum intensity <br>
-	/// Average: simple average of components
+	/// Average: simple average of components <br>
+	/// LuminosityBT601: Same as Luminosity, but uses BT.601 weights
 	enum class GrayscaleMethod
 	{
 		Luminosity = 0,
 		Lightness = 1,
-		Average = 2
+		Average = 2,
+		LuminosityBT601 = 3
 	};
 
 	/// Class representing a 2D image in Array of Structures (i.e. RGB RGB RGB), converts to a floating point representation on load

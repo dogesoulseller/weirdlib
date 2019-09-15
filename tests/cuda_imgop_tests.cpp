@@ -20,6 +20,7 @@ TEST(CUDAImage, Grayscale) {
 
 	wlib::image::cu::ImageSoACUDA testSoA_Average(testImg);
 	wlib::image::cu::ImageSoACUDA testSoA_Lightness(testImg);
+	wlib::image::cu::ImageSoACUDA testSoA_LumBT601(testImg);
 
 	testSoAA = wlib::image::cu::ConvertToGrayscale(testSoAA, true);
 	EXPECT_EQ(testSoAA.channels.size(), 2);
@@ -29,6 +30,7 @@ TEST(CUDAImage, Grayscale) {
 
 	testSoA_Average = wlib::image::cu::ConvertToGrayscale(testSoA_Average, false, wlib::image::GrayscaleMethod::Average);
 	testSoA_Lightness = wlib::image::cu::ConvertToGrayscale(testSoA_Lightness, false, wlib::image::GrayscaleMethod::Lightness);
+	testSoA_LumBT601 = wlib::image::cu::ConvertToGrayscale(testSoA_LumBT601, false, wlib::image::GrayscaleMethod::LuminosityBT601);
 }
 
 constexpr size_t PixelSampleCount = 3000;
