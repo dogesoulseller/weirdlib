@@ -155,6 +155,10 @@ namespace wlib::image
 		*this = img;
 	}
 
+	ImageSoA::ImageSoA(ImageSoA&& img) {
+		*this = img;
+	}
+
 	ImageSoA& ImageSoA::operator=(const ImageSoA& img) {
 		if (&img == this) {
 			return *this;
@@ -165,13 +169,13 @@ namespace wlib::image
 		format = img.format;
 
 		for (auto& ptr : channels) {
-			delete[] ptr;
+			if (ptr != nullptr) {
+				delete[] ptr;
+			}
 		}
 
-		if (channels.size() != img.channels.size()) {
-			channels.resize(img.channels.size());
-			channels.shrink_to_fit();
-		}
+		channels.resize(img.channels.size());
+		channels.shrink_to_fit();
 
 		for (size_t i = 0; i < channels.size(); i++) {
 			auto chan = new float[width * height];
@@ -182,9 +186,37 @@ namespace wlib::image
 		return *this;
 	}
 
+	ImageSoA& ImageSoA::operator=(ImageSoA&& img) {
+		if (&img == this) {
+			return *this;
+		}
+
+		height = img.height;
+		width = img.width;
+		format = img.format;
+
+		for (auto& ptr : channels) {
+			if (ptr != nullptr) {
+				delete[] ptr;
+			}
+		}
+
+		channels.resize(img.channels.size());
+		channels.shrink_to_fit();
+		channels.assign(img.channels.begin(), img.channels.end());
+
+		for (auto& ptr: img.channels) {
+			ptr = nullptr;
+		}
+
+		return *this;
+	}
+
 	ImageSoA::~ImageSoA() {
 		for (auto& c : channels) {
-			delete[] c;
+			if (c != nullptr) {
+				delete[] c;
+			}
 		}
 	}
 

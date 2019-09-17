@@ -155,8 +155,14 @@ namespace image
 		/// Copy constructor
 		ImageSoA(const ImageSoA&);
 
+		/// Move constructor
+		ImageSoA(ImageSoA&&);
+
 		/// Copy assignment operator
 		ImageSoA& operator=(const ImageSoA&);
+
+		/// Move assignment operator
+		ImageSoA& operator=(ImageSoA&&);
 
 		~ImageSoA();
 
@@ -188,8 +194,14 @@ namespace image
 			/// Copy constructor
 			ImageSoACUDA(const ImageSoACUDA&);
 
+			/// Move constructor
+			ImageSoACUDA(ImageSoACUDA&&);
+
 			/// Copy assignment operator
 			ImageSoACUDA& operator=(const ImageSoACUDA&);
+
+			/// Move assignment operator
+			ImageSoACUDA& operator=(ImageSoACUDA&&);
 
 			~ImageSoACUDA();
 

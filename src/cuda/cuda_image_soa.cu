@@ -40,6 +40,10 @@ namespace cu
 		*this = other;
 	}
 
+	ImageSoACUDA::ImageSoACUDA(ImageSoACUDA&& other) {
+		*this = other;
+	}
+
 	ImageSoACUDA::~ImageSoACUDA() {
 		for (const auto& c : channels) {
 			cudaFree(c);
@@ -73,6 +77,32 @@ namespace cu
 
 		return *this;
 	}
+
+	ImageSoACUDA& ImageSoACUDA::operator=(ImageSoACUDA&& img) {
+		if (&img == this) {
+			return *this;
+		}
+
+		height = img.height;
+		width = img.width;
+		format = img.format;
+
+		for (auto& ptr : channels) {
+			cudaFree(ptr);
+		}
+
+		channels.resize(img.channels.size());
+		channels.shrink_to_fit();
+		channels.assign(img.channels.begin(), img.channels.end());
+
+		for (auto& ptr : img.channels) {
+			ptr = nullptr;
+		}
+
+		return *this;
+	}
+
+
 
 	ImageSoA ImageSoACUDA::ConvertToImageSoA() {
 		ImageSoA soa;
