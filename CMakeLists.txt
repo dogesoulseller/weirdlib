@@ -178,6 +178,16 @@ if(WEIRDLIB_ENABLE_CUDA)
 	target_link_libraries(weirdlib weirdlib_cuda Threads::Threads ${WEIRDLIB_LINKER_LIBRARIES} ${CUDA_LIBRARIES} cuda)
 endif(WEIRDLIB_ENABLE_CUDA)
 
+# STB
+add_library(weirdlib_stb_impl "${CMAKE_CURRENT_LIST_DIR}/external/stb_impl.cpp")
+target_compile_options(weirdlib_stb_impl PRIVATE
+	$<$<CXX_COMPILER_ID:Clang>: -O3 -g0 >
+	$<$<CXX_COMPILER_ID:GNU>: -O3 -g0 >
+	$<$<CXX_COMPILER_ID:Intel>: -O3 -g0 >
+	$<$<CXX_COMPILER_ID:MSVC>: /O2 >
+)
+target_link_libraries(weirdlib weirdlib_stb_impl)
+
 ##|-----------------------------|##
 ##| DOCUMENTATION CONFIGURATION |##
 ##|-----------------------------|##
