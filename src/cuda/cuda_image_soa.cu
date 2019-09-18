@@ -41,7 +41,7 @@ namespace cu
 	}
 
 	ImageSoACUDA::ImageSoACUDA(ImageSoACUDA&& other) {
-		*this = other;
+		*this = std::move(other);
 	}
 
 	ImageSoACUDA::~ImageSoACUDA() {

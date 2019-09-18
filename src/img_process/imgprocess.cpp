@@ -156,7 +156,7 @@ namespace wlib::image
 	}
 
 	ImageSoA::ImageSoA(ImageSoA&& img) {
-		*this = img;
+		*this = std::move(img);
 	}
 
 	ImageSoA& ImageSoA::operator=(const ImageSoA& img) {
