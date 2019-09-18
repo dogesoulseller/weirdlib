@@ -87,4 +87,70 @@ TEST(CUDAImage, Histogram) {
 	EXPECT_FALSE(histogram.Alpha.empty());
 }
 
+TEST(CUDAImage, DeviceSoA) {
+	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	ASSERT_TRUE(std::filesystem::exists(imgPath));
+
+	// From image file
+	wlib::image::Image testImg_baseAoS(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
+	auto pixref = testImg_baseAoS.GetPixelsAsInt();
+
+	wlib::image::cu::ImageSoACUDA testImg(testImg_baseAoS);
+	auto pixconv = testImg.ConvertToImage().GetPixelsAsInt();
+
+	EXPECT_TRUE(std::equal(pixconv.begin(), pixconv.end(), pixref.begin()));
+
+	// Copy constructed
+	wlib::image::cu::ImageSoACUDA testImgCopyConstructed(testImg);
+
+	for (const auto& chan : testImg.channels) {
+		EXPECT_NE(chan, nullptr);
+	}
+
+	auto copypix = testImgCopyConstructed.ConvertToImage().GetPixelsAsInt();
+
+	EXPECT_TRUE(std::equal(copypix.begin(), copypix.end(), pixref.begin()));
+
+	// Move constructed
+	wlib::image::cu::ImageSoACUDA testImgMoveConstructed(std::move(testImg));
+
+	for (const auto& chan : testImg.channels) {
+		EXPECT_EQ(chan, nullptr);
+	}
+
+	auto movepix = testImgMoveConstructed.ConvertToImage().GetPixelsAsInt();
+
+	EXPECT_TRUE(std::equal(movepix.begin(), movepix.end(), pixref.begin()));
+}
+
+TEST(CUDAImage, DeviceAoS) {
+	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	ASSERT_TRUE(std::filesystem::exists(imgPath));
+
+	// From image file
+	wlib::image::Image testImg_base(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
+	wlib::image::cu::ImageCUDA testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
+
+	auto hostpix = testImg_base.GetPixelsAsInt();
+	auto devpix = testImg.GetPixelsAsInt();
+
+	EXPECT_TRUE(std::equal(hostpix.begin(), hostpix.end(), devpix.begin()));
+
+	// Copy constructed
+	wlib::image::cu::ImageCUDA testImgCopyConstructed(testImg);
+
+	EXPECT_NE(testImg.pixels, nullptr);
+	auto copypix = testImgCopyConstructed.GetPixelsAsInt();
+
+	EXPECT_TRUE(std::equal(hostpix.begin(), hostpix.end(), copypix.begin()));
+
+	// Move constructed
+	wlib::image::cu::ImageCUDA testImgMoveConstructed(std::move(testImg));
+
+	EXPECT_EQ(testImg.pixels, nullptr);
+	auto movepix = testImgMoveConstructed.GetPixelsAsInt();
+
+	EXPECT_TRUE(std::equal(hostpix.begin(), hostpix.end(), movepix.begin()));
+}
+
 #endif
