@@ -58,5 +58,29 @@ namespace math
 		return std::abs(a - b) <= std::min(std::abs(a), std::abs(b)) * std::numeric_limits<CommonT>::epsilon() * tolerance;
 	}
 
+	template<typename T>
+	constexpr T max(T&& v) {
+		return std::forward<T>(v);
+	}
+
+	template<typename T0, typename T1, typename... Args>
+	constexpr std::common_type_t<T0, T1, Args...> max(T0&& v0, T1&& v1, Args... args) {
+		return v1 > v0
+		? max(v1, std::forward<Args>(args)...)
+		: max(v0, std::forward<Args>(args)...);
+	}
+
+	template<typename T>
+	constexpr T min(T&& v) {
+		return std::forward<T>(v);
+	}
+
+	template<typename T0, typename T1, typename... Args>
+	constexpr std::common_type_t<T0, T1, Args...> min(T0&& v0, T1&& v1, Args... args) {
+		return v1 < v0
+		? min(v1, std::forward<Args>(args)...)
+		: min(v0, std::forward<Args>(args)...);
+	}
+
 } // namespace math
 } // namespace wlib
