@@ -10,29 +10,19 @@ namespace image
 namespace cu
 {
 	template<GrayscaleMethod method = GrayscaleMethod::Luminosity>
-	__global__ void kernel_ConvertGrayscaleRGB(const float* __restrict__ r, const float* __restrict__ g, const float* __restrict__ b, float* __restrict__ outGray) {
+	__global__ void __launch_bounds__(512) kernel_ConvertGrayscaleRGB(const float* __restrict__ r, const float* __restrict__ g, const float* __restrict__ b, float* __restrict__ outGray) {
 		const int pixelID = getGlobalIdx_1x1();
-		outGray[pixelID] = fminf(fmaf(r[pixelID], 0.2126f, fmaf(g[pixelID], 0.7152f, b[pixelID] * 0.0722f)), 255.0f);
+		float3 comps {r[pixelID], g[pixelID], b[pixelID]};
+		if (method == GrayscaleMethod::Luminosity) {
+			outGray[pixelID] = fminf(fmaf(comps.x, 0.2126f, fmaf(comps.y, 0.7152f, comps.z * 0.0722f)), 255.0f);
+		} else if (method == GrayscaleMethod::Lightness) {
+			outGray[pixelID] = ((fmaxf(fmaxf(comps.x, comps.y), comps.z)) + (fminf(fminf(comps.x, comps.y), comps.z))) * 0.5f;
+		} else if (method == GrayscaleMethod::Average) {
+			outGray[pixelID] = (comps.x + comps.y + comps.z) * (1.0f/3.0f);
+		} else if (method == GrayscaleMethod::LuminosityBT601) {
+			outGray[pixelID] = fminf(fmaf(comps.x, 0.299f, fmaf(comps.y, 0.587f, comps.z * 0.114f)), 255.0f);
+		}
 	}
-
-	template<>
-	__global__ void kernel_ConvertGrayscaleRGB<GrayscaleMethod::Lightness>(const float* __restrict__ r, const float* __restrict__ g, const float* __restrict__ b, float* __restrict__ outGray) {
-		const int pixelID = getGlobalIdx_1x1();
-		outGray[pixelID] = ((fmaxf(fmaxf(r[pixelID], g[pixelID]), b[pixelID])) + (fminf(fminf(r[pixelID], g[pixelID]), b[pixelID]))) * 0.5f;
-	}
-
-	template<>
-	__global__ void kernel_ConvertGrayscaleRGB<GrayscaleMethod::Average>(const float* __restrict__ r, const float* __restrict__ g, const float* __restrict__ b, float* __restrict__ outGray) {
-		const int pixelID = getGlobalIdx_1x1();
-		outGray[pixelID] = (r[pixelID] + g[pixelID] + b[pixelID]) * (1.0f/3.0f);
-	}
-
-	template<>
-	__global__ void kernel_ConvertGrayscaleRGB<GrayscaleMethod::LuminosityBT601>(const float* __restrict__ r, const float* __restrict__ g, const float* __restrict__ b, float* __restrict__ outGray) {
-		const int pixelID = getGlobalIdx_1x1();
-		outGray[pixelID] = fminf(fmaf(r[pixelID], 0.299f, fmaf(g[pixelID], 0.587f, b[pixelID] * 0.114f)), 255.0f);
-	}
-
 
 	ImageSoACUDA& ConvertToGrayscale(ImageSoACUDA& inImg, const bool preserveAlpha, const GrayscaleMethod method) {
 		if (inImg.format == F_GrayAlpha || inImg.format == F_Grayscale) {
