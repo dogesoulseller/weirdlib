@@ -16,11 +16,11 @@ TEST(CUDAImage, Grayscale) {
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
 	wlib::image::cu::ImageSoACUDA testSoAA(testImg);
-	wlib::image::cu::ImageSoACUDA testSoANA(testImg);
+	wlib::image::cu::ImageSoACUDA testSoANA(testSoAA);
 
-	wlib::image::cu::ImageSoACUDA testSoA_Average(testImg);
-	wlib::image::cu::ImageSoACUDA testSoA_Lightness(testImg);
-	wlib::image::cu::ImageSoACUDA testSoA_LumBT601(testImg);
+	wlib::image::cu::ImageSoACUDA testSoA_Average(testSoAA);
+	wlib::image::cu::ImageSoACUDA testSoA_Lightness(testSoAA);
+	wlib::image::cu::ImageSoACUDA testSoA_LumBT601(testSoAA);
 
 	testSoAA = wlib::image::cu::ConvertToGrayscale(testSoAA, true);
 	EXPECT_EQ(testSoAA.channels.size(), 2);
@@ -42,7 +42,7 @@ TEST(CUDAImage, NegateValues) {
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
 
 	wlib::image::cu::ImageSoACUDA testImgDev(testImg);
-	wlib::image::cu::ImageSoACUDA testImgDev_alpha(testImg);
+	wlib::image::cu::ImageSoACUDA testImgDev_alpha(testImgDev);
 
 	wlib::image::cu::NegateValues(testImgDev);
 	wlib::image::cu::NegateValues(testImgDev_alpha, true);
