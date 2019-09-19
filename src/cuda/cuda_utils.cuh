@@ -81,7 +81,9 @@ inline int getImageSplit(const int imgHeight) {
 }
 
 inline size_t getBlockSize(const size_t imgHeight) {
-	if (imgHeight % 256 == 0) {
+	if (imgHeight % 512 == 0) {
+		return 512;
+	} else if (imgHeight % 256 == 0) {
 		return 256;
 	} else if (imgHeight % 128 == 0) {
 		return 128;
