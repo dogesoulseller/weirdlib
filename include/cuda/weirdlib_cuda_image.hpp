@@ -20,6 +20,24 @@ namespace cu
 		std::vector<uint64_t> Alpha;
 	};
 
+	/// Generate a random SoA image \n
+	/// Uses cuRAND when specified, otherwise generates on-CPU and moves to GPU
+	/// @param width image width
+	/// @param width image height
+	/// @param format image format
+	/// @param constantAlpha whether alpha should be set to the value set in alphaValue
+	/// @return image with random data
+	ImageSoACUDA GenerateRandomImageSoA(const int width, const int height, const ColorFormat format, const bool constantAlpha = false, const uint8_t alphaValue = 255);
+
+	/// Generate a random AoS image \n
+	/// Uses cuRAND when specified, otherwise generates on-CPU and moves to GPU
+	/// @param width image width
+	/// @param width image height
+	/// @param format image format
+	/// @param constantAlpha whether alpha should be set to the value set in alphaValue
+	/// @return image with random data
+	ImageCUDA GenerateRandomImage(const int width, const int height, const ColorFormat, const bool constantAlpha = false, const uint8_t alphaValue = 255);
+
 	/// Convert image (in GPU memory) into a grayscale representation using various methods described in @{link GrayscaleMethod}
 	/// @param inImg image to be modified
 	/// @param preserveAlpha whether alpha should be kept or discarded

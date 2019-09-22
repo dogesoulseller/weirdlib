@@ -153,4 +153,11 @@ TEST(CUDAImage, DeviceAoS) {
 	EXPECT_TRUE(std::equal(hostpix.begin(), hostpix.end(), movepix.begin()));
 }
 
+TEST(CUDAImage, RandomImage) {
+	constexpr int genWidth =  1024;
+	constexpr int genheight = 768;
+	auto imgsoa0 = wlib::image::cu::GenerateRandomImageSoA(genWidth, genheight, wlib::image::ColorFormat::F_RGB);
+	auto imgsoa1 = wlib::image::cu::GenerateRandomImageSoA(genWidth, genheight, wlib::image::ColorFormat::F_RGBA);
+}
+
 #endif

@@ -20,6 +20,7 @@ option(WERIDLIB_ENABLE_BUILD_IMAGEOPS "Enable building image operations module" 
 option(WERIDLIB_ENABLE_BUILD_FILEOPS "Enable building file operations module" ON)
 option(WERIDLIB_ENABLE_BUILD_ANXIETY "Enable building stress test module" ON)
 option(WEIRDLIB_ENABLE_CUDA "Enable building CUDA library modules" ON)
+option(WEIRDLIB_CUDA_USE_CURAND "Use cuRAND library for some functionality" ON)
 
 option(WEIRDLIB_INSTRUMENT_COVERAGE "Enable generating coverage instrumentation" OFF)
 option(WEIRDLIB_ENABLE_MULTITHREADING "Enable use of external threading library" ON)
@@ -84,6 +85,11 @@ if(WEIRDLIB_ENABLE_MULTITHREADING)
 		add_compile_definitions(WEIRDLIB_MULTITHREADING_MODE=1)
 	endif()
 
+	# Enable OpenMP for CUDA code
+	if(WEIRDLIB_ENABLE_CUDA AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel"))
+		string(APPEND CMAKE_CUDA_FLAGS " -Xcompiler -fopenmp ")
+	endif(WEIRDLIB_ENABLE_CUDA AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel"))
+
 endif(WEIRDLIB_ENABLE_MULTITHREADING)
 
 
@@ -105,15 +111,21 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" 
 	string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO " -g3 -Og ")
 
 	# Enable warnings
-	string(APPEND CMAKE_C_FLAGS_DEBUG " -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas ")
-	string(APPEND CMAKE_CXX_FLAGS_DEBUG " -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas ")
+	string(APPEND CMAKE_C_FLAGS_DEBUG " -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas -Wnull-dereference -Wparentheses -Wjump-misses-init -Wdouble-promotion -Wshadow -Wformat=2 -Wcast-qual")
+	string(APPEND CMAKE_CXX_FLAGS_DEBUG " -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas -Wnull-dereference -Wparentheses -Wold-style-cast -Wdouble-promotion -Wshadow -Wformat=2 -Wcast-qual")
+	string(APPEND CMAKE_C_FLAGS_RELWITHDEBINFO " -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas -Wnull-dereference -Wparentheses -Wjump-misses-init -Wdouble-promotion -Wshadow -Wformat=2 -Wcast-qual")
+	string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO " -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas -Wnull-dereference -Wparentheses -Wold-style-cast -Wdouble-promotion -Wshadow -Wformat=2 -Wcast-qual")
+
+	# GCC-specific
+	if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+		string(APPEND CMAKE_C_FLAGS_DEBUG " -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict ")
+		string(APPEND CMAKE_CXX_FLAGS_DEBUG " -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict -Wuseless-cast ")
+		string(APPEND CMAKE_C_FLAGS_RELWITHDEBINFO " -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict ")
+		string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO " -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict -Wuseless-cast ")
+	endif()
 
 	# Clang-specific settings
 	if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-		# Enable warnings in Clang and disable multiple unwanted ones
-		string(APPEND CMAKE_C_FLAGS_DEBUG " -Weverything -Wno-sign-conversion -Wno-implicit-int-conversion -Wno-padded -Wno-c++98-compat -Wno-c++98-c++11-compat -Wno-c++98-c++11-c++14-compat -Wno-weak-vtables -Wno-global-constructors -Wno-switch-enum -Wno-unknown-pragmas -Wno-covered-switch-default -Wno-ctad-maybe-unsupported -Wno-c++98-c++11-compat-binary-literal -Wno-exit-time-destructors ")
-		string(APPEND CMAKE_CXX_FLAGS_DEBUG " -Weverything -Wno-sign-conversion -Wno-implicit-int-conversion -Wno-padded -Wno-c++98-compat -Wno-c++98-c++11-compat -Wno-c++98-c++11-c++14-compat -Wno-weak-vtables -Wno-global-constructors -Wno-switch-enum -Wno-unknown-pragmas -Wno-covered-switch-default -Wno-ctad-maybe-unsupported -Wno-c++98-c++11-compat-binary-literal -Wno-exit-time-destructors ")
-
 		# Enable standalone debug information
 		string(APPEND CMAKE_C_FLAGS_DEBUG " -fstandalone-debug ")
 		string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fstandalone-debug ")
@@ -140,9 +152,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" 
 	endif(WEIRDLIB_BUILD_NATIVE)
 
 endif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-message(STATUS "Flags: ${CMAKE_CXX_FLAGS}")
-string(APPEND CMAKE_CXX_FLAGS " ${WEIRDLIB_ADDITIONAL_CXX_FLAGS} ")
 
+string(APPEND CMAKE_CXX_FLAGS " ${WEIRDLIB_ADDITIONAL_CXX_FLAGS} ")
 
 
 ##|---------------------|##
@@ -165,26 +176,46 @@ set_target_properties(weirdlib PROPERTIES
 # CUDA components
 if(WEIRDLIB_ENABLE_CUDA)
 	add_compile_definitions(WLIB_ENABLE_CUDA)
+	if(WEIRDLIB_CUDA_USE_CURAND)
+		add_compile_definitions(WLIB_CUDA_USE_CURAND)
+	endif(WEIRDLIB_CUDA_USE_CURAND)
 	enable_language(CUDA)
 
 	file(GLOB_RECURSE WEIRDLIB_CUDA_SOURCES "include/cuda/*" "src/cuda/*.cu" "src/cuda/*.cuh")
+
+	if(CMAKE_CUDA_COMPILER_ID MATCHES "NVIDIA")
+		string(APPEND CMAKE_CUDA_FLAGS " --ftz=true ")
+
+		# Not compiling with MSVC
+		if("${CMAKE_VS_PLATFORM_TOOLSET_CUDA}" STREQUAL "")
+			string(APPEND CMAKE_CUDA_FLAGS_DEBUG " -g -G -Wreorder ")
+			string(APPEND CMAKE_CUDA_FLAGS_RELWITHDEBINFO " -g -Wreorder ")
+		endif("${CMAKE_VS_PLATFORM_TOOLSET_CUDA}" STREQUAL "")
+	endif()
 
 	add_library(weirdlib_cuda ${WEIRDLIB_CUDA_SOURCES})
 
 	set_target_properties(weirdlib_cuda PROPERTIES
 		CUDA_SEPARABLE_COMPILATION ON
+		CUDA_STANDARD 14
+		CUDA_STANDARD_REQUIRED TRUE
 	)
 
 	target_link_libraries(weirdlib weirdlib_cuda Threads::Threads ${WEIRDLIB_LINKER_LIBRARIES} ${CUDA_LIBRARIES} cuda)
+
+	# Conditionally link with cuRAND
+	if(WEIRDLIB_CUDA_USE_CURAND)
+		target_link_libraries(weirdlib curand)
+	endif(WEIRDLIB_CUDA_USE_CURAND)
 endif(WEIRDLIB_ENABLE_CUDA)
 
 # STB
 add_library(weirdlib_stb_impl "${CMAKE_CURRENT_LIST_DIR}/external/stb_impl.cpp")
 target_compile_options(weirdlib_stb_impl PRIVATE
-	$<$<CXX_COMPILER_ID:Clang>: -O3 -g0 >
-	$<$<CXX_COMPILER_ID:GNU>: -O3 -g0 >
-	$<$<CXX_COMPILER_ID:Intel>: -O3 -g0 >
-	$<$<CXX_COMPILER_ID:MSVC>: /O2 >
+	$<$<CXX_COMPILER_ID:Clang>: -O3 -g0 -w >
+	$<$<CXX_COMPILER_ID:GNU>: -O3 -g0 -w >
+	$<$<CXX_COMPILER_ID:Intel>: -O3 -g0 -w >
+	$<$<CXX_COMPILER_ID:MSVC>: /O2 /W0 >
 )
 target_link_libraries(weirdlib weirdlib_stb_impl)
 
