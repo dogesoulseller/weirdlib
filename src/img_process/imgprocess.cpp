@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <thread>
 #include <array>
+#include <cstring>
 
 #ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
 
@@ -781,7 +782,7 @@ namespace wlib::image
 			__m128i low1 = _mm_unpacklo_epi32(converted2, converted3);
 
 			// Merge two registers with data in their lower halves, forming 3210 in a single register
-			__m128 output = _mm_shuffle_ps(reinterpret_cast<__m128i>(low0), reinterpret_cast<__m128i>(low1), 0b01000100);
+			__m128 output = _mm_shuffle_ps(reinterpret_cast<__m128>(low0), reinterpret_cast<__m128>(low1), 0b01000100);
 
 			_mm_store_ps(reinterpret_cast<float*>(out_tmp.data()), output);
 

@@ -169,7 +169,7 @@ namespace wlib
 		}
 
 		[[nodiscard]] size_t max_size() const noexcept {
-			m_kvpairs.max_size();
+			return m_kvpairs.max_size();
 		}
 
 		const ValueT& at(const KeyT& key) const {
@@ -282,7 +282,7 @@ namespace wlib
 		}
 
 		[[nodiscard]] size_t max_size() const noexcept {
-			m_kvpairs.max_size();
+			return m_kvpairs.max_size();
 		}
 
 		const ValueT& at(const KeyT& key) const {

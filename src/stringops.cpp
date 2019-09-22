@@ -39,7 +39,7 @@ namespace wlib::str
 			}
 		#elif X86_SIMD_LEVEL >= LV_AVX2
 			// Move through bytes with a 32-byte stride
-			if (reinterpret_cast<const size_t>(s) % 32 == 0) {
+			if (reinterpret_cast<size_t>(s) % 32 == 0) {
 				while (true) {
 					const __m256i chars = _mm256_load_si256(reinterpret_cast<const __m256i*>(s + offset));
 

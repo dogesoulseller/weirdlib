@@ -54,8 +54,8 @@ namespace wlib::file
 		f.read(reinterpret_cast<char*>(header.data()), 256);
 
 		// Most common format
-		const bool tryGeneral = std::search(header.begin(), header.end(), std::default_searcher(mpeg4_1.begin(), mpeg4_1.end())) != header.end()
-			^ std::search(header.begin(), header.end(), std::default_searcher(mpeg4_2.begin(), mpeg4_2.end())) != header.end();
+		const bool tryGeneral = (std::search(header.begin(), header.end(), std::default_searcher(mpeg4_1.begin(), mpeg4_1.end())) != header.end())
+			^ (std::search(header.begin(), header.end(), std::default_searcher(mpeg4_2.begin(), mpeg4_2.end())) != header.end());
 
 		// Less common streaming format
 		const bool tryMoovAtom = std::search(header.begin(), header.end(), std::default_searcher(moovatom.begin(), moovatom.end())) != header.end();
@@ -129,8 +129,8 @@ namespace wlib::file
 		auto searchEnd = dataStart + (std::min(std::distance(dataStart, dataEnd), std::ptrdiff_t(256)));
 
 		// Most common format
-		const bool tryGeneral = std::search(dataStart, searchEnd, std::default_searcher(mpeg4_1.begin(), mpeg4_1.end())) != searchEnd
-			^ std::search(dataStart, searchEnd, std::default_searcher(mpeg4_2.begin(), mpeg4_2.end())) != searchEnd;
+		const bool tryGeneral = (std::search(dataStart, searchEnd, std::default_searcher(mpeg4_1.begin(), mpeg4_1.end())) != searchEnd)
+			^ (std::search(dataStart, searchEnd, std::default_searcher(mpeg4_2.begin(), mpeg4_2.end())) != searchEnd);
 
 		// Less common streaming format
 		const bool tryMoovAtom = std::search(dataStart, searchEnd, std::default_searcher(moovatom.begin(), moovatom.end())) != searchEnd;
