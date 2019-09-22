@@ -94,7 +94,8 @@ namespace cu
 			size_t filesize = infile.tellg();
 			infile.seekg(0);
 
-			auto host_ptr = new uint8_t[GetTotalImageSize(width, height, format)];
+			float* host_ptr;
+			cudaMallocHost(&host_ptr, GetTotalImageSize(width, height, format)*sizeof(float));
 			infile.read(reinterpret_cast<char*>(host_ptr), GetTotalImageSize(width, height, format));
 
 			const size_t blockSize = getBlockSize(GetTotalImageSize(width, height, format));
@@ -108,6 +109,7 @@ namespace cu
 
 			cudaStreamDestroy(stream);
 			cudaFree(inPtr_dev);
+			cudaFreeHost(host_ptr);
 			pixels = outPtr_dev;
 
 			return;
