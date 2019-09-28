@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
 #include "bench_cases.hpp"
 #include <sstream>
 #include <iomanip>
@@ -88,3 +89,5 @@ namespace bench
 		return outString;
 	}
 } // namespace bench
+
+#endif

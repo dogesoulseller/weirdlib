@@ -59,19 +59,19 @@ namespace image
 		/// @param width width in pixels
 		/// @param height height in pixels
 		/// @param requestedFormat format to convert to on load, or in case of raw data, to interpret as
-		Image(const std::string& path, const bool isRawData = false, const uint64_t width = 0, const uint64_t height = 0, const ColorFormat requestedFormat = F_Default);
+		Image(const std::string& path, bool isRawData = false, uint64_t width = 0, uint64_t height = 0, ColorFormat requestedFormat = F_Default);
 
 		/// Constructor from in-memory 8-bit per color pixel data
 		/// @param width width in pixels
 		/// @param height height in pixels
 		/// @param format format to interpret data as
-		Image(const uint8_t* pixels, const uint64_t width, const uint64_t height, const ColorFormat format);
+		Image(const uint8_t* pixels, uint64_t width, uint64_t height, ColorFormat format);
 
 		/// Constructor from in-memory floating point pixel data
 		/// @param width width in pixels
 		/// @param height height in pixels
 		/// @param format format to interpret data as
-		Image(const float* pixels, const uint64_t width, const uint64_t height, const ColorFormat format);
+		Image(const float* pixels, uint64_t width, uint64_t height, ColorFormat format);
 
 		/// Copy constructor
 		Image(const Image&) = default;
@@ -94,19 +94,19 @@ namespace image
 		/// @param width width in pixels
 		/// @param height height in pixels
 		/// @param requestedFormat format to convert to on load, or in case of raw data, to interpret as
-		void LoadImage(const std::string& path, const bool isRawData = false, const uint64_t width = 0, const uint64_t height = 0, const ColorFormat requestedFormat = F_Default);
+		void LoadImage(const std::string& path, bool isRawData = false, uint64_t width = 0, uint64_t height = 0, ColorFormat requestedFormat = F_Default);
 
 		/// Load image from in-memory 8-bit per color pixel data
 		/// @param width width in pixels
 		/// @param height height in pixels
 		/// @param format format to interpret data as
-		void LoadImage(const uint8_t* pixels, const uint64_t width, const uint64_t height, const ColorFormat format);
+		void LoadImage(const uint8_t* pixels, uint64_t width, uint64_t height, ColorFormat format);
 
 		/// Load image from in-memory floating point pixel data
 		/// @param width width in pixels
 		/// @param height height in pixels
 		/// @param format format to interpret data as
-		void LoadImage(const float* pixels, const uint64_t width, const uint64_t height, const ColorFormat format);
+		void LoadImage(const float* pixels, uint64_t width, uint64_t height, ColorFormat format);
 
 		/// Get iamge width
 		/// @return width
@@ -129,7 +129,7 @@ namespace image
 		/// @param height image height
 		/// @param format image format @{link ColorFormat}
 		/// @return pixel count
-		static size_t GetTotalImageSize(const uint64_t width, const uint64_t height, const ColorFormat format) noexcept;
+		static size_t GetTotalImageSize(uint64_t width, uint64_t height, ColorFormat format) noexcept;
 
 		/// Get pixel values as 8-bit integers
 		/// @return vector of pixels represented as 8-bit unsigned integers in AoS order
@@ -229,19 +229,19 @@ namespace image
 			/// @param width width in pixels
 			/// @param height height in pixels
 			/// @param requestedFormat format to convert to on load, or in case of raw data, to interpret as
-			ImageCUDA(const std::string& path, const bool isRawData = false, const uint64_t width = 0, const uint64_t height = 0, const ColorFormat requestedFormat = F_Default);
+			ImageCUDA(const std::string& path, bool isRawData = false, uint64_t width = 0, uint64_t height = 0, ColorFormat requestedFormat = F_Default);
 
 			/// Constructor from in-memory 8-bit per color pixel data
 			/// @param width width in pixels
 			/// @param height height in pixels
 			/// @param format format to interpret data as
-			ImageCUDA(const uint8_t* pixels, const uint64_t width, const uint64_t height, const ColorFormat format);
+			ImageCUDA(const uint8_t* pixels, uint64_t width, uint64_t height, ColorFormat format);
 
 			/// Constructor from in-memory floating point pixel data
 			/// @param width width in pixels
 			/// @param height height in pixels
 			/// @param format format to interpret data as
-			ImageCUDA(const float* pixels, const uint64_t width, const uint64_t height, const ColorFormat format);
+			ImageCUDA(const float* pixels, uint64_t width, uint64_t height, ColorFormat format);
 
 			/// Copy constructor
 			ImageCUDA(const ImageCUDA&);
@@ -264,26 +264,26 @@ namespace image
 			/// @param width width in pixels
 			/// @param height height in pixels
 			/// @param requestedFormat format to convert to on load, or in case of raw data, to interpret as
-			void LoadImage(const std::string& path, const bool isRawData = false, const uint64_t width = 0, const uint64_t height = 0, const ColorFormat requestedFormat = F_Default);
+			void LoadImage(const std::string& path, bool isRawData = false, uint64_t width = 0, uint64_t height = 0, ColorFormat requestedFormat = F_Default);
 
 			/// Load image from in-memory 8-bit per color pixel data
 			/// @param width width in pixels
 			/// @param height height in pixels
 			/// @param format format to interpret data as
-			void LoadImage(const uint8_t* pixels, const uint64_t width, const uint64_t height, const ColorFormat format);
+			void LoadImage(const uint8_t* pixels, uint64_t width, uint64_t height, ColorFormat format);
 
 			/// Load image from in-memory floating point pixel data
 			/// @param width width in pixels
 			/// @param height height in pixels
 			/// @param format format to interpret data as
-			void LoadImage(const float* pixels, const uint64_t width, const uint64_t height, const ColorFormat format);
+			void LoadImage(const float* pixels, uint64_t width, uint64_t height, ColorFormat format);
 
 			/// Get total image size (i.e. width * height * format)
 			/// @param width image width
 			/// @param height image height
 			/// @param format image format @{link ColorFormat}
 			/// @return pixel count
-			static size_t GetTotalImageSize(const uint64_t width, const uint64_t height, const ColorFormat format) noexcept;
+			static size_t GetTotalImageSize(uint64_t width, uint64_t height, ColorFormat format) noexcept;
 
 			/// Get pixel values as 8-bit integers
 			/// @return vector of pixels represented as 8-bit unsigned integers in AoS order
@@ -298,13 +298,13 @@ namespace image
 	/// @param preserveAlpha whether alpha should be kept or discarded
 	/// @param method grayscale calculation method
 	/// @return reference to modified input image
-	ImageSoA& ConvertToGrayscale(ImageSoA& inImg, const bool preserveAlpha = false, const GrayscaleMethod method = GrayscaleMethod::Luminosity);
+	ImageSoA& ConvertToGrayscale(ImageSoA& inImg, bool preserveAlpha = false, GrayscaleMethod method = GrayscaleMethod::Luminosity);
 
 	/// Function converting 8bpc into 32bpc float
 	/// @param in pointer to raw image data
 	/// @param out caller-managed pointer to destination
 	/// @param fileSize total number of pixels
-	void ConvertUint8ToFloat(const uint8_t* in, float* out, const size_t fileSize);
+	void ConvertUint8ToFloat(const uint8_t* in, float* out, size_t fileSize);
 
 	/// Convert input image to RGBA
 	/// @param in input image
@@ -326,7 +326,7 @@ namespace image
 	/// Effectively does max_val - current_val
 	/// @param in input image
 	/// @param withAlpha whether to preserve alpha channel
-	void NegateValues(ImageSoA& in, const bool withAlpha = false);
+	void NegateValues(ImageSoA& in, bool withAlpha = false);
 
 } // namespace image
 } // namespace wlib

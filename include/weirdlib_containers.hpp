@@ -336,6 +336,4 @@ namespace wlib
 		}
 	};
 
-
-
 } // namespace wlib

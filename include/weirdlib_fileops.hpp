@@ -56,12 +56,12 @@ namespace file
 	/// @param fileData pointer to start of file data
 	/// @param size maximum number of bytes to access
 	/// @return {@link FileType} enum value
-	FileType DetectFileType(const uint8_t* fileData, const size_t size);
+	FileType DetectFileType(const uint8_t* fileData, size_t size);
 
 	/// Get extension (including .) corresponding to file type
 	/// @param type file type to get extension for
 	/// @return extension
-	std::string GetFiletypeExtension(const FileType type) noexcept;
+	std::string GetFiletypeExtension(FileType type) noexcept;
 
 } // namespace file
 } // namespace wlib

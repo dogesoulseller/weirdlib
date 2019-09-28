@@ -17,7 +17,6 @@ option(WEIRDLIB_ENABLE_APPLICATIONS "Enable building example applications" ON)
 option(WEIRDLIB_ENABLE_BUILD_STRINGOPS "Enable building of string module" ON)
 option(WEIRDLIB_ENABLE_BUILD_CRYPTO "Enable building of crypto module" ON)
 option(WERIDLIB_ENABLE_BUILD_IMAGEOPS "Enable building image operations module" ON)
-option(WERIDLIB_ENABLE_BUILD_FILEOPS "Enable building file operations module" ON)
 option(WERIDLIB_ENABLE_BUILD_ANXIETY "Enable building stress test module" ON)
 option(WEIRDLIB_ENABLE_CUDA "Enable building CUDA library modules" ON)
 option(WEIRDLIB_CUDA_USE_CURAND "Use cuRAND library for some functionality" ON)
@@ -106,15 +105,29 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" 
 	string(APPEND CMAKE_C_FLAGS " -masm=intel ")
 	string(APPEND CMAKE_CXX_FLAGS " -masm=intel ")
 
-	# Set correct optimization and symbol flags for profile builds
-	string(APPEND CMAKE_C_FLAGS_RELWITHDEBINFO " -g3 -Og ")
-	string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO " -g3 -Og ")
+	# Non-ICC
+	if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+		# Set correct optimization and symbol flags for profile builds
+		string(APPEND CMAKE_C_FLAGS_RELWITHDEBINFO " -g3 -Og ")
+		string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO " -g3 -Og ")
 
-	# Enable warnings
-	string(APPEND CMAKE_C_FLAGS_DEBUG " -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas -Wnull-dereference -Wparentheses -Wjump-misses-init -Wdouble-promotion -Wshadow -Wformat=2 -Wcast-qual")
-	string(APPEND CMAKE_CXX_FLAGS_DEBUG " -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas -Wnull-dereference -Wparentheses -Wold-style-cast -Wdouble-promotion -Wshadow -Wformat=2 -Wcast-qual")
-	string(APPEND CMAKE_C_FLAGS_RELWITHDEBINFO " -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas -Wnull-dereference -Wparentheses -Wjump-misses-init -Wdouble-promotion -Wshadow -Wformat=2 -Wcast-qual")
-	string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO " -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas -Wnull-dereference -Wparentheses -Wold-style-cast -Wdouble-promotion -Wshadow -Wformat=2 -Wcast-qual")
+		# Enable warnings
+		string(APPEND CMAKE_C_FLAGS_DEBUG " -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas -Wnull-dereference -Wparentheses -Wjump-misses-init -Wdouble-promotion -Wshadow -Wformat=2 -Wcast-qual")
+		string(APPEND CMAKE_CXX_FLAGS_DEBUG " -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas -Wnull-dereference -Wparentheses -Wold-style-cast -Wdouble-promotion -Wshadow -Wformat=2 -Wcast-qual")
+		string(APPEND CMAKE_C_FLAGS_RELWITHDEBINFO " -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas -Wnull-dereference -Wparentheses -Wjump-misses-init -Wdouble-promotion -Wshadow -Wformat=2 -Wcast-qual")
+		string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO " -g3 -Wall -Wextra -Wpedantic -Wno-unknown-pragmas -Wnull-dereference -Wparentheses -Wold-style-cast -Wdouble-promotion -Wshadow -Wformat=2 -Wcast-qual")
+	else() # ICC
+		# Set correct optimization and symbol flags for profile builds
+		string(APPEND CMAKE_C_FLAGS_RELWITHDEBINFO " -g3 ")
+		string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO " -g3 ")
+
+		# Enable warnings
+		string(APPEND CMAKE_C_FLAGS_DEBUG " -g3 -Wall -Wextra -Wno-unknown-pragmas -Wparentheses -Wjump-misses-init -Wshadow -Wformat=2 -Wcast-qual")
+		string(APPEND CMAKE_CXX_FLAGS_DEBUG " -g3 -Wall -Wextra -Wno-unknown-pragmas -Wparentheses -Wshadow -Wformat=2 -Wcast-qual")
+		string(APPEND CMAKE_C_FLAGS_RELWITHDEBINFO " -g3 -Wall -Wextra -Wno-unknown-pragmas -Wparentheses -Wjump-misses-init -Wshadow -Wformat=2 -Wcast-qual")
+		string(APPEND CMAKE_CXX_FLAGS_RELWITHDEBINFO " -g3 -Wall -Wextra -Wno-unknown-pragmas -Wparentheses -Wshadow -Wformat=2 -Wcast-qual")
+
+	endif()
 
 	# GCC-specific
 	if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")

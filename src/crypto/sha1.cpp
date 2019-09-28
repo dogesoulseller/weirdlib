@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_CRYPTOGRAPHY
 #include "../../include/weirdlib_crypto.hpp"
 #include "../../include/weirdlib_bitops.hpp"
 #include "../../include/cpu_detection.hpp"
@@ -17,7 +18,6 @@
 
 namespace wlib::crypto
 {
-	#ifdef WEIRDLIB_ENABLE_CRYPTOGRAPHY
 
 		constexpr uint32_t SHA1_R0_R1_CONSTANT = 0x5a827999;
 		constexpr uint32_t SHA1_R2_CONSTANT = 0x6ed9eba1;
@@ -230,5 +230,5 @@ namespace wlib::crypto
 			++transform_count;
 		}
 
-	#endif
 } // namespace wlib::crypto
+#endif

@@ -27,7 +27,7 @@ namespace cu
 	/// @param format image format
 	/// @param constantAlpha whether alpha should be set to the value set in alphaValue
 	/// @return image with random data
-	ImageSoACUDA GenerateRandomImageSoA(const int width, const int height, const ColorFormat format, const bool constantAlpha = false, const uint8_t alphaValue = 255);
+	ImageSoACUDA GenerateRandomImageSoA(int width, int height, ColorFormat format, bool constantAlpha = false, uint8_t alphaValue = 255);
 
 	/// Generate a random AoS image \n
 	/// Uses cuRAND when specified, otherwise generates on-CPU and moves to GPU
@@ -36,20 +36,20 @@ namespace cu
 	/// @param format image format
 	/// @param constantAlpha whether alpha should be set to the value set in alphaValue
 	/// @return image with random data
-	ImageCUDA GenerateRandomImage(const int width, const int height, const ColorFormat, const bool constantAlpha = false, const uint8_t alphaValue = 255);
+	ImageCUDA GenerateRandomImage(int width, int height, ColorFormat, bool constantAlpha = false, uint8_t alphaValue = 255);
 
 	/// Convert image (in GPU memory) into a grayscale representation using various methods described in @{link GrayscaleMethod}
 	/// @param inImg image to be modified
 	/// @param preserveAlpha whether alpha should be kept or discarded
 	/// @param method grayscale calculation method
 	/// @return reference to modified input image
-	ImageSoACUDA& ConvertToGrayscale(ImageSoACUDA& inImg, const bool preserveAlpha = false, const GrayscaleMethod method = GrayscaleMethod::Luminosity);
+	ImageSoACUDA& ConvertToGrayscale(ImageSoACUDA& inImg, bool preserveAlpha = false, GrayscaleMethod method = GrayscaleMethod::Luminosity);
 
 	/// Convert all color values (in GPU memory) to their image negative version <br>
 	/// Effectively does max_val - current_val
 	/// @param in input image
 	/// @param withAlpha whether to preserve alpha channel
-	void NegateValues(ImageSoACUDA& in, const bool withAlpha = false);
+	void NegateValues(ImageSoACUDA& in, bool withAlpha = false);
 
 	/// Get histogram data for each channel
 	/// @param in input image

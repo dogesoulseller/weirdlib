@@ -133,13 +133,13 @@ namespace crypto
 
 		private:
 
-		uint32_t blk(const std::array<uint32_t, SHA1_BLOCK_INTS>& block, const size_t i) noexcept;
+		uint32_t blk(const std::array<uint32_t, SHA1_BLOCK_INTS>& block, size_t i) noexcept;
 
-		void R0(const std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept;
-		void R1(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept;
-		void R2(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept;
-		void R3(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept;
-		void R4(std::array<uint32_t, SHA1_BLOCK_INTS>& block, const uint32_t v, uint32_t &w, const uint32_t x, const uint32_t y, uint32_t &z, const size_t i) noexcept;
+		void R0(const std::array<uint32_t, SHA1_BLOCK_INTS>& block, uint32_t v, uint32_t &w, uint32_t x, uint32_t y, uint32_t &z, size_t i) noexcept;
+		void R1(std::array<uint32_t, SHA1_BLOCK_INTS>& block, uint32_t v, uint32_t &w, uint32_t x, uint32_t y, uint32_t &z, size_t i) noexcept;
+		void R2(std::array<uint32_t, SHA1_BLOCK_INTS>& block, uint32_t v, uint32_t &w, uint32_t x, uint32_t y, uint32_t &z, size_t i) noexcept;
+		void R3(std::array<uint32_t, SHA1_BLOCK_INTS>& block, uint32_t v, uint32_t &w, uint32_t x, uint32_t y, uint32_t &z, size_t i) noexcept;
+		void R4(std::array<uint32_t, SHA1_BLOCK_INTS>& block, uint32_t v, uint32_t &w, uint32_t x, uint32_t y, uint32_t &z, size_t i) noexcept;
 
 		void transform(std::array<uint32_t, SHA1_BLOCK_INTS>& block) noexcept;
 

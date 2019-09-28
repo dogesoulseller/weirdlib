@@ -37,4 +37,4 @@
 /// @param width image width
 /// @param height image height
 /// @return thread count
-int getImagePreferredThreadCount(const int width, const int height);
+int getImagePreferredThreadCount(int width, int height);

@@ -1,4 +1,4 @@
-#ifdef WLIB_ENABLE_CUDA
+#if defined(WEIRDLIB_ENABLE_IMAGE_OPERATIONS) && defined(WLIB_ENABLE_CUDA)
 #include <gtest/gtest.h>
 #include "../include/cuda/weirdlib_cuda_image.hpp"
 #include <filesystem>

@@ -1,5 +1,5 @@
+#ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
 #include "../include/weirdlib.hpp"
-
 #include "bench_common.hpp"
 #include "bench_load.hpp"
 #include "bench_cases.hpp"
@@ -94,3 +94,11 @@ int main(int argc, char* argv[]) {
 	delete smallImage;
 	return 0;
 }
+#else
+#include <iostream>
+int main() {
+	std::cerr << "Missing some libraries required for benchmarks. Error";
+	return -1;
+}
+
+#endif

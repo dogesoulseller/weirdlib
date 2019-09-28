@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "../include/weirdlib.hpp"
 #include <iostream>
+
 //TODO: Test erase
 TEST(Containers, UnorderedFlatMap) {
 	wlib::unordered_flat_map<std::string, std::string> flatmap;

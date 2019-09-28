@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
 #include "../../include/weirdlib_image.hpp"
 #include "../../include/cpu_detection.hpp"
 
@@ -242,3 +243,4 @@ namespace wlib::image
 	}
 
 } // namespace wlib::image
+#endif

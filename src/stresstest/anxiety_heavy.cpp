@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_ANXIETY
 #include "../../include/weirdlib_anxiety.hpp"
 #include "../../include/cpu_detection.hpp"
 #include "../../include/weirdlib_traits.hpp"
@@ -9,7 +10,6 @@
 
 namespace wlib::anxiety
 {
-	#ifdef WEIRDLIB_ENABLE_ANXIETY
 	static inline std::uniform_real_distribution<double> float_dist(std::numeric_limits<double>::min(), std::numeric_limits<double>::max());
 	static std::chrono::time_point<std::chrono::high_resolution_clock> startTimePoint;
 
@@ -66,14 +66,5 @@ namespace wlib::anxiety
 		StressFMA(std::chrono::milliseconds(durationMS), threadCount);
 	}
 
-	#else
-	constexpr const char* errMsg = "This function is a stub - stress test module was disabled for this compilation";
-
-	void StressFMA(const std::chrono::milliseconds /*duration*/, const size_t /*threadCount*/) {
-		throw wlib::module_not_built(errMsg);
-	}
-	void StressFMA(const size_t /*durationMS*/, const size_t /*threadCount*/) {
-		throw wlib::module_not_built(errMsg);
-	}
-	#endif
 } // namespace wlib::anxiety
+#endif

@@ -1,3 +1,4 @@
+#if defined(WEIRDLIB_ENABLE_IMAGE_OPERATIONS) && defined(WLIB_ENABLE_CUDA)
 #include "../../include/cuda/weirdlib_cuda_image.hpp"
 #include "./cuda_utils.cuh"
 #include <cuda_runtime.h>
@@ -385,3 +386,4 @@ namespace cu
 } // namespace image
 
 } // namespace wlib
+#endif

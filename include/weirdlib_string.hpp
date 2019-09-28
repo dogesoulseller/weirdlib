@@ -27,10 +27,10 @@ namespace str
 	/// @param str1 second string
 	/// @param len maximum length of comparison
 	/// @return true if strings are identical, false otherwise
-	bool strcmp(const char* str0, const char* str1, const size_t len);
+	bool strcmp(const char* str0, const char* str1, size_t len);
 
-	/// Alias for {@link strcmp(const char*, const char*, const size_t) strcmp}
-	bool strncmp(const char* str0, const char* str1, const size_t len);
+	/// Alias for {@link strcmp(const char*, const char*, size_t) strcmp}
+	bool strncmp(const char* str0, const char* str1, size_t len);
 
 } // namespace str
 } // wlib

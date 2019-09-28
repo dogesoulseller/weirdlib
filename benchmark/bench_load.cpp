@@ -1,5 +1,5 @@
+#ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
 #include "bench_load.hpp"
-
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Weverything"
 #include "../external/stb/stb_image.h"
@@ -21,3 +21,5 @@ namespace bench
 	}
 
 } // namespace bench
+
+#endif
