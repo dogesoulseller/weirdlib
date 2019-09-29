@@ -44,7 +44,7 @@ namespace wlib::image
 			f.read(reinterpret_cast<char*>(pixtmp), fileSize);
 
 			ConvertUint8ToFloat(pixtmp, pixels.data(), fileSize);
-
+			delete[] pixtmp;
 			return;
 		}
 
