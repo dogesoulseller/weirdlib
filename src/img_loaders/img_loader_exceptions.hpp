@@ -14,7 +14,7 @@ namespace wlib::image::except
 
 		public:
 		template<typename StrT>
-		inline unsupported_image_type(StrT&& msg) noexcept {
+		inline unsupported_image_type(std::string& msg) noexcept {
 			what_message = msg;
 		}
 
@@ -22,7 +22,7 @@ namespace wlib::image::except
 			what_message = std::move(std::string(msg));
 		}
 
-		inline const char* what() const noexcept
+		[[nodiscard]] inline const char* what() const noexcept override
 		{
 			return what_message.c_str();
 		}
@@ -33,8 +33,7 @@ namespace wlib::image::except
 		std::string what_message;
 
 		public:
-		template<typename StrT>
-		inline invalid_image_data(StrT&& msg) noexcept {
+		inline invalid_image_data(std::string& msg) noexcept {
 			what_message = msg;
 		}
 
@@ -42,7 +41,7 @@ namespace wlib::image::except
 			what_message = std::move(std::string(msg));
 		}
 
-		inline const char* what() const noexcept
+		[[nodiscard]] inline const char* what() const noexcept override
 		{
 			return what_message.c_str();
 		}
