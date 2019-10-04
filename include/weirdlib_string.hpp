@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <cstddef>
-#include <utility>
 
 namespace wlib
 {
@@ -31,6 +30,22 @@ namespace str
 
 	/// Alias for {@link strcmp(const char*, const char*, size_t) strcmp}
 	bool strncmp(const char* str0, const char* str1, size_t len);
+
+	/// Find substring needle in str
+	/// @param str string to search
+	/// @param needle substring to search for
+	/// @param strLen length of string to search (if set to 0, determined in-function)
+	/// @param needleLen length of substring to search for (if set to 0, determined in-function)
+	/// @return pointer to first occurence of substring in string
+	const char* strstr(const char* str, const char* needle, size_t strLen = 0, size_t needleLen = 0);
+
+	/// Find substring needle in str
+	/// @param str string to search
+	/// @param needle substring to search for
+	/// @param strLen length of string to search (if set to 0, determined in-function)
+	/// @param needleLen length of substring to search for (if set to 0, determined in-function)
+	/// @return pointer to first occurence of substring in string
+	char* strstr(char* str, const char* needle, size_t strLen = 0, size_t needleLen = 0);
 
 } // namespace str
 } // wlib

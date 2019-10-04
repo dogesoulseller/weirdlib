@@ -98,4 +98,21 @@ TEST(StringOps, Strcmp) {
 	EXPECT_TRUE(wlib::str::strncmp(testringMatches, testringMatches, wlib::str::strlen(testringMatches))) << "The string comparison failed";
 }
 
+TEST(StringOps, Strstr) {
+	// No match
+	const auto reference_nomatch = std::strstr(loremIpsum, "nomatchneedle");
+	const auto actual_nomatch = wlib::str::strstr(loremIpsum, "nomatchneedle");
+	EXPECT_EQ(reference_nomatch, actual_nomatch) << "Substring search results do not match";
+
+	// Matching large size
+	const auto reference_vlong = std::strstr(loremIpsum, "varius");
+	const auto actual_vlong = wlib::str::strstr(loremIpsum, "varius");
+	EXPECT_EQ(reference_vlong, actual_vlong) << "Substring search results do not match";
+
+	// Zero-length matches
+	const auto reference_zeroLen = std::strstr(teststringEmpty, "");
+	const auto actual_zeroLen = wlib::str::strstr(teststringEmpty, "");
+	EXPECT_EQ(reference_zeroLen, actual_zeroLen) << "Substring search results do not match";
+}
+
 #endif //WEIRDLIB_ENABLE_STRING_OPERATIONS
