@@ -1,18 +1,14 @@
 #ifdef WEIRDLIB_ENABLE_CRYPTOGRAPHY
 #include "../../include/weirdlib_crypto.hpp"
 #include "../../include/weirdlib_traits.hpp"
-
-#include <numeric>
 #include "../../include/cpu_detection.hpp"
 
-#ifdef __x86_64__
-	#include <immintrin.h>
-#endif
+#include <numeric>
 
 namespace wlib::crypto
 {
 	template<uint16_t rev_polynomial>
-	constexpr std::array<uint16_t, 256> __compileTimeGenerateCRC16Table() noexcept {
+	static constexpr std::array<uint16_t, 256> __compileTimeGenerateCRC16Table() noexcept {
 		std::array<uint16_t, 256> result{};
 
 		for (uint16_t i = 0; i < 256; i++) {
@@ -28,7 +24,7 @@ namespace wlib::crypto
 	}
 
 	template<uint32_t rev_polynomial>
-	constexpr std::array<uint32_t, 256> __compileTimeGenerateCRC32Table() noexcept {
+	static constexpr std::array<uint32_t, 256> __compileTimeGenerateCRC32Table() noexcept {
 		std::array<uint32_t, 256> result{};
 
 		for (uint32_t i = 0; i < 256; i++) {
@@ -44,7 +40,7 @@ namespace wlib::crypto
 	}
 
 	template<uint64_t rev_polynomial>
-	constexpr std::array<uint64_t, 256> __compileTimeGenerateCRC64Table() noexcept {
+	static constexpr std::array<uint64_t, 256> __compileTimeGenerateCRC64Table() noexcept {
 		std::array<uint64_t, 256> result{};
 
 		for (uint64_t i = 0; i < 256; i++) {
@@ -59,155 +55,20 @@ namespace wlib::crypto
 		return result;
 	}
 
-	constexpr std::array<uint16_t, 256> CRC16CCITTLookupTable = __compileTimeGenerateCRC16Table<0x8408>();	// CCITT (0x1021)
-	constexpr std::array<uint16_t, 256> CRC16ARCLookupTable   = __compileTimeGenerateCRC16Table<0xA001>();	// ARC (0x8005)
-	constexpr std::array<uint16_t, 256> CRC16DNPLookupTable   = __compileTimeGenerateCRC16Table<0xA6BC>();	// DNP (0x3D65)
+	static constexpr std::array<uint16_t, 256> CRC16CCITTLookupTable = __compileTimeGenerateCRC16Table<0x8408>();	// CCITT (0x1021)
+	static constexpr std::array<uint16_t, 256> CRC16ARCLookupTable   = __compileTimeGenerateCRC16Table<0xA001>();	// ARC (0x8005)
+	static constexpr std::array<uint16_t, 256> CRC16DNPLookupTable   = __compileTimeGenerateCRC16Table<0xA6BC>();	// DNP (0x3D65)
 
-	constexpr std::array<uint32_t, 256> CRC32LookupTable  = __compileTimeGenerateCRC32Table<0xEDB88320>();	// ISO-HDLC (0x04C11DB7)
-	constexpr std::array<uint32_t, 256> CRC32CLookupTable = __compileTimeGenerateCRC32Table<0x82F63B78>();	// Castagnolli polynomial (0x1EDC6F41)
-	constexpr std::array<uint32_t, 256> CRC32DLookupTable = __compileTimeGenerateCRC32Table<0xD419CC15>();	// BASE91-D (0xA833982B)
-	constexpr std::array<uint32_t, 256> CRC32AUTOSARLookupTable = __compileTimeGenerateCRC32Table<0xC8DF352F>();		// AUTOSAR (0xF4ACFB13)
+	static constexpr std::array<uint32_t, 256> CRC32LookupTable  = __compileTimeGenerateCRC32Table<0xEDB88320>();	// ISO-HDLC (0x04C11DB7)
+	static constexpr std::array<uint32_t, 256> CRC32CLookupTable = __compileTimeGenerateCRC32Table<0x82F63B78>();	// Castagnolli polynomial (0x1EDC6F41)
+	static constexpr std::array<uint32_t, 256> CRC32DLookupTable = __compileTimeGenerateCRC32Table<0xD419CC15>();	// BASE91-D (0xA833982B)
+	static constexpr std::array<uint32_t, 256> CRC32AUTOSARLookupTable = __compileTimeGenerateCRC32Table<0xC8DF352F>();		// AUTOSAR (0xF4ACFB13)
 
-	constexpr std::array<uint64_t, 256> CRC64XZLookupTable = __compileTimeGenerateCRC64Table<0xC96C5795D7870F42>();	// GO-ECMA
-	constexpr std::array<uint64_t, 256> CRC64ISOLookupTable = __compileTimeGenerateCRC64Table<0xD800000000000000>();	// GO-ISO
-
-
-	#if defined(__RDRND__)
-	uint16_t SecureRandomInteger_u16() {
-		uint16_t output;
-		#if defined(__GNUC__) && !defined(__clang__)
-		asm volatile (
-			".rnd_failed_int_u16:;"
-			"rdrand ax;"
-			"jnc .rnd_failed_int_u16;"
-			: [out]"=a"(output)
-			:
-			:
-		);
-		#else
-			int result;
-			do {
-				result = _rdrand16_step(&output);
-			} while (result == 0);
-		#endif
-
-		return output;
-	}
-
-	uint32_t SecureRandomInteger_u32() {
-		uint32_t output;
-		#if defined(__GNUC__) && !defined(__clang__)
-		asm volatile (
-			".rnd_failed_int_u32:;"
-			"rdrand eax;"
-			"jnc .rnd_failed_int_u32;"
-			: [out]"=a"(output)
-			:
-			:
-		);
-		#else
-			int result;
-			do {
-				result = _rdrand32_step(&output);
-			} while (result == 0);
-		#endif
-
-		return output;
-	}
-
-	uint64_t SecureRandomInteger_u64() {
-		uint64_t output;
-		#if defined(__GNUC__) && !defined(__clang__)
-			asm volatile (
-				".rnd_failed_int_u64:;"
-				"rdrand rax;"
-				"jnc .rnd_failed_int_u64;"
-				: [out]"=a"(output)
-				:
-				:
-			);
-		#else
-			int result;
-			do {
-				result = _rdrand64_step(reinterpret_cast<unsigned long long*>(&output));
-			} while (result == 0);
-		#endif
-
-		return output;
-	}
-	#endif
-
-	#if defined(__RDSEED__)
-	uint16_t SecureRandomSeed_u16() {
-		uint16_t output;
-
-		#if defined(__GNUC__) && !defined(__clang__)
-			asm volatile (
-				".rnd_failed_seed_u16:;"
-				"rdseed ax;"
-				"jnc .rnd_failed_seed_u16;"
-				: [out]"=a"(output)
-				:
-				:
-			);
-		#else
-			int result;
-			do {
-				result = _rdseed16_step(&output);
-			} while (result == 0);
-		#endif
-
-		return output;
-	}
-
-	uint32_t SecureRandomSeed_u32() {
-		uint32_t output;
-		#if defined(__GNUC__) && !defined(__clang__)
-			asm volatile (
-				".rnd_failed_seed_u32:;"
-				"rdseed eax;"
-				"jnc .rnd_failed_seed_u32;"
-				: [out]"=a"(output)
-				:
-				:
-			);
-		#else
-			int result;
-			do {
-				result = _rdseed32_step(&output);
-			} while (result == 0);
-		#endif
-
-		return output;
-	}
-
-	uint64_t SecureRandomSeed_u64() {
-		uint64_t output;
-
-		#if defined(__GNUC__) && !defined(__clang__)
-			asm volatile (
-				".rnd_failed_seed_u64:;"
-				"rdseed rax;"
-				"jnc .rnd_failed_seed_u64;"
-				: [out]"=a"(output)
-				:
-				:
-			);
-		#else
-			int result;
-			do {
-				result = _rdseed64_step(reinterpret_cast<unsigned long long*>(&output));
-			} while (result == 0);
-		#endif
-
-		return output;
-	}
-	#endif
-
-
+	static constexpr std::array<uint64_t, 256> CRC64XZLookupTable = __compileTimeGenerateCRC64Table<0xC96C5795D7870F42>();	// GO-ECMA
+	static constexpr std::array<uint64_t, 256> CRC64ISOLookupTable = __compileTimeGenerateCRC64Table<0xD800000000000000>();	// GO-ISO
 
 	template<uint16_t initVal = 0xFFFF, uint16_t xorout = 0xFFFF>
-	uint16_t CRC16_base(const uint8_t* first, const uint8_t* last, const std::array<uint16_t, 256>& lookupTable) {
+	static uint16_t CRC16_base(const uint8_t* first, const uint8_t* last, const std::array<uint16_t, 256>& lookupTable) {
 		#if defined(__x86_64__) && defined(WLIB_ENABLE_PREFETCH)
 			// This might kill Ivy Bridge and Jaguar performance
 			// For some reason prefetches are extremely slow on those
@@ -224,7 +85,7 @@ namespace wlib::crypto
 	}
 
 	template<uint32_t initVal = 0xFFFFFFFF, uint32_t xorout = 0xFFFFFFFF>
-	uint32_t CRC32_base(const uint8_t* first, const uint8_t* last, const std::array<uint32_t, 256>& lookupTable) {
+	static uint32_t CRC32_base(const uint8_t* first, const uint8_t* last, const std::array<uint32_t, 256>& lookupTable) {
 		#if defined(__x86_64__) && defined(WLIB_ENABLE_PREFETCH)
 			// This might kill Ivy Bridge and Jaguar performance
 			// For some reason prefetches are extremely slow on those
@@ -241,7 +102,7 @@ namespace wlib::crypto
 	}
 
 	template<uint64_t initVal = 0xFFFFFFFFFFFFFFFF, uint64_t xorout = 0xFFFFFFFFFFFFFFFF>
-	uint64_t CRC64_base(const uint8_t* first, const uint8_t* last, const std::array<uint64_t, 256>& lookupTable) {
+	static uint64_t CRC64_base(const uint8_t* first, const uint8_t* last, const std::array<uint64_t, 256>& lookupTable) {
 		#if defined(__x86_64__) && defined(WLIB_ENABLE_PREFETCH)
 			// This might kill Ivy Bridge and Jaguar performance
 			// For some reason prefetches are extremely slow on those
