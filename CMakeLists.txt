@@ -12,8 +12,8 @@ add_compile_definitions(WEIRDLIB_MTMODE_NONE=0 WEIRDLIB_MTMODE_TBB=1 WEIRDLIB_MT
 
 option(WEIRDLIB_BUILD_DOCS "Enable building documentation" ON)
 option(WEIRDLIB_ENABLE_TESTING "Enable building test target" ON)
-option(WEIRDLIB_ENABLE_BENCHMARKS "Enable building benchmark target" ON)
-option(WEIRDLIB_ENABLE_APPLICATIONS "Enable building example applications" ON)
+option(WEIRDLIB_ENABLE_BENCHMARKS "Enable building benchmark target" OFF)
+option(WEIRDLIB_ENABLE_APPLICATIONS "Enable building example applications" OFF)
 option(WEIRDLIB_ENABLE_BUILD_STRINGOPS "Enable building of string module" ON)
 option(WEIRDLIB_ENABLE_BUILD_CRYPTO "Enable building of crypto module" ON)
 option(WERIDLIB_ENABLE_BUILD_IMAGEOPS "Enable building image operations module" ON)
@@ -259,15 +259,17 @@ endif(WEIRDLIB_BUILD_DOCS)
 ##| BENCHMARKS CONFIGURATION |##
 ##|--------------------------|##
 
-message(STATUS "Configuring benchmarks")
+if (WEIRDLIB_ENABLE_BENCHMARKS)
+	message(STATUS "Configuring benchmarks")
 
-set(WEIRDLIB_BENCHMARK_DIR "${PROJECT_SOURCE_DIR}/benchmark")
-add_executable(wlib_bench ${WEIRDLIB_BENCHMARK_DIR}/wlibbench.cpp ${WEIRDLIB_BENCHMARK_DIR}/bench_load.cpp ${WEIRDLIB_BENCHMARK_DIR}/bench_cases.cpp)
-set_target_properties(wlib_bench PROPERTIES
-	CXX_STANDARD 17
-	CXX_STANDARD_REQUIRED ON
-)
-target_link_libraries(wlib_bench weirdlib Threads::Threads ${WEIRDLIB_LINKER_LIBRARIES})
+	set(WEIRDLIB_BENCHMARK_DIR "${PROJECT_SOURCE_DIR}/benchmark")
+	add_executable(wlib_bench ${WEIRDLIB_BENCHMARK_DIR}/wlibbench.cpp ${WEIRDLIB_BENCHMARK_DIR}/bench_load.cpp ${WEIRDLIB_BENCHMARK_DIR}/bench_cases.cpp)
+	set_target_properties(wlib_bench PROPERTIES
+		CXX_STANDARD 17
+		CXX_STANDARD_REQUIRED ON
+	)
+	target_link_libraries(wlib_bench weirdlib Threads::Threads ${WEIRDLIB_LINKER_LIBRARIES})
+endif()
 
 
 
