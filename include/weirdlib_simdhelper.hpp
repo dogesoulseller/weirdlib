@@ -104,6 +104,24 @@ namespace simd
 		}
 	#endif
 
+	// AVX
+
+	#if X86_SIMD_LEVEL >= LV_AVX
+		inline __m256 reverseLanes(const __m256& v) {
+			return _mm256_permute2f128_ps(v, v, 1);
+		}
+
+		inline __m256d reverseLanes(const __m256d& v) {
+			return _mm256_permute2f128_pd(v, v, 1);
+		}
+	#endif
+
+	#if X86_SIMD_LEVEL >= LV_AVX2
+		inline __m256i reverseLanes(const __m256i& v) {
+			return _mm256_permute2x128_si256(v, v, 1);
+		}
+	#endif
+
 #endif
 } // namespace simd
 } // namespace wlib

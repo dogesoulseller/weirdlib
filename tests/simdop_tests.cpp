@@ -49,6 +49,33 @@ TEST(SIMDOps_X86, Reverse) {
 	EXPECT_TRUE(std::equal(wordArr, wordArr+8, wordArrRev));
 	EXPECT_TRUE(std::equal(dwordArr, dwordArr+4, dwordArrRev));
 	EXPECT_TRUE(std::equal(qwordArr, qwordArr+2, qwordArrRev));
+#endif
+
+#if X86_SIMD_LEVEL >= LV_AVX
+	alignas(32) float floatArrAVX[8];
+	alignas(32) double doubleArrAVX[4];
+	alignas(32) uint64_t intArrAVX[4];
+
+	alignas(32) float floatArrAVXLRev[8] = {4.0f, 5.0f, 6.0f, 7.0f, 0.0f, 1.0f, 2.0f, 3.0f};
+	alignas(32) double doubleArrAVXLRev[4] = {2.0, 3.0, 0.0, 1.0};
+	alignas(32) uint64_t intArrAVXLRev[4] = {2, 3, 0, 1};
+
+	__m256 floatVecAVX = _mm256_set_ps(7.0f, 6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f, 0.0f);
+	__m256d doubleVecAVX = _mm256_set_pd(3.0, 2.0, 1.0, 0.0);
+	__m256i intVecAVX = _mm256_set_epi64x(3, 2, 1, 0);
+
+	__m256 floatVecAVXLRev = wlib::simd::reverseLanes(floatVecAVX);
+	__m256d doubleVecAVXLRev = wlib::simd::reverseLanes(doubleVecAVX);
+	__m256i intVecAVXLRev = wlib::simd::reverseLanes(intVecAVX);
+
+	_mm256_store_ps(floatArrAVX, floatVecAVXLRev);
+	_mm256_store_pd(doubleArrAVX, doubleVecAVXLRev);
+	_mm256_store_si256(reinterpret_cast<__m256i*>(intArrAVX), intVecAVXLRev);
+
+	EXPECT_TRUE(std::equal(floatArrAVX, floatArrAVX+8, floatArrAVXLRev));
+	EXPECT_TRUE(std::equal(doubleArrAVX, doubleArrAVX+4, doubleArrAVXLRev));
+	EXPECT_TRUE(std::equal(intArrAVX, intArrAVX+4, intArrAVXLRev));
 
 #endif
+
 }
