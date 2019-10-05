@@ -9,6 +9,7 @@
 #include "weirdlib_anxiety.hpp"
 #include "weirdlib_containers.hpp"
 #include "weirdlib_math.hpp"
+#include "weirdlib_simdhelper.hpp"
 
 namespace wlib
 {
