@@ -36,6 +36,7 @@ namespace simd
 		static const __m128i SIMD128B_zeroMask = _mm_set1_epi8(0);
 		inline const __m128i SIMD128B_byteReverseMask = _mm_set_epi8(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 		inline const __m128i SIMD128B_16bitReverseMask = _mm_set_epi8(1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14);
+		inline const int SIMD128B_wordReverseMask = 177;
 		inline constexpr int SIMD128_64bitReverseMask = 0x1;
 	#endif
 
@@ -81,14 +82,14 @@ namespace simd
 
 		#if X86_SIMD_LEVEL >= LV_SSSE3
 		/// Reverse order of 16-bit elements in register <br>
-		/// Specialized for presence of SSSE3's per-byte moves to avoid an instruction
+		/// Specialized for presence of SSSE3's per-byte moves to avoid two instructions
 		template<> inline __m128i reverse<16>(const __m128i& v) {
 			return _mm_shuffle_epi8(v, SIMD128B_16bitReverseMask);
 		}
 		#else
 		/// Reverse order of 16-bit elements in register
 		template<> inline __m128i reverse<16>(const __m128i& v) {
-			return _mm_shufflehi_epi16(_mm_shufflelo_epi16(v, SIMD128_32bitReverseMask), SIMD128_32bitReverseMask);
+			return _mm_shuffle_epi32(_mm_shufflehi_epi16(_mm_shufflelo_epi16(v, SIMD128B_wordReverseMask), SIMD128B_wordReverseMask), SIMD128_32bitReverseMask);
 		}
 		#endif
 
