@@ -115,4 +115,83 @@ TEST(StringOps, Strstr) {
 	EXPECT_EQ(reference_zeroLen, actual_zeroLen) << "Substring search results do not match";
 }
 
+// TODO: Mark as false if had unexpected char
+TEST(StringOps, Parse_Int) {
+	std::string sIntNegStr = "-32451";
+	std::string sIntPosStr = "32451";
+	std::string uIntStr = "51228";
+	std::string invalidStrStr = "test";
+	std::string earlyStopStr = "3245e4r1yst0p";
+
+	int32_t sIntNeg;
+	uint32_t sIntInUInt;
+	int32_t sIntPos;
+	uint32_t uInt;
+	uint32_t invalidStr;
+	int32_t earlyStopSInt;
+	uint32_t earlyStopUInt;
+
+	EXPECT_TRUE(wlib::str::ParseString(sIntNegStr, sIntNeg));
+	EXPECT_TRUE(wlib::str::ParseString(sIntPosStr, sIntPos));
+	EXPECT_TRUE(wlib::str::ParseString(uIntStr, uInt));
+	EXPECT_TRUE(wlib::str::ParseString(sIntNegStr, sIntNeg));
+	EXPECT_TRUE(wlib::str::ParseString(earlyStopStr, earlyStopUInt));
+	EXPECT_TRUE(wlib::str::ParseString(earlyStopStr, earlyStopSInt));
+
+	EXPECT_FALSE(wlib::str::ParseString(sIntNegStr, sIntInUInt));
+	EXPECT_FALSE(wlib::str::ParseString(invalidStrStr, invalidStr));
+
+	EXPECT_EQ(sIntNeg, -32451);
+	EXPECT_EQ(sIntPos, 32451);
+	EXPECT_EQ(uInt, 51228);
+	EXPECT_EQ(earlyStopSInt, 3245);
+	EXPECT_EQ(earlyStopUInt, 3245);
+}
+
+TEST(StringOps, Parse_Bool) {
+	std::string yesStr = "Yes";
+	std::string truStr = "True";
+	std::string tStr = "t";
+	std::string yStr = "y";
+
+	EXPECT_TRUE(wlib::str::ParseBool(yesStr));
+	EXPECT_TRUE(wlib::str::ParseBool(truStr));
+	EXPECT_TRUE(wlib::str::ParseBool(tStr));
+	EXPECT_TRUE(wlib::str::ParseBool(yStr));
+
+	EXPECT_TRUE(wlib::str::ParseBool(" Yes "));
+	EXPECT_FALSE(wlib::str::ParseBool("random"));
+	EXPECT_FALSE(wlib::str::ParseBool("no"));
+	EXPECT_FALSE(wlib::str::ParseBool("false"));
+}
+
+TEST(StringOps, Parse_Float) {
+	std::string fltStr = "3.14";
+	std::string fltNegStr = "-3.14";
+
+	float flt;
+	double dbl;
+	long double ldbl;
+
+	float fltNeg;
+	double dblNeg;
+	long double ldblNeg;
+
+	wlib::str::ParseString(fltStr, flt);
+	wlib::str::ParseString(fltStr, dbl);
+	wlib::str::ParseString(fltStr, ldbl);
+
+	wlib::str::ParseString(fltNegStr, fltNeg);
+	wlib::str::ParseString(fltNegStr, dblNeg);
+	wlib::str::ParseString(fltNegStr, ldblNeg);
+
+	EXPECT_FLOAT_EQ(flt, 3.14f);
+	EXPECT_FLOAT_EQ(dbl, 3.14);
+	EXPECT_FLOAT_EQ(ldbl, 3.14L);
+
+	EXPECT_FLOAT_EQ(fltNeg, -3.14f);
+	EXPECT_FLOAT_EQ(dblNeg, -3.14);
+	EXPECT_FLOAT_EQ(ldblNeg, -3.14L);
+}
+
 #endif //WEIRDLIB_ENABLE_STRING_OPERATIONS
