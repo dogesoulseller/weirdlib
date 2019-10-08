@@ -100,7 +100,7 @@ namespace simd
 
 		/// Reverse order of 64-bit elements in register
 		template<> inline __m128i reverse<64>(const __m128i& v) {
-			return reinterpret_cast<__m128i>(_mm_shuffle_pd(reinterpret_cast<const __m128i>(v), reinterpret_cast<const __m128i>(v), SIMD128_64bitReverseMask));
+			return reinterpret_cast<__m128i>(_mm_shuffle_pd(reinterpret_cast<const __m128d>(v), reinterpret_cast<const __m128d>(v), SIMD128_64bitReverseMask));
 		}
 	#endif
 

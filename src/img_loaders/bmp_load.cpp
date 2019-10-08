@@ -64,26 +64,22 @@ namespace wlib::image
 		std::memcpy(&height, in+currentOffset, 4);
 		currentOffset+=4;
 
-		// Color planes check
-		{
-			uint16_t cPlanes;
-			std::memcpy(&cPlanes, in+currentOffset, 2);
-			currentOffset+=2;
+		// Color planes
+		uint16_t cPlanes;
+		std::memcpy(&cPlanes, in+currentOffset, 2);
+		currentOffset+=2;
 
-			if (cPlanes != 1) {
-				throw except::unsupported_image_type("BMP Loader: Color planes field must be 1");
-			}
+		if (cPlanes != 1) {
+			throw except::unsupported_image_type("BMP Loader: Color planes field must be 1");
 		}
 
 		// Bpp check - only support BGR24
-		{
-			uint16_t bpp;
-			std::memcpy(&bpp, in+currentOffset, 2);
-			currentOffset+=2;
+		uint16_t bpp;
+		std::memcpy(&bpp, in+currentOffset, 2);
+		currentOffset+=2;
 
-			if (bpp != 24) {
-				throw except::unsupported_image_type("BMP Loader: Image must be BGR 24 bits-per-pixel");
-			}
+		if (bpp != 24) {
+			throw except::unsupported_image_type("BMP Loader: Image must be BGR 24 bits-per-pixel");
 		}
 
 		// Skip unnecessary fields
