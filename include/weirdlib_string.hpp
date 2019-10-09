@@ -57,6 +57,14 @@ namespace detail
 	/// @return pointer to first occurence of substring in string
 	char* strstr(char* str, const char* needle, size_t strLen = 0, size_t needleLen = 0);
 
+	/// Find substring needle in str
+	/// @param str string to search
+	/// @param needle substring to search for
+	/// @param strLen length of string to search (if set to 0, determined in-function)
+	/// @param needleLen length of substring to search for (if set to 0, determined in-function)
+	/// @return pointer to first occurence of substring in string
+	const char* strstr(const std::string& str, const std::string& needle, size_t strLen = 0, size_t needleLen = 0);
+
 	/// Parse string as boolean <br>
 	/// Case-insensitive, detects y, yes, t, true; all others are false
 	inline bool ParseBool(const std::string& str) {

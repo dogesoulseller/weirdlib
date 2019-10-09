@@ -191,5 +191,11 @@ namespace wlib::str
 		#endif
 	}
 
+	const char* strstr(const std::string& str, const std::string& needle, size_t strLen, size_t needleLen) {
+		strLen = strLen == 0 ? str.size() : strLen;
+		needleLen = needleLen == 0 ? needle.size() : needleLen;
+		return strstr(str.c_str(), needle.c_str(), strLen, needleLen);
+	}
+
 } // namespace wlib::str
 #endif // WEIRDLIB_ENABLE_STRING_OPERATIONS
