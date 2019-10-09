@@ -1,6 +1,7 @@
 #pragma once
 #ifdef WLIB_ENABLE_CUDA
 #include <cuda_runtime.h>
+#include "./cuda_mask_intellisense.cuh"
 
 /// 1D grid of 1D blocks
 inline __device__ int getGlobalIdx_1x1() {

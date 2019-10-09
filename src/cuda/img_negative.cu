@@ -2,6 +2,7 @@
 #include "../../include/cuda/weirdlib_cuda_image.hpp"
 #include "./cuda_utils.cuh"
 #include <cuda_runtime.h>
+#include "./cuda_mask_intellisense.cuh"
 
 namespace wlib
 {
