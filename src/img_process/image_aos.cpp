@@ -2,6 +2,8 @@
 #include "../../include/weirdlib_image.hpp"
 #include "../../include/cpu_detection.hpp"
 #include "../../include/weirdlib_traits.hpp"
+#include "../../include/weirdlib_fileops.hpp"
+#include "../img_loaders/image_format_loaders.hpp"
 #include <fstream>
 
 #pragma clang diagnostic push
@@ -48,55 +50,94 @@ namespace wlib::image
 			return;
 		}
 
-		int w;
-		int h;
-		int chan;
-		uint8_t* stbpix;
-
-		switch (requestedFormat)
+		auto ftype = wlib::file::DetectFileType(path);
+		switch (ftype)
 		{
-		case ColorFormat::F_Grayscale:
-			stbpix = stbi_load(path.c_str(), &w, &h, &chan, 1);
-			break;
-		case ColorFormat::F_GrayAlpha:
-			stbpix = stbi_load(path.c_str(), &w, &h, &chan, 2);
-			break;
-		case ColorFormat::F_RGB:
-		case ColorFormat::F_BGR:
-			stbpix = stbi_load(path.c_str(), &w, &h, &chan, 3);
-			break;
-		case ColorFormat::F_Default:
-		case ColorFormat::F_RGBA:
-		case ColorFormat::F_BGRA:
-			stbpix = stbi_load(path.c_str(), &w, &h, &chan, 4);
+		case wlib::file::FILETYPE_BMP: {
+			auto bmpInfo = LoadBMP(path);
+			height = bmpInfo.height;
+			width = bmpInfo.width;
+			format = static_cast<ColorFormat>(bmpInfo.colorChannels);
+			pixels.resize(GetTotalImageSize(width, height, format));
+			pixels.shrink_to_fit();
+			ConvertUint8ToFloat(bmpInfo.pixels.data(), pixels.data(), GetTotalImageSize(width, height, format));
 			break;
 		}
-
-		width = w;
-		height = h;
-		format = requestedFormat;
-		pixels.resize(GetTotalImageSize(width, height, format));
-		pixels.shrink_to_fit();
-
-		ConvertUint8ToFloat(stbpix, pixels.data(), GetTotalImageSize(width, height, format));
-
-		switch (requestedFormat)
-		{
-		case F_BGR:
-			for (size_t i = 0; i < GetTotalImageSize(width, height, format); i+=3) {
-				std::swap(pixels[0+i], pixels[2+i]);
-			}
-			break;
-		case F_BGRA:
-			for (size_t i = 0; i < GetTotalImageSize(width, height, format); i+=4) {
-				std::swap(pixels[0+i], pixels[2+i]);
-			}
-			break;
-		default:
+		case wlib::file::FILETYPE_PBM:
+		case wlib::file::FILETYPE_PGM:
+		case wlib::file::FILETYPE_PPM: { // TODO: Scale input
+			auto pnmInfo = LoadPNM(path);
+			pnmInfo.colorChannels = static_cast<ColorFormat>(pnmInfo.colorChannels);
+			width = pnmInfo.width;
+			height = pnmInfo.height;
+			pixels.resize(GetTotalImageSize(width, height, format));
+			pixels.shrink_to_fit();
+			ConvertUint8ToFloat(pnmInfo.pixels.data(), pixels.data(), GetTotalImageSize(width, height, format));
 			break;
 		}
+		case wlib::file::FILETYPE_PAM: { // TODO: Scale input
+			auto pamInfo = LoadPAM(path);
+			pamInfo.colorChannels = static_cast<ColorFormat>(pamInfo.colorChannels);
+			width = pamInfo.width;
+			height = pamInfo.height;
+			pixels.resize(GetTotalImageSize(width, height, format));
+			pixels.shrink_to_fit();
+			ConvertUint16ToFloat(pamInfo.pixels.data(), pixels.data(), GetTotalImageSize(width, height, format));
+			break;
+		}
+		default: {
+			int w;
+			int h;
+			int chan;
+			uint8_t* stbpix;
 
-		free(stbpix);
+			switch (requestedFormat)
+			{
+			case ColorFormat::F_Grayscale:
+				stbpix = stbi_load(path.c_str(), &w, &h, &chan, 1);
+				break;
+			case ColorFormat::F_GrayAlpha:
+				stbpix = stbi_load(path.c_str(), &w, &h, &chan, 2);
+				break;
+			case ColorFormat::F_RGB:
+			case ColorFormat::F_BGR:
+				stbpix = stbi_load(path.c_str(), &w, &h, &chan, 3);
+				break;
+			case ColorFormat::F_Default:
+			case ColorFormat::F_RGBA:
+			case ColorFormat::F_BGRA:
+				stbpix = stbi_load(path.c_str(), &w, &h, &chan, 4);
+				break;
+			}
+
+			width = w;
+			height = h;
+			format = requestedFormat;
+			pixels.resize(GetTotalImageSize(width, height, format));
+			pixels.shrink_to_fit();
+
+			ConvertUint8ToFloat(stbpix, pixels.data(), GetTotalImageSize(width, height, format));
+
+			switch (requestedFormat)
+			{
+			case F_BGR:
+				for (size_t i = 0; i < GetTotalImageSize(width, height, format); i+=3) {
+					std::swap(pixels[0+i], pixels[2+i]);
+				}
+				break;
+			case F_BGRA:
+				for (size_t i = 0; i < GetTotalImageSize(width, height, format); i+=4) {
+					std::swap(pixels[0+i], pixels[2+i]);
+				}
+				break;
+			default:
+				break;
+			}
+
+			free(stbpix);
+			return;
+			}
+		}
 	}
 
 	void Image::LoadImage(const uint8_t* _pixels, const uint64_t _width, const uint64_t _height, const ColorFormat _format) {

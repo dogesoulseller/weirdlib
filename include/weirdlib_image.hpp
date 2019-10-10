@@ -306,6 +306,12 @@ namespace image
 	/// @param fileSize total number of pixels
 	void ConvertUint8ToFloat(const uint8_t* in, float* out, size_t fileSize);
 
+	/// Function converting 16bpc into 32bpc float
+	/// @param in pointer to raw image data
+	/// @param out caller-managed pointer to destination
+	/// @param fileSize total number of pixels
+	void ConvertUint16ToFloat(const uint16_t* in, float* out, const size_t fileSize);
+
 	/// Convert input image to RGBA
 	/// @param in input image
 	void ConvertToRGBA(ImageSoA& in);

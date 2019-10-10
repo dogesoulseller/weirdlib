@@ -386,6 +386,44 @@ namespace wlib::image
 		return inImg;
 	}
 
+	void ConvertUint16ToFloat(const uint16_t* in, float* out, const size_t fileSize) {
+		#if X86_SIMD_LEVEL >= LV_AVX2
+			size_t iters = fileSize / 8;
+			size_t itersRem = fileSize % 8;
+
+			for (size_t i = 0; i < iters; i++) {
+				__m128i pixin = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in+i*8));
+				__m256i pix0 = _mm256_cvtepu16_epi32(pixin);
+				__m256 cvt = _mm256_cvtepi32_ps(pix0);
+
+				_mm256_store_ps(out+i*8, cvt);
+			}
+
+			for (size_t i = iters * 8; i < iters * 8 + itersRem; i++) {
+				out[i] = static_cast<float>(in[i]);
+			}
+		#elif X86_SIMD_LEVEL >= LV_SSE41
+			size_t iters = fileSize / 4;
+			size_t itersRem = fileSize % 4;
+
+			for (size_t i = 0; i < iters; i++) {
+				__m128i pixin = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in+i*4));
+				__m128i pix0 = _mm_cvtepu16_epi32(pixin);
+				__m128 cvt = _mm_cvtepi32_ps(pix0);
+
+				_mm_store_ps(out+i*4, cvt);
+			}
+
+			for (size_t i = iters * 4; i < iters * 4 + itersRem; i++) {
+				out[i] = static_cast<float>(in[i]);
+			}
+		#else
+			for (size_t i = 0; i < fileSize; i++) {
+				out[i] = static_cast<float>(in[i]);
+			}
+		#endif
+	}
+
 	// TODO: Work on 16 bytes simultaneously instead of reading the same chunk four times
 	void ConvertUint8ToFloat(const uint8_t* in, float* out, const size_t fileSize) {
 		#if X86_SIMD_LEVEL >= LV_AVX512
@@ -444,7 +482,7 @@ namespace wlib::image
 			for (size_t i = iters * 32; i < iters * 32 + itersRem; i++) {
 				out[i] = static_cast<float>(in[i]);
 			}
-		#elif X86_SIMD_LEVEL >= LV_SSE41
+		#elif X86_SIMD_LEVEL >= LV_SSE41 // TODO: SSSE3 version
 			size_t iters = fileSize / 16;
 			size_t itersRem = fileSize % 16;
 
