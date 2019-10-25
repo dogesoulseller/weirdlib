@@ -19,7 +19,7 @@ namespace wlib::image::except
 		}
 
 		explicit inline unsupported_image_type(const char* msg) noexcept {
-			what_message = std::move(std::string(msg));
+			what_message = std::string(msg);
 		}
 
 		inline unsupported_image_type(std::string&& msg) noexcept {
@@ -46,7 +46,7 @@ namespace wlib::image::except
 		}
 
 		explicit inline invalid_image_data(const char* msg) noexcept {
-			what_message = std::move(std::string(msg));
+			what_message = std::string(msg);
 		}
 
 		[[nodiscard]] inline const char* what() const noexcept override
@@ -69,7 +69,7 @@ namespace wlib::image::except
 		}
 
 		explicit inline file_open_error(const char* msg) noexcept {
-			what_message = std::move(std::string(msg));
+			what_message = std::string(msg);
 		}
 
 		[[nodiscard]] inline const char* what() const noexcept override
