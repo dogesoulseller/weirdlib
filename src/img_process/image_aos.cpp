@@ -53,16 +53,6 @@ namespace wlib::image
 		auto ftype = wlib::file::DetectFileType(path);
 		switch (ftype)
 		{
-		case wlib::file::FILETYPE_BMP: {
-			auto bmpInfo = LoadBMP(path);
-			height = bmpInfo.height;
-			width = bmpInfo.width;
-			format = static_cast<ColorFormat>(bmpInfo.colorChannels);
-			pixels.resize(GetTotalImageSize(width, height, format));
-			pixels.shrink_to_fit();
-			ConvertUint8ToFloat(bmpInfo.pixels.data(), pixels.data(), GetTotalImageSize(width, height, format));
-			break;
-		}
 		case wlib::file::FILETYPE_PBM:
 		case wlib::file::FILETYPE_PGM:
 		case wlib::file::FILETYPE_PPM: { // TODO: Scale input

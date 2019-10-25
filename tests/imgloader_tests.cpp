@@ -9,21 +9,6 @@
 #include "pnmdata.hpp"
 
 constexpr const char* wlibTestDir = WLIBTEST_TESTING_DIRECTORY;
-
-TEST(ImgOps_Loader, BMP) {
-	std::string path = std::filesystem::path(wlibTestDir) / "fileop_files" / "bmp.bmp";
-	auto info = wlib::image::LoadBMP(path.c_str());
-
-	int width, height;
-	auto pix = stbi_load(path.c_str(), &width, &height, nullptr, 3);
-
-	EXPECT_EQ(width, info.width);
-	EXPECT_EQ(height, info.height);
-	EXPECT_TRUE(std::equal(info.pixels.data(), info.pixels.data()+info.pixels.size(), pix));
-
-	stbi_image_free(pix);
-}
-
 constexpr int expectedWidthPNM = 27;
 constexpr int expectedHeightPNM = 12;
 constexpr int expectedMaxValPNM = 255;
