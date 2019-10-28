@@ -154,22 +154,49 @@ namespace wlib::image
 
 
 	size_t Image::GetTotalImageSize(const uint64_t width, const uint64_t height, const ColorFormat format) noexcept {
+		size_t result = width * height;
 		switch (format)
 		{
-		case ColorFormat::F_Grayscale:
-			return width * height;
-		case ColorFormat::F_GrayAlpha:
-			return width * height * 2;
-		case ColorFormat::F_RGB:
-		case ColorFormat::F_BGR:
-			return width * height * 3;
-		case ColorFormat::F_Default:
-		case ColorFormat::F_RGBA:
-		case ColorFormat::F_BGRA:
-			return width * height * 4;
+		case F_GrayAlpha:
+			result *= 2;
+			break;
+		case F_RGB:
+		case F_BGR:
+			result *= 3;
+			break;
+		case F_RGBA:
+		case F_BGRA:
+			result *= 4;
+			break;
+		case F_Grayscale:
 		default:
-			return 0;
-		}
+			break;
+		};
+
+		return result;
+	}
+
+	size_t Image::GetTotalImageSize() const noexcept {
+		size_t result = width * height;
+		switch (format)
+		{
+		case F_GrayAlpha:
+			result *= 2;
+			break;
+		case F_RGB:
+		case F_BGR:
+			result *= 3;
+			break;
+		case F_RGBA:
+		case F_BGRA:
+			result *= 4;
+			break;
+		case F_Grayscale:
+		default:
+			break;
+		};
+
+		return result;
 	}
 } // namespace wlib::image
 
