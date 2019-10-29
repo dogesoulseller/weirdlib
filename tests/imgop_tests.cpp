@@ -55,7 +55,7 @@ TEST(ImgOps, ConvertSoAToImage) {
 
 TEST(ImgOps, LoadFromFormatted) {
 	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
-	const std::string imgPathF = std::string(wlibTestDir) + std::string("testphoto.bmp");
+	const std::string imgPathF = std::string(wlibTestDir) + std::string("testphoto.png");
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 	ASSERT_TRUE(std::filesystem::exists(imgPathF));
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
