@@ -10,9 +10,9 @@ accepted_extensions = (".c", ".cc", ".cxx", ".cpp", ".C", ".h", ".hh", ".hpp", "
 directories_to_check = ["apps", "include", "src", "benchmark"]
 
 checks = "bugprone-*,"\
-	+"modernize-*,-modernize-use-trailing-return-type,-modernize-concat-nested-namespaces,"\
+	+"modernize-*,-modernize-use-trailing-return-type,-modernize-concat-nested-namespaces,-modernize-avoid-c-arrays,"\
 	+"performance-*,"\
-	+"readability-*,-readability-magic-numbers,-readability-uppercase-literal-suffix,"\
+	+"readability-*,-readability-magic-numbers,-readability-uppercase-literal-suffix,-readability-braces-around-statement,"\
 	+"portability-*,-portability-simd-intrinsics,"\
 	+"clang-analyzer-*,"\
 	+"misc-*,"\
