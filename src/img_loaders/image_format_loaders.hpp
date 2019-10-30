@@ -9,34 +9,6 @@
 
 namespace wlib::image
 {
-	struct ImageInfo
-	{
-		size_t width;
-		size_t height;
-		uint8_t colorChannels;
-		std::vector<uint8_t> pixels;
-	};
-
-	/// Load BMP file <br>
-	/// Supports 24bpp BGR without compression only
-	/// @param path file path to location on disk
-	/// @return @{link ImageInfo}
-	ImageInfo LoadBMP(const std::string& path);
-
-	/// Load BMP file <br>
-	///	Supports 24bpp BGR without compression only
-	/// @param in fstream (must be opened using binary mode, otherwise behavior is undefined)
-	/// @return @{link ImageInfo}
-	ImageInfo LoadBMP(std::ifstream& in);
-
-	/// Load BMP file <br>
-	///	Supports 24bpp BGR without compression only
-	/// @param in pointer to start of memory with a BMP file's contents
-	/// @param size size in bytes of data
-	/// @return @{link ImageInfo}
-	ImageInfo LoadBMP(const uint8_t* in);
-
-
 	struct ImageInfoPNM
 	{
 		size_t width;
@@ -116,4 +88,29 @@ namespace wlib::image
 	/// @return @{link ImageInfoPFM}
 	ImageInfoPFM LoadPFM(const uint8_t* in, size_t size = 0);
 
+
+	struct ImageInfoTGA
+	{
+		uint16_t width;
+		uint16_t height;
+		uint16_t xOrigin;
+		uint16_t yOrigin;
+		uint8_t bpp;
+		std::vector<uint8_t> data;
+	};
+
+	/// Load TARGA image file
+	/// @param path file path to location on disk
+	/// @return @{link ImageInfoTGA}
+	ImageInfoTGA LoadTGA(const std::string& path);
+
+	/// Load TARGA image file
+	/// @param in fstream (must be opened using binary mode, otherwise behavior is undefined)
+	/// @return @{link ImageInfoTGA}
+	ImageInfoTGA LoadTGA(std::ifstream& in);
+
+	/// Load TARGA image file
+	/// @param path file path to location on disk
+	/// @return @{link ImageInfoTGA}
+	ImageInfoTGA LoadTGA(const uint8_t* in, size_t size = 0);
 } // namespace wlib::image
