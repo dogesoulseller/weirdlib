@@ -79,7 +79,7 @@ namespace wlib::image
 			int w;
 			int h;
 			int chan;
-			uint8_t* stbpix;
+			uint8_t* stbpix = nullptr;
 
 			switch (requestedFormat)
 			{

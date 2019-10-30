@@ -222,7 +222,7 @@ namespace wlib::image
 	}
 
 	Image ImageSoA::ConvertToImage() {
-		alignas(64) float* outputPix;
+		alignas(64) float* outputPix = nullptr;
 
 		switch (format)
 		{
