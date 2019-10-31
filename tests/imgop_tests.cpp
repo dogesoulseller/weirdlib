@@ -11,11 +11,11 @@
 
 constexpr const char* wlibTestDir = WLIBTEST_TESTING_DIRECTORY;
 
-constexpr uint64_t imageWidth = 1200;
-constexpr uint64_t imageHeight = 1500;
+constexpr uint64_t imageWidth = 64;
+constexpr uint64_t imageHeight = 64;
 
 TEST(ImgOps, LoadRawData) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
@@ -27,7 +27,7 @@ TEST(ImgOps, LoadRawData) {
 }
 
 TEST(ImgOps, ConvertToSoA) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
@@ -41,7 +41,7 @@ TEST(ImgOps, ConvertToSoA) {
 }
 
 TEST(ImgOps, ConvertSoAToImage) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
 	wlib::image::ImageSoA testSoA(testImg);
@@ -54,8 +54,8 @@ TEST(ImgOps, ConvertSoAToImage) {
 }
 
 TEST(ImgOps, LoadFromFormatted) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
-	const std::string imgPathF = std::string(wlibTestDir) + std::string("testphoto.png");
+	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
+	const std::string imgPathF = std::string(wlibTestDir) + std::string("imgload_files/base.png");
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 	ASSERT_TRUE(std::filesystem::exists(imgPathF));
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
@@ -71,7 +71,7 @@ TEST(ImgOps, LoadFromFormatted) {
 }
 
 TEST(ImgOps, ConvertRGBA_Grayscale) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
@@ -93,40 +93,10 @@ TEST(ImgOps, ConvertRGBA_Grayscale) {
 	testSoA_LumBT601 = wlib::image::ConvertToGrayscale(testSoA_LumBT601, false, wlib::image::GrayscaleMethod::LuminosityBT601);
 }
 
-TEST(ImgOps, ColorOrderConversion) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
-	ASSERT_TRUE(std::filesystem::exists(imgPath));
-
-	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
-	wlib::image::ImageSoA testSoAA(testImg);
-	wlib::image::ImageSoA testSoANA(testImg);
-
-	wlib::image::ConvertToBGRA(testSoAA);
-	wlib::image::ConvertToBGR(testSoANA);
-
-	EXPECT_EQ(testSoAA.channels[0][0], testImg.GetPixels()[2]);
-	EXPECT_EQ(testSoAA.channels[1][0], testImg.GetPixels()[1]);
-	EXPECT_EQ(testSoAA.channels[2][0], testImg.GetPixels()[0]);
-	EXPECT_EQ(testSoAA.channels[3][0], testImg.GetPixels()[3]);
-
-	EXPECT_EQ(testSoANA.channels[0][0], testImg.GetPixels()[2]);
-	EXPECT_EQ(testSoANA.channels[1][0], testImg.GetPixels()[1]);
-	EXPECT_EQ(testSoANA.channels[2][0], testImg.GetPixels()[0]);
-	EXPECT_EQ(testSoANA.channels.size(), 3);
-
-	// Check alpha append
-	wlib::image::ConvertToBGRA(testSoANA);
-
-	EXPECT_EQ(testSoANA.channels[0][0], testImg.GetPixels()[2]);
-	EXPECT_EQ(testSoANA.channels[1][0], testImg.GetPixels()[1]);
-	EXPECT_EQ(testSoANA.channels[2][0], testImg.GetPixels()[0]);
-	EXPECT_EQ(testSoANA.channels[3][0], 255.0f);
-}
-
-constexpr size_t PixelSampleCount = 3000;
+constexpr size_t PixelSampleCount = 50;
 
 TEST(ImgOps, NegateValues) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
 	wlib::image::ImageSoA testSoA_Alpha(testImg);
@@ -155,7 +125,7 @@ TEST(ImgOps, NegateValues) {
 }
 
 TEST(ImgOps, FloatToUint8) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	std::ifstream rawfile(imgPath, std::ios::binary | std::ios::ate);
@@ -171,8 +141,9 @@ TEST(ImgOps, FloatToUint8) {
 	EXPECT_TRUE(std::equal(pixelsRef.cbegin(), pixelsRef.cend(), pixels.cbegin()));
 }
 
+// TODO: Change to 64x64 images
 TEST(ImgOps, ColorOrderConversions) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
 

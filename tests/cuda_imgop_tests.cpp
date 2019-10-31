@@ -7,11 +7,11 @@
 
 constexpr const char* wlibTestDir = WLIBTEST_TESTING_DIRECTORY;
 
-constexpr uint64_t imageWidth = 1200;
-constexpr uint64_t imageHeight = 1500;
+constexpr uint64_t imageWidth = 64;
+constexpr uint64_t imageHeight = 77;
 
 TEST(CUDAImage, Grayscale) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base_uneven.rawpix");
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
@@ -33,10 +33,10 @@ TEST(CUDAImage, Grayscale) {
 	testSoA_LumBT601 = wlib::image::cu::ConvertToGrayscale(testSoA_LumBT601, false, wlib::image::GrayscaleMethod::LuminosityBT601);
 }
 
-constexpr size_t PixelSampleCount = 3000;
+constexpr size_t PixelSampleCount = 60;
 
 TEST(CUDAImage, NegateValues) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base_uneven.rawpix");
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
@@ -72,7 +72,7 @@ TEST(CUDAImage, NegateValues) {
 }
 
 TEST(CUDAImage, Histogram) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base_uneven.rawpix");
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
@@ -88,7 +88,7 @@ TEST(CUDAImage, Histogram) {
 }
 
 TEST(CUDAImage, DeviceSoA) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base_uneven.rawpix");
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	// From image file
@@ -124,7 +124,7 @@ TEST(CUDAImage, DeviceSoA) {
 }
 
 TEST(CUDAImage, DeviceAoS) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("testphoto.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base_uneven.rawpix");
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	// From image file
@@ -154,8 +154,8 @@ TEST(CUDAImage, DeviceAoS) {
 }
 
 TEST(CUDAImage, RandomImage) {
-	constexpr int genWidth =  1024;
-	constexpr int genheight = 768;
+	constexpr int genWidth =  640;
+	constexpr int genheight = 480;
 	auto imgsoa0 = wlib::image::cu::GenerateRandomImageSoA(genWidth, genheight, wlib::image::ColorFormat::F_RGB);
 	auto imgsoa1 = wlib::image::cu::GenerateRandomImageSoA(genWidth, genheight, wlib::image::ColorFormat::F_RGBA);
 }
