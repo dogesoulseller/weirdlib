@@ -37,7 +37,8 @@ namespace image
 		Luminosity = 0,
 		Lightness = 1,
 		Average = 2,
-		LuminosityBT601 = 3
+		LuminosityBT601 = 3,
+		LuminosityBT2100 = 4
 	};
 
 	/// Class representing a 2D image in Array of Structures (i.e. RGB RGB RGB), converts to a floating point representation on load
@@ -187,7 +188,7 @@ namespace image
 
 		~ImageSoA();
 
-		/// Realign channels using unpack instructions
+		/// Realign channels
 		/// @return AoS @{link Image}
 		Image ConvertToImage();
 	};
