@@ -1,8 +1,17 @@
-.vscode
 build
-docs/html
-docs/latex
 .swp
+
 intc
 coverage
+
+# Doxygen-generated dirs
+docs/html
+docs/latex
+
+# VS Code configs
+.vscode
 *.code-workspace
+
+# Handwritten documentation
+docsrc/*
+!docsrc/weirdlib.tex
