@@ -3,6 +3,7 @@
 #include <cmath>
 #include <numeric>
 #include <limits>
+#include <utility>
 
 namespace wlib
 {
@@ -82,5 +83,44 @@ namespace math
 		: min(v0, std::forward<Args>(args)...);
 	}
 
+	// Specialized for all integral
+	template<typename T0, typename T1, typename... Args> constexpr
+	std::enable_if_t<std::is_integral_v<T0> && std::is_integral_v<T1>
+	&& (std::is_integral_v<Args> && ...),
+	std::common_type_t<T0, T1, Args...>>
+	average(T0 x, T1 y, Args... rest) {
+		size_t tmp = x + y + (rest + ...);
+		return tmp / (sizeof...(rest) + 2);
+	}
+
+	// Average with remainder
+	template<typename T0, typename T1, typename... Args> constexpr
+	std::enable_if_t<std::is_integral_v<T0> && std::is_integral_v<T1>
+	&& (std::is_integral_v<Args> && ...),
+	std::pair<std::common_type_t<T0, T1, Args...>, std::common_type_t<T0, T1, Args...>>>
+	average_and_remainder(T0 x, T1 y, Args... rest) {
+		size_t tmp = x + y + (rest + ...);
+		return std::make_pair(tmp / (sizeof...(rest) + 2), tmp % (sizeof...(rest) + 2));
+	}
+
+	// Specialized for all floating
+	template<typename T0, typename T1, typename... Args> constexpr
+	std::enable_if_t<std::is_floating_point_v<T0> && std::is_floating_point_v<T1>
+	&& (std::is_floating_point_v<Args> && ...),
+	std::common_type_t<T0, T1, Args...>>
+	average(T0 x, T1 y, Args... rest) {
+		auto tmp = x + y + (rest + ...);
+		return tmp / static_cast<std::common_type_t<T0, T1, Args...>>((sizeof...(rest) + 2));
+	}
+
+	// Specialized for mixed
+	template<typename T0, typename T1, typename... Args> constexpr
+	std::enable_if_t<(!(std::is_floating_point_v<T0> && std::is_floating_point_v<T1>
+	&& (std::is_floating_point_v<Args> && ...))) && (!(std::is_integral_v<T0> && std::is_integral_v<T1>
+	&& (std::is_integral_v<Args> && ...))), std::common_type_t<T0, T1, Args...>>
+	average(T0 x, T1 y, Args... rest) {
+		auto tmp = x + y + (rest + ...);
+		return tmp / static_cast<std::common_type_t<T0, T1, Args...>>((sizeof...(rest) + 2));
+	}
 } // namespace math
 } // namespace wlib
