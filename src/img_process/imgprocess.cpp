@@ -353,6 +353,81 @@ namespace wlib::image
 			#endif
 			break;
 		}
+		case GrayscaleMethod::LuminosityBT2100: {
+			// Processing with SIMD
+			#if X86_SIMD_LEVEL >= LV_AVX
+				const auto redMul = _mm256_set1_ps(0.2627f);
+				const auto greenMul = _mm256_set1_ps(0.6780f);
+				const auto blueMul = _mm256_set1_ps(0.0593f);
+				const auto maxMask = _mm256_set1_ps(255.0f);
+
+				const auto iter_AVX = (inImg.width * inImg.height) / 8;
+				const auto iterRem_AVX = (inImg.width * inImg.height) % 8;
+
+				for (size_t i = 0; i < iter_AVX; i++) {
+					const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
+					const auto gChan = _mm256_loadu_ps(inImg.channels[channelGreenN]+i*8);
+					const auto bChan = _mm256_loadu_ps(inImg.channels[channelBlueN]+i*8);
+
+					#ifdef X86_SIMD_FMA
+						const auto resultGr = _mm256_min_ps(_mm256_fmadd_ps(rChan, redMul, _mm256_fmadd_ps(gChan, greenMul, _mm256_mul_ps(bChan, blueMul))), maxMask);
+					#else
+						const auto resultGr = _mm256_min_ps(
+							_mm256_add_ps(_mm256_mul_ps(rChan, redMul), _mm256_add_ps(_mm256_mul_ps(gChan, greenMul), _mm256_mul_ps(bChan, blueMul))), maxMask);
+					#endif
+						_mm256_storeu_ps(outGr+8*i, resultGr);
+				}
+
+				for (size_t i = iter_AVX * 8; i < iterRem_AVX + iter_AVX*8; i++) {
+					if (const auto result = std::fma(inImg.channels[channelRedN][i], 0.2627f, std::fma(inImg.channels[channelGreenN][i], 0.6780f, inImg.channels[channelBlueN][i] * 0.0593f)); result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+
+				_mm256_zeroupper();
+			#elif X86_SIMD_LEVEL >= LV_SSE
+				const auto redMul = _mm_set1_ps(0.2627f);
+				const auto greenMul = _mm_set1_ps(0.6780f);
+				const auto blueMul = _mm_set1_ps(0.0593f);
+				const auto maxMask = _mm_set1_ps(255.0f);
+
+				const auto iter_SSE = (inImg.width * inImg.height) / 4;
+				const auto iterRem_SSE = (inImg.width * inImg.height) % 4;
+
+				for (size_t i = 0; i < iter_SSE; i++) {
+					const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
+					const auto gChan = _mm_loadu_ps(inImg.channels[channelGreenN]+i*4);
+					const auto bChan = _mm_loadu_ps(inImg.channels[channelBlueN]+i*4);
+
+					#ifdef X86_SIMD_FMA	// Technically shouldn't be possible
+						const auto resultGr = _mm_min_ps(_mm_fmadd_ps(rChan, redMul, _mm256_fmadd_ps(gChan, greenMul, _mm_mul_ps(bChan, blueMul))), maxMask);
+					#else
+						const auto resultGr = _mm_min_ps(
+							_mm_add_ps(_mm_mul_ps(rChan, redMul), _mm_add_ps(_mm_mul_ps(gChan, greenMul), _mm_mul_ps(bChan, blueMul))), maxMask);
+					#endif
+						_mm_storeu_ps(outGr+4*i, resultGr);
+				}
+
+				for (size_t i = iter_SSE * 4; i < iterRem_SSE + iter_SSE * 4; i++) {
+					if (const auto result = std::fma(inImg.channels[channelRedN][i], 0.2627f, std::fma(inImg.channels[channelGreenN][i], 0.6780f, inImg.channels[channelBlueN][i] * 0.0593f)); result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+			#else
+				for (size_t i = 0; i < inImg.width * inImg.height; i++) {
+					if (const auto result = std::fma(inImg.channels[channelRedN][i], 0.2627f, std::fma(inImg.channels[channelGreenN][i], 0.6780f, inImg.channels[channelBlueN][i] * 0.0593f)); result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+			#endif
+			break;
+		}
 		default:
 			break;
 		}

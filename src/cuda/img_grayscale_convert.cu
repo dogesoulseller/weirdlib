@@ -21,6 +21,8 @@ namespace cu
 			outGray[pixelID] = (comps.x + comps.y + comps.z) * (1.0f/3.0f);
 		} else if (method == GrayscaleMethod::LuminosityBT601) {
 			outGray[pixelID] = fminf(fmaf(comps.x, 0.299f, fmaf(comps.y, 0.587f, comps.z * 0.114f)), 255.0f);
+		} else if (method == GrayscaleMethod::LuminosityBT2100) {
+			outGray[pixelID] = fminf(fmaf(comps.x, 0.2627f, fmaf(comps.y, 0.6780f, comps.z * 0.0593f)), 255.0f);
 		}
 	}
 
@@ -65,7 +67,10 @@ namespace cu
 			kernel_ConvertGrayscaleRGB<GrayscaleMethod::Average><<<gridSize, blockSize, 0, stream>>>(red, green, blue, outGray);
 			break;
 		case GrayscaleMethod::LuminosityBT601:
-			kernel_ConvertGrayscaleRGB<GrayscaleMethod::Luminosity><<<gridSize, blockSize, 0, stream>>>(red, green, blue, outGray);
+			kernel_ConvertGrayscaleRGB<GrayscaleMethod::LuminosityBT601><<<gridSize, blockSize, 0, stream>>>(red, green, blue, outGray);
+			break;
+		case GrayscaleMethod::LuminosityBT2100:
+			kernel_ConvertGrayscaleRGB<GrayscaleMethod::LuminosityBT2100><<<gridSize, blockSize, 0, stream>>>(red, green, blue, outGray);
 			break;
 		}
 		cudaStreamDestroy(stream);

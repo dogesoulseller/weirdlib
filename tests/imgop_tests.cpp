@@ -81,6 +81,7 @@ TEST(ImgOps, ConvertRGBA_Grayscale) {
 	wlib::image::ImageSoA testSoA_Average(testImg);
 	wlib::image::ImageSoA testSoA_Lightness(testImg);
 	wlib::image::ImageSoA testSoA_LumBT601(testImg);
+	wlib::image::ImageSoA testSoA_LumBT2100(testImg);
 
 	testSoAA = wlib::image::ConvertToGrayscale(testSoAA, true);
 	EXPECT_EQ(testSoAA.channels.size(), 2);
@@ -91,6 +92,7 @@ TEST(ImgOps, ConvertRGBA_Grayscale) {
 	testSoA_Average = wlib::image::ConvertToGrayscale(testSoA_Average, false, wlib::image::GrayscaleMethod::Average);
 	testSoA_Lightness = wlib::image::ConvertToGrayscale(testSoA_Lightness, false, wlib::image::GrayscaleMethod::Lightness);
 	testSoA_LumBT601 = wlib::image::ConvertToGrayscale(testSoA_LumBT601, false, wlib::image::GrayscaleMethod::LuminosityBT601);
+	testSoA_LumBT601 = wlib::image::ConvertToGrayscale(testSoA_LumBT2100, false, wlib::image::GrayscaleMethod::LuminosityBT2100);
 }
 
 constexpr size_t PixelSampleCount = 50;
