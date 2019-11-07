@@ -18,7 +18,7 @@
 #include "../common.hpp"
 
 inline static std::vector<uint8_t> GetASCIIPBMPixels(const char* pixin, size_t width, size_t height, size_t maxFileSize) noexcept {
-	static const std::regex whitespaceRemoveRegex("\\s+", std::regex_constants::ECMAScript | std::regex_constants::optimize);
+	static const std::regex whitespaceRemoveRegex(R"(\s+)", std::regex_constants::ECMAScript | std::regex_constants::optimize);
 
 	auto pix_nowspace = std::make_unique<char[]>(maxFileSize);
 	std::vector<uint8_t> pixels(width*height);
@@ -39,7 +39,7 @@ inline static std::vector<uint8_t> GetASCIIPBMPixels(const char* pixin, size_t w
 }
 
 inline static std::vector<uint8_t> GetASCIIPGMPixels(const char* pixin, size_t width, size_t height, size_t maxFileSize) noexcept {
-	static const std::regex multiWhitespaceRemoveRegex("\\s{2,}", std::regex_constants::ECMAScript | std::regex_constants::optimize);
+	static const std::regex multiWhitespaceRemoveRegex(R"(\s{2,})", std::regex_constants::ECMAScript | std::regex_constants::optimize);
 	auto pix_nowspace = std::make_unique<char[]>(maxFileSize);
 	std::vector<uint8_t> pixels(width*height);
 
@@ -64,7 +64,7 @@ inline static std::vector<uint8_t> GetASCIIPGMPixels(const char* pixin, size_t w
 }
 
 inline static std::vector<uint8_t> GetASCIIPPMPixels(const char* pixin, size_t width, size_t height, size_t maxFileSize) noexcept {
-	static const std::regex multiWhitespaceRemoveRegex("\\s\\s+", std::regex_constants::ECMAScript | std::regex_constants::optimize);
+	static const std::regex multiWhitespaceRemoveRegex(R"(\s\s+)", std::regex_constants::ECMAScript | std::regex_constants::optimize);
 	auto pix_nowspace = std::make_unique<char[]>(maxFileSize);
 	std::vector<uint8_t> pixels(width*height*3);
 
@@ -174,7 +174,7 @@ namespace wlib::image
 
 		const std::string formatIdentifier(formatIdentifier_cstr.data());
 
-		std::regex commentRemoveRegex("(\\s*#+.*)",
+		std::regex commentRemoveRegex(R"reg((\s*#+.*))reg",
 			std::regex_constants::optimize | std::regex_constants::ECMAScript);
 
 		// Make copy of data without comments

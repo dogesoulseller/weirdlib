@@ -39,7 +39,7 @@ namespace wlib::image
 	ImageInfoPAM LoadPAM(const uint8_t* in, size_t size) {
 		ImageInfoPAM info;
 
-		std::regex commentRemoveRegex("(\\s*#+.*)",
+		std::regex commentRemoveRegex(R"reg((\s*#+.*))reg",
 			std::regex_constants::optimize | std::regex_constants::ECMAScript);
 
 		// Make copy of data without comments
