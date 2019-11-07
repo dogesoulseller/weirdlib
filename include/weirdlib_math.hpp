@@ -4,6 +4,7 @@
 #include <numeric>
 #include <limits>
 #include <utility>
+#include <iterator>
 
 namespace wlib
 {
@@ -122,5 +123,29 @@ namespace math
 		auto tmp = x + y + (rest + ...);
 		return tmp / static_cast<std::common_type_t<T0, T1, Args...>>((sizeof...(rest) + 2));
 	}
+
+	// Specialized for iterators
+	template<typename IterT> constexpr
+	typename std::iterator_traits<IterT>::value_type average(const IterT start, const IterT end) {
+		auto out = typename std::iterator_traits<IterT>::value_type {};
+		for (auto i = start; i != end; i++) {
+			out += (*i);
+		}
+
+		return out / std::distance(start, end);
+	}
+
+	// Specialized for iterators
+	template<typename IterT> constexpr
+	std::enable_if_t<std::is_integral_v<typename std::iterator_traits<IterT>::value_type>,
+	std::pair<typename std::iterator_traits<IterT>::value_type, size_t>> average_and_remainder(const IterT start, const IterT end) {
+		auto out = typename std::iterator_traits<IterT>::value_type {};
+		for (auto i = start; i != end; i++) {
+			out += (*i);
+		}
+		const auto distance = std::distance(start, end);
+		return std::make_pair(out / distance, out % distance);
+	}
+
 } // namespace math
 } // namespace wlib
