@@ -66,7 +66,7 @@ namespace detail
 	const char* strstr(const std::string& str, const std::string& needle, size_t strLen = 0, size_t needleLen = 0);
 
 	/// Parse string as boolean <br>
-	/// Case-insensitive, detects y, yes, t, true; all others are false
+	/// Case-insensitive, detects y, yes, t, true, on, enable, enabled; all others are false
 	inline bool ParseBool(const std::string& str) {
 		return detail::parseStringToBool(str);
 	}

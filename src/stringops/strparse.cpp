@@ -1,4 +1,5 @@
 #include "../../include/weirdlib_string.hpp"
+#include "../common.hpp"
 #include <vector>
 #include <algorithm>
 #include <cstring>
@@ -63,11 +64,17 @@ namespace wlib::str::detail
 		std::string strLowercase = str;
 		strLowercase.resize(str.size());
 		std::transform(str.cbegin(), str.cend(), strLowercase.begin(), _toLowerWorkaround);
+		strLowercase.erase(std::remove_if(strLowercase.begin(), strLowercase.end(), [](const char c){
+			for (const auto w: whitespace) {
+				if (w == c)
+					return true;
+			}
+			return false;
+		}), strLowercase.end());
 
-		bool result = (wlib::str::strstr(strLowercase.c_str(), "true") != nullptr) ||
-			(wlib::str::strstr(strLowercase.c_str(), "yes") != nullptr) ||
-			(strLowercase.find('t') != std::string::npos) ||
-			(strLowercase.find('y') != std::string::npos);
+		bool result = strLowercase == "true" || strLowercase == "yes" || strLowercase == "on"
+		|| strLowercase == "enable" || strLowercase == "enabled"
+		|| strLowercase == "t" || strLowercase == "y";
 
 		return result;
 	}
