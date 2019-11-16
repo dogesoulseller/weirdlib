@@ -12,6 +12,8 @@ constexpr const char* wlibTestDir = WLIBTEST_TESTING_DIRECTORY;
 TEST(Parse, Comfyg) {
 	std::filesystem::path filePath = std::filesystem::path(wlibTestDir) / "parser_files" / "test_config.comf";
 
+	ASSERT_TRUE(std::filesystem::exists(filePath));
+
 	wlib::parse::Comfyg cfg(filePath);
 	auto testFloatPlain = cfg.GetVal<double>("ExampleFloatPlain");
 	auto testFloatSci = cfg.GetVal<double>("ExampleFloatSci");
@@ -22,9 +24,9 @@ TEST(Parse, Comfyg) {
 	auto testString = cfg.GetVal<std::string>("ExampleString");
 
 	// No implicit conversions
-	EXPECT_ANY_THROW(cfg.GetVal<bool>("ExampleFloatPlain"));
-	EXPECT_ANY_THROW(cfg.GetVal<float>("ExampleFloatNonexistent"));
-	EXPECT_ANY_THROW(cfg.GetVal<float>(""));
+	EXPECT_THROW(cfg.GetVal<bool>("ExampleFloatPlain"), wlib::parse::comfyg_value_get_error);
+	EXPECT_THROW(cfg.GetVal<float>("ExampleFloatNonexistent"), std::out_of_range);
+	EXPECT_THROW(cfg.GetVal<float>(""), std::out_of_range);
 
 	EXPECT_FLOAT_EQ(testFloatPlain, 903100.1328);
 	EXPECT_FLOAT_EQ(testFloatSci, 903100.1328);
