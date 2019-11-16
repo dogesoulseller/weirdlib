@@ -50,9 +50,4 @@ namespace traits
 
 } // traits
 
-	class module_not_built : public std::runtime_error
-	{
-		public:
-		inline module_not_built(const char* m = "") : std::runtime_error(m) {}
-	};
 } // wlib
