@@ -1,0 +1,37 @@
+# This format is a simple, UTF-8 encoded, typed, machine and human-readable list of key-value pairs
+# And clearly it supports comments
+# Types it supports are (case-insensitive):
+# - Integer or Int (64-bit)
+# - Float or Decimal (64-bit)
+# - String or Str
+# - Boolean or Bool
+
+# Values are formatted as
+# KeyName<Type> = Value
+# KeyName can be any valid UTF-8 String that doesn't have '<', '>', '=' or any whitespace in it
+# Multiple values with the same KeyName results in undefined behavior
+# However comments can not appear in the same lines as a key
+# KeyName<Type> = Value # This is invalid
+
+# For example to encode an integer:
+ExampleIntegerPlain<Integer> = -903100
+
+# Integers can also have _ in them to make them easier to read by humans
+ExampleIntegerSep<Integer> = -903_100
+
+# Floats can be encoded directly
+ExampleFloatPlain<Float> = 903100.1328
+
+# Or using scientific notation
+ExampleFloatSci<Float> = 9.031001328e5
+
+# Booleans are interpreted "y", "yes", "t", "true", "on", "enable", "enabled" as true values, all others are false
+ExampleBoolT<Boolean> = true
+ExampleBoolF<Boolean> = aye
+
+# Strings are UTF-8 encoded and enclosed in " ", but cannot span multiple lines
+# Unless escape sequences are used, which are the same as in C: \n, \r, etc.
+# All whitespace is preserved otherwise
+# Any character preceded by \ will be ignored if it's not an actual escape sequence
+ExampleString<String> = "Lorem ipsum\n Newlines\!"
+
