@@ -6,6 +6,8 @@
 #include <memory>
 #include <cstring>
 
+using namespace std::string_literals;
+
 namespace wlib::image
 {
 	enum TGAImageType
@@ -343,7 +345,7 @@ namespace wlib::image
 	ImageInfoTGA LoadTGA(const std::string& path) {
 		std::ifstream in(path, std::ios::binary);
 		if (!in.good()) {
-			throw except::file_open_error(std::string("TGA Loader: Failed to open file ") + path);
+			throw except::file_open_error("TGA Loader: Failed to open file "s + path);
 		}
 
 		return LoadTGA(in);

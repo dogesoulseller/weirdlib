@@ -9,13 +9,15 @@
 #include <fstream>
 #include <thread>
 
+using namespace std::string_literals;
+
 constexpr const char* wlibTestDir = WLIBTEST_TESTING_DIRECTORY;
 
 constexpr uint64_t imageWidth = 64;
 constexpr uint64_t imageHeight = 64;
 
 TEST(ImgOps, LoadRawData) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
@@ -27,7 +29,7 @@ TEST(ImgOps, LoadRawData) {
 }
 
 TEST(ImgOps, ConvertToSoA) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
@@ -41,7 +43,7 @@ TEST(ImgOps, ConvertToSoA) {
 }
 
 TEST(ImgOps, ConvertSoAToImage) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
 	wlib::image::ImageSoA testSoA(testImg);
@@ -54,8 +56,8 @@ TEST(ImgOps, ConvertSoAToImage) {
 }
 
 TEST(ImgOps, LoadFromFormatted) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
-	const std::string imgPathF = std::string(wlibTestDir) + std::string("imgload_files/base.png");
+	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base.rawpix"s;
+	const std::string imgPathF = std::string(wlibTestDir) + "imgload_files/base.png"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 	ASSERT_TRUE(std::filesystem::exists(imgPathF));
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
@@ -71,7 +73,7 @@ TEST(ImgOps, LoadFromFormatted) {
 }
 
 TEST(ImgOps, ConvertRGBA_Grayscale) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
@@ -98,7 +100,7 @@ TEST(ImgOps, ConvertRGBA_Grayscale) {
 constexpr size_t PixelSampleCount = 50;
 
 TEST(ImgOps, NegateValues) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
 	wlib::image::ImageSoA testSoA_Alpha(testImg);
@@ -127,7 +129,7 @@ TEST(ImgOps, NegateValues) {
 }
 
 TEST(ImgOps, FloatToUint8) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	std::ifstream rawfile(imgPath, std::ios::binary | std::ios::ate);
@@ -145,7 +147,7 @@ TEST(ImgOps, FloatToUint8) {
 
 // TODO: Change to 64x64 images
 TEST(ImgOps, ColorOrderConversions) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
 

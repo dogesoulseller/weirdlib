@@ -133,12 +133,14 @@ inline static std::vector<uint8_t> GetBinaryPBMPixels(const char* pixin, size_t 
 	return pixels;
 }
 
+using namespace std::string_literals;
+
 namespace wlib::image
 {
 	ImageInfoPNM LoadPNM(const std::string& path) {
 		std::ifstream in(path, std::ios::binary);
 		if (!in.good()) {
-			throw except::file_open_error(std::string("PNM Loader: Failed to open file ") + path);
+			throw except::file_open_error("PNM Loader: Failed to open file "s + path);
 		}
 
 		return LoadPNM(in);

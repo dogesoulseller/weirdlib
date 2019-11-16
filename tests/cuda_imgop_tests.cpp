@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <future>
 #include <random>
+using namespace std::string_literals;
 
 constexpr const char* wlibTestDir = WLIBTEST_TESTING_DIRECTORY;
 
@@ -11,7 +12,7 @@ constexpr uint64_t imageWidth = 64;
 constexpr uint64_t imageHeight = 77;
 
 TEST(CUDAImage, Grayscale) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base_uneven.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base_uneven.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
@@ -36,7 +37,7 @@ TEST(CUDAImage, Grayscale) {
 constexpr size_t PixelSampleCount = 60;
 
 TEST(CUDAImage, NegateValues) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base_uneven.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base_uneven.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
@@ -72,7 +73,7 @@ TEST(CUDAImage, NegateValues) {
 }
 
 TEST(CUDAImage, Histogram) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base_uneven.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base_uneven.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
@@ -88,7 +89,7 @@ TEST(CUDAImage, Histogram) {
 }
 
 TEST(CUDAImage, DeviceSoA) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base_uneven.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base_uneven.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	// From image file
@@ -124,7 +125,7 @@ TEST(CUDAImage, DeviceSoA) {
 }
 
 TEST(CUDAImage, DeviceAoS) {
-	const std::string imgPath = std::string(wlibTestDir) + std::string("imgload_files/base_uneven.rawpix");
+	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base_uneven.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	// From image file

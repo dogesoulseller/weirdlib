@@ -9,13 +9,14 @@
 #include <fstream>
 #include <memory>
 #include <charconv>
+using namespace std::string_literals;
 
 namespace wlib::image
 {
 	ImageInfoPAM LoadPAM(const std::string& path) {
 		std::ifstream in(path, std::ios::binary);
 		if (!in.good()) {
-			throw except::file_open_error(std::string("PAM Loader: Failed to open file ") + path);
+			throw except::file_open_error("PAM Loader: Failed to open file "s + path);
 		}
 
 		return LoadPAM(in);

@@ -79,6 +79,8 @@ TEST(WlibCrypto, CRC64ISO) {
 	EXPECT_NO_THROW(wlib::crypto::CRC64ISO(CRCTestVector.data(), CRCTestVector.data()+CRCTestVector.size()));
 }
 
+using namespace std::string_literals;
+
 TEST(WlibCrypto, SHA1) {
 	wlib::crypto::SHA1 shagen;
 	wlib::crypto::SHA1 shagen_empty;
@@ -86,7 +88,7 @@ TEST(WlibCrypto, SHA1) {
 	// Result from wikipedia
 	shagen.update("The quick brown fox jumps over the lazy dog");
 	auto result_fox = shagen.finalize_to_string();
-	EXPECT_EQ(result_fox, std::string("2fd4e1c67a2d28fced849ee1bb76e7391b93eb12"));
+	EXPECT_EQ(result_fox, "2fd4e1c67a2d28fced849ee1bb76e7391b93eb12"s);
 
 	shagen.reset();
 

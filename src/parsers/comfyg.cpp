@@ -10,6 +10,8 @@
 #include <string>
 #include <string_view>
 
+using namespace std::string_literals;
+
 namespace wlib::parse
 {
 	static bool isComment(const std::string& str) noexcept {
@@ -31,7 +33,7 @@ namespace wlib::parse
 		std::vector<uint8_t> fileBytes;
 		std::ifstream file(path, std::ios::binary | std::ios::ate);
 		if (!file.good()) {
-			throw std::runtime_error(std::string("Comfyg loader: Failed to load file ") + path);
+			throw std::runtime_error("Comfyg loader: Failed to load file "s + path);
 		}
 
 		auto fileSize = file.tellg();
@@ -93,7 +95,7 @@ namespace wlib::parse
 			// Detect line with error
 			if (openBracketPos == std::string::npos || closeBracketPos == std::string::npos
 			|| eqSignPos == std::string::npos || startKeyPos == std::string::npos) {
-				auto errMsg = std::string("Failed to tokenize value at line ") + std::to_string(currentLine);
+				auto errMsg = "Failed to tokenize value at line "s + std::to_string(currentLine);
 				errors.emplace_back(std::move(errMsg), ParseErrorType::TokenizeFailed);
 				currentLine++;
 				continue;
@@ -117,7 +119,7 @@ namespace wlib::parse
 
 				int64_t v;
 				if (auto success = str::ParseString(valueStr, v); !success) {
-					auto errMsg = std::string("Failed to parse integer value at line ") + std::to_string(currentLine);
+					auto errMsg = "Failed to parse integer value at line "s + std::to_string(currentLine);
 					errors.emplace_back(std::move(errMsg), ParseErrorType::InvalidValue);
 					currentLine++;
 					continue;
@@ -129,7 +131,7 @@ namespace wlib::parse
 
 				double v;
 				if (auto success = str::ParseString(valueStr, v); !success) {
-					auto errMsg = std::string("Failed to parse float value at line ") + std::to_string(currentLine);
+					auto errMsg = "Failed to parse float value at line "s + std::to_string(currentLine);
 					errors.emplace_back(std::move(errMsg), ParseErrorType::InvalidValue);
 					currentLine++;
 					continue;
@@ -141,7 +143,7 @@ namespace wlib::parse
 				auto stringEnd = valueStr.find_last_of('"');
 
 				if (stringStart == std::string::npos || stringEnd == std::string::npos) {
-					auto errMsg = std::string("Invalid string at line ") + std::to_string(currentLine);
+					auto errMsg = "Invalid string at line "s + std::to_string(currentLine);
 					errors.emplace_back(std::move(errMsg), ParseErrorType::InvalidValue);
 					currentLine++;
 					continue;
@@ -203,7 +205,7 @@ namespace wlib::parse
 				bool v = str::ParseBool(valueStr);
 				values.insert(keyStr, v);
 			} else {
-				auto errMsg = std::string("Unsupported type ") + typeStr + std::string(" at line " ) + std::to_string(currentLine);
+				auto errMsg = "Unsupported type "s + typeStr + " at line "s + std::to_string(currentLine);
 				errors.emplace_back(std::move(errMsg), ParseErrorType::InvalidType);
 				currentLine++;
 				continue;
