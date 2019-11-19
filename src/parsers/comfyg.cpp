@@ -50,7 +50,6 @@ namespace wlib::parse
 
 	void Comfyg::ParseFormat(const uint8_t* ptr, size_t len) {
 		std::vector<std::string> lines;
-		sortedLines.reserve(lines.size());
 
 		// Split into lines
 		size_t offset = 0;
