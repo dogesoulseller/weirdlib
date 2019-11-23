@@ -33,6 +33,29 @@ namespace wlib::parse
 		}
 	};
 
+	class cuesheet_invalid_filetype : public std::exception
+	{
+		std::string what_message;
+
+		public:
+		inline cuesheet_invalid_filetype(const std::string& msg) noexcept {
+			what_message = msg;
+		}
+
+		inline cuesheet_invalid_filetype(std::string&& msg) noexcept {
+			what_message = std::move(msg);
+		}
+
+		explicit inline cuesheet_invalid_filetype(const char* msg) noexcept {
+			what_message = std::string(msg);
+		}
+
+		[[nodiscard]] inline const char* what() const noexcept override
+		{
+			return what_message.c_str();
+		}
+	};
+
 	enum class ComfygType
 	{
 		Integer,
@@ -47,6 +70,23 @@ namespace wlib::parse
 		TokenizeFailed,
 		InvalidValue,
 		InvalidType
+	};
+
+	struct CuesheetTrack
+	{
+		uint8_t idx;
+		std::string pregapTimestamp;
+		std::string startTimestamp;
+		std::string title;
+		std::string artist;
+	};
+
+	struct CuesheetFile
+	{
+		std::string path;
+		std::string title;
+		std::string artist;
+		std::vector<CuesheetTrack> tracks;
 	};
 
 	using ComfygValue = std::variant<int64_t, double, bool, std::string>;
@@ -122,4 +162,21 @@ namespace wlib::parse
 		unordered_flat_map<std::string, ComfygValue> values;
 		std::vector<std::pair<std::string, ComfygType>> sortedLines;
 	};
+
+	class Cuesheet
+	{
+		public:
+		Cuesheet(const std::string& path);
+		Cuesheet(const uint8_t* ptr, size_t len);
+
+		inline const auto& GetContents() const noexcept {
+			return contents;
+		}
+
+		private:
+		void ParseFormat(const uint8_t* ptr, size_t len);
+
+		std::vector<CuesheetFile> contents;
+	};
+
 } // namespace wlib::parse

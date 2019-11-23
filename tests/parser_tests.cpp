@@ -7,6 +7,8 @@
 #include "../include/weirdlib.hpp"
 #include "../include/weirdlib_parsers.hpp"
 
+using namespace std::string_literals;
+
 constexpr const char* wlibTestDir = WLIBTEST_TESTING_DIRECTORY;
 
 TEST(Parse, Comfyg) {
@@ -45,4 +47,75 @@ TEST(Parse, Comfyg) {
 	EXPECT_FLOAT_EQ(testFloatHiP, testFloatPlain);
 
 	EXPECT_EQ(testInteger32, testIntegerPlain);
+}
+
+TEST(Parse, CuesheetSimple) {
+	std::filesystem::path filePath = std::filesystem::path(wlibTestDir) / "parser_files" / "test_audiocue_single.cue";
+
+	wlib::parse::Cuesheet cue(filePath);
+
+	EXPECT_EQ(cue.GetContents().size(), 1);
+
+	auto cueContents = cue.GetContents()[0];
+
+	EXPECT_EQ(cueContents.artist, "Faithless"s);
+	EXPECT_EQ(cueContents.title, "Live in Berlin"s);
+	EXPECT_EQ(cueContents.path, "Faithless - Live in Berlin.mp3"s);
+
+	EXPECT_EQ(cueContents.tracks.size(), 8);
+	EXPECT_EQ(cueContents.tracks[0].title, "Reverence"s);
+	EXPECT_EQ(cueContents.tracks[0].startTimestamp, "00:00:00"s);
+	EXPECT_EQ(cueContents.tracks[3].title, "Insomnia"s);
+	EXPECT_EQ(cueContents.tracks[3].startTimestamp, "17:04:00"s);
+	EXPECT_EQ(cueContents.tracks[7].title, "God Is a DJ"s);
+	EXPECT_EQ(cueContents.tracks[7].startTimestamp, "42:35:00"s);
+}
+
+TEST(Parse, CuesheetUnicode) {
+	std::filesystem::path filePath = std::filesystem::path(wlibTestDir) / "parser_files" / "test_audiocue_utf8.cue";
+
+	wlib::parse::Cuesheet cue(filePath);
+
+	EXPECT_EQ(cue.GetContents().size(), 1);
+
+	auto cueContents = cue.GetContents()[0];
+
+	EXPECT_EQ(cueContents.artist, "Amateras Records"s);
+	EXPECT_EQ(cueContents.title, "Resonate Anthems"s);
+
+	EXPECT_EQ(cueContents.tracks.size(), 11);
+	EXPECT_EQ(cueContents.tracks[0].title, "Dead or Alive"s);
+	EXPECT_EQ(cueContents.tracks[0].startTimestamp, "00:00:00"s);
+	EXPECT_EQ(cueContents.tracks[0].artist, "音召缶"s);
+	EXPECT_EQ(cueContents.tracks[4].title, "DOUBLE CHERRY BLOSSOM [Extended Mix]"s);
+	EXPECT_EQ(cueContents.tracks[4].startTimestamp, "20:07:33"s);
+	EXPECT_EQ(cueContents.tracks[4].artist, "Alstroemeria Records"s);
+	EXPECT_EQ(cueContents.tracks[10].title, "Dear My Stage [Halozy SMJ Eurotbeat Remix]"s);
+	EXPECT_EQ(cueContents.tracks[10].startTimestamp, "52:24:40"s);
+	EXPECT_EQ(cueContents.tracks[10].artist, "miko"s);
+}
+
+TEST(Parse, CuesheetMultifile) {
+	std::filesystem::path filePath = std::filesystem::path(wlibTestDir) / "parser_files" / "test_audiocue_multifile.cue";
+
+	wlib::parse::Cuesheet cue(filePath);
+
+	EXPECT_EQ(cue.GetContents().size(), 15);
+
+	EXPECT_EQ(cue.GetContents()[0].tracks.size(), 1);
+	EXPECT_EQ(cue.GetContents()[6].tracks.size(), 1);
+	EXPECT_EQ(cue.GetContents()[14].tracks.size(), 1);
+
+	EXPECT_EQ(cue.GetContents()[0].tracks[0].title, "Genesis"s);
+	EXPECT_EQ(cue.GetContents()[0].tracks[0].artist, "Pendulum"s);
+	EXPECT_EQ(cue.GetContents()[0].tracks[0].startTimestamp, "00:00:00"s);
+
+	EXPECT_EQ(cue.GetContents()[6].tracks[0].startTimestamp, "00:00:00"s);
+	EXPECT_EQ(cue.GetContents()[6].tracks[0].artist, "Pendulum"s);
+	EXPECT_EQ(cue.GetContents()[6].tracks[0].title, "Immunize (ft. Liam H)"s);
+
+	EXPECT_EQ(cue.GetContents()[14].tracks[0].startTimestamp, "00:00:00"s);
+	EXPECT_EQ(cue.GetContents()[14].tracks[0].artist, "Pendulum"s);
+	EXPECT_EQ(cue.GetContents()[14].tracks[0].title, "Encoder"s);
+
 }
