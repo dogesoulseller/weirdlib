@@ -99,4 +99,20 @@ TEST(WlibCrypto, SHA1) {
 	EXPECT_EQ(result_empty, result_null);
 }
 
+TEST(WlibCrypto, Base64Encode) {
+	wlib::crypto::Base64Encoder enc;
+	enc.update("The quick brown fox jumps over the lazy dog");
+	auto result = enc.finalize();
+	EXPECT_EQ(result, "VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw=="s);
+}
+
+TEST(WlibCrypto, Base64Decode) {
+	wlib::crypto::Base64Decoder dec;
+	auto decoded = dec.decode("VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw=="s);
+	std::string decString(decoded.begin(), decoded.end());
+	EXPECT_EQ(decString, "The quick brown fox jumps over the lazy dog"s);
+
+	EXPECT_THROW(dec.decode("VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw======"), std::runtime_error);
+}
+
 #endif

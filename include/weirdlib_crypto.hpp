@@ -150,6 +150,47 @@ namespace crypto
 		size_t transform_count;
 	};
 
+	/// Base64 encoder <br>
+	class Base64Encoder
+	{
+		public:
+		Base64Encoder() noexcept;
+		Base64Encoder(const std::string& charset, char paddingChar);
+
+		void reset() noexcept;
+
+		template<typename IterT>
+		void update(const IterT begin, const IterT end) {
+			size_t oldSize = buffer.size();
+			buffer.resize(buffer.size() + std::distance(begin, end));
+
+			std::copy(begin, end, buffer.data()+oldSize);
+		}
+
+		void update(const std::string& str);
+
+		std::string finalize() const noexcept;
+
+		private:
+		const std::string encodeLookup;
+		const char padCharacter;
+		std::vector<uint8_t> buffer;
+	};
+
+	/// Base64 decoder <br>
+	/// Decodes with the default charset of Base64Encoder or URL charset
+	class Base64Decoder
+	{
+		public:
+		Base64Decoder(bool useURLAlphabet = false, char paddingChar = '=') noexcept;
+
+		std::vector<uint8_t> decode(const std::string& str) const;
+
+		private:
+		const std::array<uint8_t, 2> cursorVals;
+		const char padCharacter;
+	};
+
 } // namespace crypto
 
 } // namespace wlib
