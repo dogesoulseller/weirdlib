@@ -16,7 +16,7 @@ namespace crypto
 	static constexpr size_t SHA1_BLOCK_INTS = 16;	// Number of 32bit integers per SHA1 block
 	static constexpr size_t SHA1_BLOCK_BYTES = SHA1_BLOCK_INTS * 4;
 
-	#if defined(__RDRND__)
+	#if defined(__RDRND__) || defined(__unix__)
 
 	/// Generate random 16-bit integer
 	/// @return hardware-generated 16-bit integer
@@ -31,7 +31,7 @@ namespace crypto
 	uint64_t SecureRandomInteger_u64();
 	#endif
 
-	#if defined(__RDSEED__)
+	#if defined(__RDSEED__) || defined(__unix__)
 
 	/// Generate random 16-bit seed
 	/// @return hardware-generated 16-bit integer meant for use as a seed
