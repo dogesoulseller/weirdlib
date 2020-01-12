@@ -12,14 +12,10 @@ add_compile_definitions(WEIRDLIB_MTMODE_NONE=0 WEIRDLIB_MTMODE_TBB=1 WEIRDLIB_MT
 
 option(WEIRDLIB_BUILD_DOCS "Enable building documentation" ON)
 option(WEIRDLIB_ENABLE_TESTING "Enable building test target" ON)
-option(WEIRDLIB_ENABLE_BENCHMARKS "Enable building benchmark target" OFF)
 option(WEIRDLIB_ENABLE_APPLICATIONS "Enable building example applications" OFF)
 option(WEIRDLIB_ENABLE_BUILD_STRINGOPS "Enable building of string module" ON)
 option(WEIRDLIB_ENABLE_BUILD_CRYPTO "Enable building of crypto module" ON)
 option(WERIDLIB_ENABLE_BUILD_IMAGEOPS "Enable building image operations module" ON)
-option(WERIDLIB_ENABLE_BUILD_ANXIETY "Enable building stress test module" ON)
-option(WEIRDLIB_ENABLE_CUDA "Enable building CUDA library modules" ON)
-option(WEIRDLIB_CUDA_USE_CURAND "Use cuRAND library for some functionality" ON)
 
 option(WEIRDLIB_INSTRUMENT_COVERAGE "Enable generating coverage instrumentation" OFF)
 option(WEIRDLIB_ENABLE_MULTITHREADING "Enable use of external threading library" ON)
@@ -42,11 +38,6 @@ endif(WEIRDLIB_ENABLE_BUILD_STRINGOPS)
 if(WERIDLIB_ENABLE_BUILD_IMAGEOPS)
 	add_compile_definitions(WEIRDLIB_ENABLE_IMAGE_OPERATIONS)
 endif(WERIDLIB_ENABLE_BUILD_IMAGEOPS)
-
-# Stress test module
-if(WERIDLIB_ENABLE_BUILD_ANXIETY)
-	add_compile_definitions(WEIRDLIB_ENABLE_ANXIETY)
-endif(WERIDLIB_ENABLE_BUILD_ANXIETY)
 
 # Conditionally enable use of prefetch instructions
 if(WEIRDLIB_ENABLE_PREFETCH)
@@ -83,11 +74,6 @@ if(WEIRDLIB_ENABLE_MULTITHREADING)
 	elseif(WEIRDLIB_MULTITHREADING_LIBRARY STREQUAL "tbb")
 		add_compile_definitions(WEIRDLIB_MULTITHREADING_MODE=1)
 	endif()
-
-	# Enable OpenMP for CUDA code
-	if(WEIRDLIB_ENABLE_CUDA AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel"))
-		string(APPEND CMAKE_CUDA_FLAGS " -Xcompiler -fopenmp ")
-	endif(WEIRDLIB_ENABLE_CUDA AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel"))
 
 endif(WEIRDLIB_ENABLE_MULTITHREADING)
 
@@ -186,42 +172,6 @@ set_target_properties(weirdlib PROPERTIES
 	CXX_STANDARD_REQUIRED ON
 )
 
-# CUDA components
-if(WEIRDLIB_ENABLE_CUDA)
-	add_compile_definitions(WLIB_ENABLE_CUDA)
-	if(WEIRDLIB_CUDA_USE_CURAND)
-		add_compile_definitions(WLIB_CUDA_USE_CURAND)
-	endif(WEIRDLIB_CUDA_USE_CURAND)
-	enable_language(CUDA)
-
-	file(GLOB_RECURSE WEIRDLIB_CUDA_SOURCES "include/cuda/*" "src/cuda/*.cu" "src/cuda/*.cuh")
-
-	if(CMAKE_CUDA_COMPILER_ID MATCHES "NVIDIA")
-		string(APPEND CMAKE_CUDA_FLAGS " --ftz=true ")
-
-		# Not compiling with MSVC
-		if("${CMAKE_VS_PLATFORM_TOOLSET_CUDA}" STREQUAL "")
-			string(APPEND CMAKE_CUDA_FLAGS_DEBUG " -g -G -Wreorder ")
-			string(APPEND CMAKE_CUDA_FLAGS_RELWITHDEBINFO " -g -Wreorder ")
-		endif("${CMAKE_VS_PLATFORM_TOOLSET_CUDA}" STREQUAL "")
-	endif()
-
-	add_library(weirdlib_cuda ${WEIRDLIB_CUDA_SOURCES})
-
-	set_target_properties(weirdlib_cuda PROPERTIES
-		CUDA_SEPARABLE_COMPILATION ON
-		CUDA_STANDARD 14
-		CUDA_STANDARD_REQUIRED TRUE
-	)
-
-	target_link_libraries(weirdlib weirdlib_cuda Threads::Threads ${WEIRDLIB_LINKER_LIBRARIES} ${CUDA_LIBRARIES} cuda)
-
-	# Conditionally link with cuRAND
-	if(WEIRDLIB_CUDA_USE_CURAND)
-		target_link_libraries(weirdlib curand)
-	endif(WEIRDLIB_CUDA_USE_CURAND)
-endif(WEIRDLIB_ENABLE_CUDA)
-
 # STB
 add_library(weirdlib_stb_impl "${CMAKE_CURRENT_LIST_DIR}/external/stb_impl.cpp")
 target_compile_options(weirdlib_stb_impl PRIVATE
@@ -252,24 +202,6 @@ if(WEIRDLIB_BUILD_DOCS)
 		VERBATIM
 	)
 endif(WEIRDLIB_BUILD_DOCS)
-
-
-
-##|--------------------------|##
-##| BENCHMARKS CONFIGURATION |##
-##|--------------------------|##
-
-if (WEIRDLIB_ENABLE_BENCHMARKS)
-	message(STATUS "Configuring benchmarks")
-
-	set(WEIRDLIB_BENCHMARK_DIR "${PROJECT_SOURCE_DIR}/benchmark")
-	add_executable(wlib_bench ${WEIRDLIB_BENCHMARK_DIR}/wlibbench.cpp ${WEIRDLIB_BENCHMARK_DIR}/bench_load.cpp ${WEIRDLIB_BENCHMARK_DIR}/bench_cases.cpp)
-	set_target_properties(wlib_bench PROPERTIES
-		CXX_STANDARD 17
-		CXX_STANDARD_REQUIRED ON
-	)
-	target_link_libraries(wlib_bench weirdlib Threads::Threads ${WEIRDLIB_LINKER_LIBRARIES})
-endif()
 
 
 
