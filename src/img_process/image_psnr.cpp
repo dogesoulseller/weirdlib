@@ -1,5 +1,6 @@
 #include "../../include/weirdlib_image.hpp"
 #include "../../include/cpu_detection.hpp"
+#include "../../include/weirdlib_simdhelper.hpp"
 #include <cmath>
 #include <array>
 #include <numeric>
@@ -57,7 +58,6 @@ namespace wlib::image
 			accumulatorScal += std::reduce(std::execution::seq, accumulatorVec_arr.begin(), accumulatorVec_arr.end());
 
 			return accumulatorScal / count;
-
 		#elif X86_SIMD_LEVEL >= LV_SSE2
 			size_t iters = count / 4;
 			size_t itersRem = count % 4;
@@ -86,7 +86,6 @@ namespace wlib::image
 			accumulatorScal += std::reduce(std::execution::seq, accumulatorVec_arr.begin(), accumulatorVec_arr.end());
 
 			return accumulatorScal / count;
-
 		#else
 			float mseAccumulator = 0.0f;
 			for (size_t i = 0; i < count; i++) {
@@ -127,44 +126,56 @@ namespace wlib::image
 
 			return accumulatorScal / count;
 		#elif X86_SIMD_LEVEL >= LV_SSE2
+			size_t iters = count / 4;
+			size_t itersRem = count % 4;
 
-		size_t iters = count / 2;
-		size_t itersRem = count % 2;
+			__m128d accumulatorVec = _mm_setzero_pd();
 
-		__m128d accumulatorVec = _mm_setzero_pd();
+			for (size_t i = 0; i < iters; i++) {
+				// Loads 4
+				__m128 lVals_flt = _mm_loadu_ps(lhs+4*i);
+				__m128 rVals_flt = _mm_loadu_ps(rhs+4*i);
 
-		// TODO: Unroll to prevent unnecessary loads
-		for (size_t i = 0; i < iters; i++) {
-			__m128d lVals = _mm_cvtps_pd(_mm_loadu_ps(lhs+2*i));
-			__m128d rVals = _mm_cvtps_pd(_mm_loadu_ps(rhs+2*i));
-			__m128d diff = _mm_sub_pd(lVals, rVals);
-			__m128d mseRes = _mm_mul_pd(diff, diff);
+				// Converts first two values
+				__m128d lVals0 = _mm_cvtps_pd(lVals_flt);
+				__m128d rVals0 = _mm_cvtps_pd(rVals_flt);
 
-			accumulatorVec = _mm_add_pd(accumulatorVec, mseRes);
-		}
+				// Reverse lhs and rhs to get to high half
+				lVals_flt = simd::reverse(lVals_flt);
+				rVals_flt = simd::reverse(rVals_flt);
 
-		double accumulatorScal = 0.0;
+				// Convert next two values that are now in the low part
+				__m128d lVals1 = _mm_cvtps_pd(lVals_flt);
+				__m128d rVals1 = _mm_cvtps_pd(rVals_flt);
 
-		for (size_t i = 0; i < itersRem; i++) {
-			accumulatorScal += std::pow(static_cast<double>(lhs[iters*2+i] - rhs[iters*2+i]), 2);
-		}
+				__m128d diff0 = _mm_sub_pd(lVals0, rVals0);
+				__m128d diff1 = _mm_sub_pd(lVals1, rVals1);
 
-		std::array<double, 2> accumulatorVec_arr;
-		_mm_storeu_pd(accumulatorVec_arr.data(), accumulatorVec);
+				__m128d mseRes0 = _mm_mul_pd(diff0, diff0);
+				__m128d mseRes1 = _mm_mul_pd(diff1, diff1);
 
-		accumulatorScal += std::reduce(std::execution::seq, accumulatorVec_arr.begin(), accumulatorVec_arr.end());
+				accumulatorVec = _mm_add_pd(accumulatorVec, _mm_add_pd(mseRes0, mseRes1));
+			}
 
-		return accumulatorScal / count;
+			double accumulatorScal = 0.0;
 
+			for (size_t i = 0; i < itersRem; i++) {
+				accumulatorScal += std::pow(static_cast<double>(lhs[iters*4+i] - rhs[iters*4+i]), 2);
+			}
+
+			std::array<double, 2> accumulatorVec_arr;
+			_mm_storeu_pd(accumulatorVec_arr.data(), accumulatorVec);
+
+			accumulatorScal += std::reduce(std::execution::seq, accumulatorVec_arr.begin(), accumulatorVec_arr.end());
+
+			return accumulatorScal / count;
 		#else
+			double mseAccumulator = 0.0;
+			for (size_t i = 0; i < count; i++) {
+				mseAccumulator += std::pow(static_cast<double>(lhs[i] - rhs[i]), 2);
+			}
 
-		double mseAccumulator = 0.0;
-		for (size_t i = 0; i < count; i++) {
-			mseAccumulator += std::pow(static_cast<double>(lhs[i] - rhs[i]), 2);
-		}
-
-		return mseAccumulator / count;
-
+			return mseAccumulator / count;
 		#endif
 	}
 
