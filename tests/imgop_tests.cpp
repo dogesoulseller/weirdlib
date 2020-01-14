@@ -8,6 +8,7 @@
 #include <vector>
 #include <fstream>
 #include <thread>
+#include <limits>
 
 using namespace std::string_literals;
 
@@ -278,6 +279,64 @@ TEST(ImgOps, ColorOrderConversions) {
 	tBGRA.join();
 	tRGBA.join();
 	tRGB.join();
+}
+
+TEST(ImgOps, PSNR) {
+	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base.rawpix"s;
+	const std::string imgPathJPG = std::string(wlibTestDir) + "imgload_files/base.jpg"s;
+
+	ASSERT_TRUE(std::filesystem::exists(imgPath));
+	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
+	wlib::image::Image testImgJPG(imgPathJPG);
+
+	wlib::image::ImageSoA testImgSoA(testImg);
+	wlib::image::ImageSoA testImgJPGSoA(testImgJPG);
+
+	auto outData = wlib::image::CalculatePSNR<float>(testImgSoA, testImgSoA);
+
+	// MSE of identical images should be 0
+	EXPECT_FLOAT_EQ(outData.MSEPerChannel[0], 0.0f);
+	EXPECT_FLOAT_EQ(outData.MSEPerChannel[1], 0.0f);
+	EXPECT_FLOAT_EQ(outData.MSEPerChannel[2], 0.0f);
+
+	// PSNR of identical images should be infinity
+	EXPECT_FLOAT_EQ(outData.PSNRPerChannel[0], std::numeric_limits<float>::infinity());
+	EXPECT_FLOAT_EQ(outData.PSNRPerChannel[1], std::numeric_limits<float>::infinity());
+	EXPECT_FLOAT_EQ(outData.PSNRPerChannel[2], std::numeric_limits<float>::infinity());
+
+	// Same, but with doubles
+	auto outDataDbl = wlib::image::CalculatePSNR<double>(testImgSoA, testImgSoA);
+
+	// MSE of identical images should be 0
+	EXPECT_DOUBLE_EQ(outDataDbl.MSEPerChannel[0], 0.0);
+	EXPECT_DOUBLE_EQ(outDataDbl.MSEPerChannel[1], 0.0);
+	EXPECT_DOUBLE_EQ(outDataDbl.MSEPerChannel[2], 0.0);
+
+	// PSNR of identical images should be infinity
+	EXPECT_DOUBLE_EQ(outDataDbl.PSNRPerChannel[0], std::numeric_limits<double>::infinity());
+	EXPECT_DOUBLE_EQ(outDataDbl.PSNRPerChannel[1], std::numeric_limits<double>::infinity());
+	EXPECT_DOUBLE_EQ(outDataDbl.PSNRPerChannel[2], std::numeric_limits<double>::infinity());
+
+	// Different images
+	auto outDataDiff = wlib::image::CalculatePSNR(testImgSoA, testImgJPGSoA);
+
+	EXPECT_LE(outDataDiff.MSEPerChannel[0], 2.07f);
+	EXPECT_GE(outDataDiff.MSEPerChannel[0], 2.04f);
+
+	EXPECT_LE(outDataDiff.PSNRPerChannel[0], 45.01f);
+	EXPECT_GE(outDataDiff.PSNRPerChannel[0], 45.001f);
+
+	// Different images with doubles
+	auto outDataDiffDbl = wlib::image::CalculatePSNR<double>(testImgSoA, testImgJPGSoA);
+
+	EXPECT_LE(outDataDiffDbl.MSEPerChannel[0], 2.07);
+	EXPECT_GE(outDataDiffDbl.MSEPerChannel[0], 2.04);
+
+	EXPECT_LE(outDataDiffDbl.PSNRPerChannel[0], 45.01);
+	EXPECT_GE(outDataDiffDbl.PSNRPerChannel[0], 45.001);
+
+	// TODO: Test exceptions on wrong size
+	// TODO: Test on grayscale
 }
 
 #endif

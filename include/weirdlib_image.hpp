@@ -15,6 +15,52 @@ namespace wlib
 
 namespace image
 {
+	class image_channel_error : public std::exception
+	{
+		std::string what_message;
+
+		public:
+		inline image_channel_error(const std::string& msg) noexcept {
+			what_message = msg;
+		}
+
+		inline image_channel_error(std::string&& msg) noexcept {
+			what_message = std::move(msg);
+		}
+
+		explicit inline image_channel_error(const char* msg) noexcept {
+			what_message = std::string(msg);
+		}
+
+		[[nodiscard]] inline const char* what() const noexcept override
+		{
+			return what_message.c_str();
+		}
+	};
+
+	class image_dimensions_error : public std::exception
+	{
+		std::string what_message;
+
+		public:
+		inline image_dimensions_error(const std::string& msg) noexcept {
+			what_message = msg;
+		}
+
+		inline image_dimensions_error(std::string&& msg) noexcept {
+			what_message = std::move(msg);
+		}
+
+		explicit inline image_dimensions_error(const char* msg) noexcept {
+			what_message = std::string(msg);
+		}
+
+		[[nodiscard]] inline const char* what() const noexcept override
+		{
+			return what_message.c_str();
+		}
+	};
+
 	/// Image format information
 	enum ColorFormat
 	{
@@ -41,6 +87,14 @@ namespace image
 		LuminosityBT601 = 3,
 		LuminosityBT2100 = 4
 	};
+
+	template<typename FloatT = float>
+	struct PSNRData
+	{
+		std::vector<FloatT> PSNRPerChannel;
+		std::vector<FloatT> MSEPerChannel;
+	};
+
 
 	/// Class representing a 2D image in Array of Structures (i.e. RGB RGB RGB), converts to a floating point representation on load
 	class Image
@@ -254,6 +308,24 @@ namespace image
 
 		~ImageSoA();
 	};
+
+	namespace detail
+	{
+		PSNRData<float> psnrFloat(ImageSoA& image0, ImageSoA& image1);
+		PSNRData<double> psnrDouble(ImageSoA& image0, ImageSoA& image1);
+	} // namespace detail
+
+
+	template<typename FloatT = float>
+	PSNRData<FloatT> CalculatePSNR(ImageSoA& image0, ImageSoA& image1) {
+		static_assert(std::is_same_v<FloatT, float> || std::is_same_v<FloatT, double>);
+
+		if constexpr (std::is_same_v<FloatT, float>) {
+			return detail::psnrFloat(image0, image1);
+		} else {
+			return detail::psnrDouble(image0, image1);
+		}
+	}
 
 	/// Convert image into a grayscale representation using various methods described in @{link GrayscaleMethod}
 	/// @param inImg image to be modified
