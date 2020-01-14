@@ -1,5 +1,15 @@
 #include "../../include/weirdlib_image.hpp"
+#include "../../include/cpu_detection.hpp"
 #include <cmath>
+#include <array>
+#include <numeric>
+
+#if __has_include(<execution>)
+	#include <execution>
+#elif __has_include(<experimental/execution>)
+	#include <experimental/execution>
+	using std::execution::seq = std::experimental::execution::seq;
+#endif
 
 namespace wlib::image
 {
@@ -19,23 +29,89 @@ namespace wlib::image
 		return compatible;
 	}
 
-	// TODO: SIMD
+	// TODO: AVX SIMD
 	static float getChannelMSE_float(float* lhs, float* rhs, size_t count) noexcept {
+		#if X86_SIMD_LEVEL >= LV_SSE2
+
+		size_t iters = count / 4;
+		size_t itersRem = count % 4;
+
+		__m128 accumulatorVec = _mm_setzero_ps();
+
+		// TODO: Maybe unroll?
+		for (size_t i = 0; i < iters; i++) {
+			__m128 lVals = _mm_loadu_ps(lhs+4*i);
+			__m128 rVals = _mm_loadu_ps(rhs+4*i);
+			__m128 diff = _mm_sub_ps(lVals, rVals);
+			__m128 mseRes = _mm_mul_ps(diff, diff);
+
+			accumulatorVec = _mm_add_ps(accumulatorVec, mseRes);
+		}
+
+		float accumulatorScal = 0.0f;
+
+		for (size_t i = 0; i < itersRem; i++) {
+			accumulatorScal += std::pow(lhs[iters*4+i] - rhs[iters*4+i], 2);
+		}
+
+		std::array<float, 4> accumulatorVec_arr;
+		_mm_storeu_ps(accumulatorVec_arr.data(), accumulatorVec);
+
+		accumulatorScal += std::reduce(std::execution::seq, accumulatorVec_arr.begin(), accumulatorVec_arr.end());
+
+		return accumulatorScal / count;
+
+		#else
 		float mseAccumulator = 0.0f;
 		for (size_t i = 0; i < count; i++) {
 			mseAccumulator += std::pow(lhs[i] - rhs[i], 2);
 		}
 
 		return mseAccumulator / count;
+		#endif
 	}
 
 	static double getChannelMSE_double(float* lhs, float* rhs, size_t count) noexcept {
+		#if X86_SIMD_LEVEL >= LV_SSE2
+
+		size_t iters = count / 2;
+		size_t itersRem = count % 2;
+
+		__m128d accumulatorVec = _mm_setzero_pd();
+
+		// TODO: Unroll to prevent unnecessary loads
+		for (size_t i = 0; i < iters; i++) {
+			__m128d lVals = _mm_cvtps_pd(_mm_loadu_ps(lhs+2*i));
+			__m128d rVals = _mm_cvtps_pd(_mm_loadu_ps(rhs+2*i));
+			__m128d diff = _mm_sub_pd(lVals, rVals);
+			__m128d mseRes = _mm_mul_pd(diff, diff);
+
+			accumulatorVec = _mm_add_pd(accumulatorVec, mseRes);
+		}
+
+		double accumulatorScal = 0.0;
+
+		for (size_t i = 0; i < itersRem; i++) {
+			accumulatorScal += std::pow(static_cast<double>(lhs[iters*2+i] - rhs[iters*2+i]), 2);
+		}
+
+		std::array<double, 2> accumulatorVec_arr;
+		_mm_storeu_pd(accumulatorVec_arr.data(), accumulatorVec);
+
+		accumulatorScal += std::reduce(std::execution::seq, accumulatorVec_arr.begin(), accumulatorVec_arr.end());
+
+		return accumulatorScal / count;
+
+		#else
+
 		double mseAccumulator = 0.0;
 		for (size_t i = 0; i < count; i++) {
 			mseAccumulator += std::pow(static_cast<double>(lhs[i] - rhs[i]), 2);
 		}
 
 		return mseAccumulator / count;
+
+		#endif
 	}
 
 	template<typename FloatT>
