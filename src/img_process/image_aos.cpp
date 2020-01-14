@@ -81,25 +81,46 @@ namespace wlib::image
 			switch (requestedFormat)
 			{
 			case ColorFormat::F_Grayscale:
+				format = requestedFormat;
 				stbpix = stbi_load(path.c_str(), &w, &h, &chan, 1);
 				break;
 			case ColorFormat::F_GrayAlpha:
+				format = requestedFormat;
 				stbpix = stbi_load(path.c_str(), &w, &h, &chan, 2);
 				break;
 			case ColorFormat::F_RGB:
 			case ColorFormat::F_BGR:
+				format = requestedFormat;
 				stbpix = stbi_load(path.c_str(), &w, &h, &chan, 3);
 				break;
-			case ColorFormat::F_Default:
 			case ColorFormat::F_RGBA:
 			case ColorFormat::F_BGRA:
+				format = requestedFormat;
 				stbpix = stbi_load(path.c_str(), &w, &h, &chan, 4);
+				break;
+			case ColorFormat::F_Default:
+				stbpix = stbi_load(path.c_str(), &w, &h, &chan, 0);
+				switch (chan)
+				{
+				case 4:
+					format = F_RGBA;
+					break;
+				case 3:
+					format = F_RGB;
+					break;
+				case 2:
+					format = F_GrayAlpha;
+					break;
+				case 1:
+					format = F_Grayscale;
+				default:
+					break;
+				}
 				break;
 			}
 
 			width = w;
 			height = h;
-			format = requestedFormat;
 			pixels.resize(GetTotalImageSize(width, height, format));
 			pixels.shrink_to_fit();
 
