@@ -3,441 +3,466 @@
 #include "../../include/weirdlib_traits.hpp"
 #include "../../include/cpu_detection.hpp"
 
-#include <vector>
+#include "../common.hpp"
+#include <cmath>
+#include <algorithm>
+#include <thread>
+#include <array>
+#include <cstring>
+
+
+#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
+	#include <tbb/tbb.h>
+#endif
+
 
 namespace wlib::image
 {
-	namespace detail
-	{
-		void swapRAndB_3c(float* in, size_t count) {
-			for (size_t i = 0; i < count; i++) {
-				auto tmp = in[i*3];
-
-				in[i*3] = in[i*3+2];
-				in[i*3+2] = tmp;
-			}
+	ImageSoA& ConvertToGrayscale(ImageSoA& inImg, const bool preserveAlpha, const GrayscaleMethod method) {
+		// Converting to grayscale from grayscale...
+		if (inImg.format == F_GrayAlpha || inImg.format == F_Grayscale) {
+			return inImg;
 		}
 
-		void swapRAndB_4c(float* in, size_t count) {
-			for (size_t i = 0; i < count; i++) {
-				auto tmp = in[i*4];
+		size_t channelRedN;
+		size_t channelGreenN = 1;
+		size_t channelBlueN;
 
-				in[i*4] = in[i*4+2];
-				in[i*4+2] = tmp;
-			}
+		if (inImg.format == F_RGB || inImg.format == F_RGBA) {
+			channelRedN = 0;
+			channelBlueN = 2;
+		} else {
+			channelRedN = 2;
+			channelBlueN = 0;
 		}
 
-		std::vector<float> dropAlpha_4c(Image& in) {
-			std::vector<float> tmp(in.GetWidth() * in.GetHeight() * 3);
-			auto inStorage = in.AccessStorage();
+		alignas(32) auto outGr = new float[inImg.width * inImg.height];
 
-			for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
-				tmp[i*3] = inStorage[i*4];
-				tmp[i*3+1] = inStorage[i*4+1];
-				tmp[i*3+2] = inStorage[i*4+2];
-			}
+		auto ProcessLuminosity = [&](const float rWeight, const float gWeight, const float bWeight) {
+			// Processing with SIMD
+			#if X86_SIMD_LEVEL >= LV_AVX
+				const auto redMul = _mm256_set1_ps(rWeight);
+				const auto greenMul = _mm256_set1_ps(gWeight);
+				const auto blueMul = _mm256_set1_ps(bWeight);
+				const auto maxMask = _mm256_set1_ps(255.0f);
 
-			return tmp;
-		}
+				const auto iter_AVX = (inImg.width * inImg.height) / 8;
+				const auto iterRem_AVX = (inImg.width * inImg.height) % 8;
 
-		std::vector<float> dropAlpha_2c(Image& in) {
-			std::vector<float> tmp(in.GetWidth() * in.GetHeight());
-			auto inStorage = in.AccessStorage();
+				for (size_t i = 0; i < iter_AVX; i++) {
+					const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
+					const auto gChan = _mm256_loadu_ps(inImg.channels[channelGreenN]+i*8);
+					const auto bChan = _mm256_loadu_ps(inImg.channels[channelBlueN]+i*8);
 
-			for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
-				tmp[i] = inStorage[i*2];
-			}
+					#ifdef X86_SIMD_FMA
+						const auto resultGr = _mm256_min_ps(_mm256_fmadd_ps(rChan, redMul, _mm256_fmadd_ps(gChan, greenMul, _mm256_mul_ps(bChan, blueMul))), maxMask);
+					#else
+						const auto resultGr = _mm256_min_ps(
+							_mm256_add_ps(_mm256_mul_ps(rChan, redMul), _mm256_add_ps(_mm256_mul_ps(gChan, greenMul), _mm256_mul_ps(bChan, blueMul))), maxMask);
+					#endif
+						_mm256_storeu_ps(outGr+8*i, resultGr);
+				}
 
-			return tmp;
-		}
+				for (size_t i = iter_AVX * 8; i < iterRem_AVX + iter_AVX*8; i++) {
+					if (const auto result = std::fma(inImg.channels[channelRedN][i], rWeight, std::fma(inImg.channels[channelGreenN][i], gWeight, inImg.channels[channelBlueN][i] * bWeight)); result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
 
-		std::vector<float> appendAlpha_3c(Image& in) {
-			std::vector<float> tmp(in.GetWidth() * in.GetHeight() * 4);
-			auto inStorage = in.AccessStorage();
+				_mm256_zeroupper();
+			#elif X86_SIMD_LEVEL >= LV_SSE
+				const auto redMul = _mm_set1_ps(rWeight);
+				const auto greenMul = _mm_set1_ps(gWeight);
+				const auto blueMul = _mm_set1_ps(bWeight);
+				const auto maxMask = _mm_set1_ps(255.0f);
 
-			for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
-				tmp[i*4] = inStorage[i*3];
-				tmp[i*4+1] = inStorage[i*3+1];
-				tmp[i*4+2] = inStorage[i*3+2];
-				tmp[i*4+3] = 255.0f;
-			}
+				const auto iter_SSE = (inImg.width * inImg.height) / 4;
+				const auto iterRem_SSE = (inImg.width * inImg.height) % 4;
 
-			return tmp;
-		}
+				for (size_t i = 0; i < iter_SSE; i++) {
+					const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
+					const auto gChan = _mm_loadu_ps(inImg.channels[channelGreenN]+i*4);
+					const auto bChan = _mm_loadu_ps(inImg.channels[channelBlueN]+i*4);
 
-		std::vector<float> broadcastGray_to3c(Image& in) {
-			std::vector<float> tmp(in.GetWidth() * in.GetHeight() * 3);
-			auto inStorage = in.AccessStorage();
+					#ifdef X86_SIMD_FMA	// Technically shouldn't be possible
+						const auto resultGr = _mm_min_ps(_mm_fmadd_ps(rChan, redMul, _mm256_fmadd_ps(gChan, greenMul, _mm_mul_ps(bChan, blueMul))), maxMask);
+					#else
+						const auto resultGr = _mm_min_ps(
+							_mm_add_ps(_mm_mul_ps(rChan, redMul), _mm_add_ps(_mm_mul_ps(gChan, greenMul), _mm_mul_ps(bChan, blueMul))), maxMask);
+					#endif
+						_mm_storeu_ps(outGr+4*i, resultGr);
+				}
 
-			for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
-				tmp[i*3] = inStorage[i];
-				tmp[i*3+1] = inStorage[i];
-				tmp[i*3+2] = inStorage[i];
-			}
-
-			return tmp;
-		}
-
-		std::vector<float> broadcastGray_to4c(Image& in) {
-			std::vector<float> tmp(in.GetWidth() * in.GetHeight() * 4);
-			auto inStorage = in.AccessStorage();
-
-			for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
-				tmp[i*4] = inStorage[i];
-				tmp[i*4+1] = inStorage[i];
-				tmp[i*4+2] = inStorage[i];
-				tmp[i*4+3] = 255.0f;
-			}
-
-			return tmp;
-		}
-
-		std::vector<float> broadcastGrayAlpha_to3c(Image& in) {
-			std::vector<float> tmp(in.GetWidth() * in.GetHeight() * 3);
-			auto inStorage = in.AccessStorage();
-
-			for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
-				tmp[i*3] = inStorage[i*2];
-				tmp[i*3+1] = inStorage[i*2];
-				tmp[i*3+2] = inStorage[i*2];
-			}
-
-			return tmp;
-		}
-
-		std::vector<float> broadcastGrayAlpha_to4c(Image& in) {
-			std::vector<float> tmp(in.GetWidth() * in.GetHeight() * 4);
-			auto inStorage = in.AccessStorage();
-
-			for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
-				tmp[i*4] = inStorage[i*2];
-				tmp[i*4+1] = inStorage[i*2];
-				tmp[i*4+2] = inStorage[i*2];
-				tmp[i*4+3] = inStorage[i*2+1];
-			}
-
-			return tmp;
-		}
-	} // namespace detail
-
-
-	void ConvertToRGB(ImageSoA& in) {
-		switch (in.format)
-		{
-		case F_BGRA:
-			std::swap(in.channels[0], in.channels[2]);
-			[[fallthrough]];
-		case F_RGBA:
-			delete[] in.channels[3];
-			in.channels.erase(in.channels.begin() + 3);
-			break;
-		case F_BGR:
-			std::swap(in.channels[0], in.channels[2]);
-			break;
-		case F_Grayscale: {
-			in.channels.resize(3);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
-			break;
-		}
-		case F_GrayAlpha: {
-			delete[] in.channels[1];
-			in.channels.resize(3);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
-			break;
-		}
-		default:
-			break;
-		}
-
-		in.format = F_RGB;
-	}
-
-	void ConvertToBGR(ImageSoA& in) {
-		switch (in.format)
-		{
-		case F_RGBA:
-			std::swap(in.channels[0], in.channels[2]);
-			[[fallthrough]];
-		case F_BGRA:
-			delete[] in.channels[3];
-			in.channels.erase(in.channels.begin() + 3);
-			break;
-		case F_RGB:
-			std::swap(in.channels[0], in.channels[2]);
-			break;
-		case F_Grayscale: {
-			in.channels.resize(3);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
-			break;
-		}
-		case F_GrayAlpha: {
-			delete[] in.channels[1];
-			in.channels.resize(3);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
-			break;
-		}
-		default:
-			break;
-		}
-
-		in.format = F_BGR;
-	}
-
-	void ConvertToRGBA(ImageSoA& in) {
-		switch (in.format)
-		{
-		case F_BGRA:
-			std::swap(in.channels[0], in.channels[2]);
-			break;
-		case F_BGR:
-			std::swap(in.channels[0], in.channels[2]);
-			[[fallthrough]];
-		case F_RGB:
-		{
-			alignas(64) auto tmp = new float[in.width * in.height];
-			std::uninitialized_fill(tmp, tmp + in.width * in.height, 255.0f);
-			in.channels.push_back(tmp);
-			break;
-		}
-		case F_Grayscale: {
-			in.channels.resize(4);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			alignas(64) auto tmp2 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			std::uninitialized_fill(tmp2, tmp2 + in.width * in.height, 255.0f);
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
-			in.channels[3] = tmp1;
-			break;
-		}
-		case F_GrayAlpha: {
-			in.channels.resize(4);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			in.channels[3] = in.channels[1];
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
-			break;
-		}
-		default:
-			break;
-		}
-
-		in.format = F_RGBA;
-	}
-
-	void ConvertToBGRA(ImageSoA& in) {
-		switch (in.format)
-		{
-		case F_RGBA:
-			std::swap(in.channels[0], in.channels[2]);
-			break;
-		case F_RGB:
-			std::swap(in.channels[0], in.channels[2]);
-			[[fallthrough]];
-		case F_BGR: {
-			alignas(64) auto tmp = new float[in.width * in.height];
-			std::uninitialized_fill(tmp, tmp + in.width * in.height, 255.0f);
-			in.channels.push_back(tmp);
-			break;
-		}
-		case F_Grayscale: {
-			in.channels.resize(4);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			alignas(64) auto tmp2 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			std::uninitialized_fill(tmp2, tmp2 + in.width * in.height, 255.0f);
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
-			in.channels[3] = tmp2;
-			break;
-		}
-		case F_GrayAlpha: {
-			in.channels.resize(4);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			in.channels[3] = in.channels[1];
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
-			break;
-		}
-		default:
-			break;
-		}
-
-		in.format = F_BGRA;
-	}
-
-	void ConvertToRGB(Image& in) {
-		switch (in.GetFormat())
-		{
-		case F_BGR: {
-			detail::swapRAndB_3c(in.GetPixels_Unsafe(), in.GetWidth() * in.GetHeight());
-			break;
-		}
-		case F_RGBA: {
-			auto tmp = detail::dropAlpha_4c(in);
-			std::swap(in.AccessStorage(), tmp);
-			break;
-		}
-		case F_BGRA: {
-			detail::swapRAndB_4c(in.GetPixels_Unsafe(), in.GetWidth() * in.GetHeight());
-			auto tmp = detail::dropAlpha_4c(in);
-			std::swap(in.AccessStorage(), tmp);
-			break;
-		}
-		case F_Grayscale: {
-			auto tmp = detail::broadcastGray_to3c(in);
-			std::swap(in.AccessStorage(), tmp);
-			break;
-		}
-		case F_GrayAlpha: {
-			auto tmp = detail::broadcastGrayAlpha_to3c(in);
-			std::swap(in.AccessStorage(), tmp);
-			break;
-		}
-		default:
-			break;
-
+				for (size_t i = iter_SSE * 4; i < iterRem_SSE + iter_SSE * 4; i++) {
+					if (const auto result = std::fma(inImg.channels[channelRedN][i], rWeight, std::fma(inImg.channels[channelGreenN][i], gWeight, inImg.channels[channelBlueN][i] * bWeight)); result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+			#else
+				for (size_t i = 0; i < inImg.width * inImg.height; i++) {
+					if (const auto result = std::fma(inImg.channels[channelRedN][i], rWeight, std::fma(inImg.channels[channelGreenN][i], gWeight, inImg.channels[channelBlueN][i] * bWeight)); result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+			#endif
 		};
 
-		in.SetFormat(F_RGB);
-	}
-
-	void ConvertToBGR(Image& in) {
-		switch (in.GetFormat())
+		switch (method)
 		{
-		case F_RGB: {
-			detail::swapRAndB_3c(in.GetPixels_Unsafe(), in.GetWidth() * in.GetHeight());
+		case GrayscaleMethod::Luminosity:
+		{
+			ProcessLuminosity(0.2126f, 0.7152f, 0.0722f);
 			break;
 		}
-		case F_RGBA: {
-			detail::swapRAndB_4c(in.GetPixels_Unsafe(), in.GetWidth() * in.GetHeight());
-			auto tmp = detail::dropAlpha_4c(in);
-			std::swap(in.AccessStorage(), tmp);
+		case GrayscaleMethod::LuminosityBT601:
+		{
+			ProcessLuminosity(0.299f, 0.587f, 0.114f);
 			break;
 		}
-		case F_BGRA: {
-			auto tmp = detail::dropAlpha_4c(in);
-			std::swap(in.AccessStorage(), tmp);
+		case GrayscaleMethod::LuminosityBT2100:
+		{
+			ProcessLuminosity(0.2627f, 0.6780f, 0.0593f);
 			break;
 		}
-		case F_Grayscale: {
-			auto tmp = detail::broadcastGray_to3c(in);
-			std::swap(in.AccessStorage(), tmp);
+		case GrayscaleMethod::Lightness:
+		{
+			// Processing with SIMD
+			#if X86_SIMD_LEVEL >= LV_AVX
+				const auto maxMask = _mm256_set1_ps(255.0f);
+				const auto divMask = _mm256_set1_ps(0.5f);
+
+				const auto iter_AVX = (inImg.width * inImg.height) / 8;
+				const auto iterRem_AVX = (inImg.width * inImg.height) % 8;
+
+				for (size_t i = 0; i < iter_AVX; i++) {
+					const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
+					const auto gChan = _mm256_loadu_ps(inImg.channels[channelGreenN]+i*8);
+					const auto bChan = _mm256_loadu_ps(inImg.channels[channelBlueN]+i*8);
+
+					const auto maxValues = _mm256_max_ps(rChan, _mm256_max_ps(gChan, bChan));
+					const auto minValues = _mm256_min_ps(rChan, _mm256_min_ps(gChan, bChan));
+
+					#ifdef X86_SIMD_FMA
+					const auto resultGr = _mm256_min_ps(_mm256_fmadd_ps(maxValues, minValues, divMask), maxMask);
+					#else
+					const auto resultGr = _mm256_min_ps(_mm256_mul_ps(_mm256_add_ps(maxValues, minValues), divMask), maxMask);
+					#endif
+
+					_mm256_storeu_ps(outGr+8*i, resultGr);
+				}
+
+				for (size_t i = iter_AVX * 8; i < iterRem_AVX + iter_AVX*8; i++) {
+					const auto maxValue = std::max(std::max(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto minValue = std::min(std::min(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto result = (maxValue + minValue) * 0.5f;
+
+					if (result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+
+				_mm256_zeroupper();
+			#elif X86_SIMD_LEVEL >= LV_SSE
+				const auto maxMask = _mm_set1_ps(255.0f);
+				const auto divMask = _mm_set1_ps(0.5f);
+
+				const auto iter_SSE = (inImg.width * inImg.height) / 4;
+				const auto iterRem_SSE = (inImg.width * inImg.height) % 4;
+
+				for (size_t i = 0; i < iter_SSE; i++) {
+					const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
+					const auto gChan = _mm_loadu_ps(inImg.channels[channelGreenN]+i*4);
+					const auto bChan = _mm_loadu_ps(inImg.channels[channelBlueN]+i*4);
+
+					const auto maxValues = _mm_max_ps(rChan, _mm_max_ps(gChan, bChan));
+					const auto minValues = _mm_min_ps(rChan, _mm_min_ps(gChan, bChan));
+
+					const auto resultGr = _mm_min_ps(_mm_mul_ps(_mm_add_ps(maxValues, minValues), divMask), maxMask);
+
+					_mm_storeu_ps(outGr+4*i, resultGr);
+				}
+
+				for (size_t i = iter_SSE * 4; i < iterRem_SSE + iter_SSE*4; i++) {
+					const auto maxValue = std::max(std::max(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto minValue = std::min(std::min(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto result = (maxValue + minValue) * 0.5f;
+
+					if (result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+
+			#else
+				for (size_t i = 0; i < inImg.width * inImg.height; i++) {
+					const auto maxValue = std::max(std::max(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto minValue = std::min(std::min(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto result = (maxValue + minValue) * 0.5f;
+
+					if (result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+			#endif
 			break;
 		}
-		case F_GrayAlpha: {
-			auto tmp = detail::broadcastGrayAlpha_to3c(in);
-			std::swap(in.AccessStorage(), tmp);
+		case GrayscaleMethod::Average:
+		{
+			// Processing with SIMD
+			#if X86_SIMD_LEVEL >= LV_AVX
+				const auto maxMask = _mm256_set1_ps(255.0f);
+				const auto divMask = _mm256_set1_ps(0.3333333333f);
+
+				const auto iter_AVX = (inImg.width * inImg.height) / 8;
+				const auto iterRem_AVX = (inImg.width * inImg.height) % 8;
+
+				for (size_t i = 0; i < iter_AVX; i++) {
+					const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
+					const auto gChan = _mm256_loadu_ps(inImg.channels[channelGreenN]+i*8);
+					const auto bChan = _mm256_loadu_ps(inImg.channels[channelBlueN]+i*8);
+
+					#ifdef X86_SIMD_FMA
+					const auto resultGr = _mm256_min_ps(_mm256_fmadd_ps(_mm256_add_ps(rChan, gChan), bChan, divMask), maxMask);
+					#else
+					const auto resultGr = _mm256_min_ps(_mm256_mul_ps(_mm256_add_ps(rChan, _mm256_add_ps(gChan, bChan)), divMask), maxMask);
+					#endif
+
+					_mm256_storeu_ps(outGr+8*i, resultGr);
+				}
+
+				for (size_t i = iter_AVX * 8; i < iterRem_AVX + iter_AVX*8; i++) {
+					const auto result = (inImg.channels[channelRedN][i] + inImg.channels[channelGreenN][i] + inImg.channels[channelBlueN][i]) * 0.3333333333f;
+
+					if (result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+
+				_mm256_zeroupper();
+			#elif X86_SIMD_LEVEL >= LV_SSE
+				const auto maxMask = _mm_set1_ps(255.0f);
+				const auto divMask = _mm_set1_ps(0.3333333333f);
+
+				const auto iter_AVX = (inImg.width * inImg.height) / 4;
+				const auto iterRem_AVX = (inImg.width * inImg.height) % 4;
+
+				for (size_t i = 0; i < iter_AVX; i++) {
+					const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
+					const auto gChan = _mm_loadu_ps(inImg.channels[channelGreenN]+i*4);
+					const auto bChan = _mm_loadu_ps(inImg.channels[channelBlueN]+i*4);
+
+					const auto resultGr = _mm_min_ps(_mm_mul_ps(_mm_add_ps(rChan, _mm_add_ps(gChan, bChan)), divMask), maxMask);
+
+					_mm_storeu_ps(outGr+4*i, resultGr);
+				}
+
+				for (size_t i = iter_AVX * 4; i < iterRem_AVX + iter_AVX*4; i++) {
+					const auto result = (inImg.channels[channelRedN][i] + inImg.channels[channelGreenN][i] + inImg.channels[channelBlueN][i]) * 0.3333333333f;
+
+					if (result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+
+			#else
+				for (size_t i = 0; i < inImg.width * inImg.height; i++) {
+					const auto result = (inImg.channels[channelRedN][i] + inImg.channels[channelGreenN][i] + inImg.channels[channelBlueN][i]) * 0.3333333333f;
+
+					if (result > 255.0f) {
+						outGr[i] = 255.0f;
+					} else {
+						outGr[i] = result;
+					}
+				}
+			#endif
 			break;
 		}
 		default:
 			break;
+		}
 
-		};
+		// Copy channels
+		if (inImg.format == F_RGB || inImg.format == F_BGR || !preserveAlpha) {
+			inImg.format = F_Grayscale;
 
-		in.SetFormat(F_BGR);
+			for (auto& ptr : inImg.channels) {
+				delete[] ptr;
+			}
+
+			inImg.channels.resize(1);
+			inImg.channels.shrink_to_fit();
+			inImg.channels[0] = outGr;
+		} else if (inImg.format == F_RGBA || inImg.format == F_BGRA) {
+			inImg.format = F_GrayAlpha;
+
+			for (size_t i = 0; i < inImg.channels.size()-1; i++) {
+				delete[] inImg.channels[i];
+			}
+
+			auto imgAlpha = inImg.channels[3];
+
+			inImg.channels.resize(2);
+			inImg.channels.shrink_to_fit();
+			inImg.channels[0] = outGr;
+			inImg.channels[1] = imgAlpha;
+		}
+
+		return inImg;
 	}
 
-	void ConvertToRGBA(Image& in) {
-		switch (in.GetFormat())
-		{
-		case F_RGB: {
-			auto tmp = detail::appendAlpha_3c(in);
-			std::swap(in.AccessStorage(), tmp);
-			break;
-		}
-		case F_BGR: {
-			auto tmp = detail::appendAlpha_3c(in);
-			detail::swapRAndB_4c(tmp.data(), in.GetWidth() * in.GetHeight());
-			std::swap(in.AccessStorage(), tmp);
-			break;
-		}
-		case F_BGRA: {
-			detail::swapRAndB_4c(in.GetPixels_Unsafe(), in.GetWidth() * in.GetHeight());
-			break;
-		}
-		case F_Grayscale: {
-			auto tmp = detail::broadcastGray_to4c(in);
-			std::swap(in.AccessStorage(), tmp);
-			break;
-		}
-		case F_GrayAlpha: {
-			auto tmp = detail::broadcastGrayAlpha_to4c(in);
-			std::swap(in.AccessStorage(), tmp);
-			break;
-		}
-		default:
-			break;
-		}
+	void ConvertUint16ToFloat(const uint16_t* in, float* out, const size_t fileSize) {
+		#if X86_SIMD_LEVEL >= LV_AVX2
+			size_t iters = fileSize / 8;
+			size_t itersRem = fileSize % 8;
 
-		in.SetFormat(F_RGBA);
+			for (size_t i = 0; i < iters; i++) {
+				__m128i pixin = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in+i*8));
+				__m256i pix0 = _mm256_cvtepu16_epi32(pixin);
+				__m256 cvt = _mm256_cvtepi32_ps(pix0);
+
+				_mm256_store_ps(out+i*8, cvt);
+			}
+
+			for (size_t i = iters * 8; i < iters * 8 + itersRem; i++) {
+				out[i] = static_cast<float>(in[i]);
+			}
+		#elif X86_SIMD_LEVEL >= LV_SSE41
+			size_t iters = fileSize / 4;
+			size_t itersRem = fileSize % 4;
+
+			for (size_t i = 0; i < iters; i++) {
+				__m128i pixin = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in+i*4));
+				__m128i pix0 = _mm_cvtepu16_epi32(pixin);
+				__m128 cvt = _mm_cvtepi32_ps(pix0);
+
+				_mm_store_ps(out+i*4, cvt);
+			}
+
+			for (size_t i = iters * 4; i < iters * 4 + itersRem; i++) {
+				out[i] = static_cast<float>(in[i]);
+			}
+		#else
+			for (size_t i = 0; i < fileSize; i++) {
+				out[i] = static_cast<float>(in[i]);
+			}
+		#endif
 	}
 
-	void ConvertToBGRA(Image& in) {
-		switch (in.GetFormat())
-		{
-		case F_RGB: {
-			auto tmp = detail::appendAlpha_3c(in);
-			detail::swapRAndB_4c(tmp.data(), in.GetWidth() * in.GetHeight());
-			std::swap(in.AccessStorage(), tmp);
-			break;
-		}
-		case F_RGBA: {
-			detail::swapRAndB_4c(in.GetPixels_Unsafe(), in.GetWidth() * in.GetHeight());
-			break;
-		}
-		case F_BGR: {
-			auto tmp = detail::appendAlpha_3c(in);
-			std::swap(in.AccessStorage(), tmp);
-			break;
-		}
-		case F_Grayscale: {
-			auto tmp = detail::broadcastGray_to4c(in);
-			std::swap(in.AccessStorage(), tmp);
-			break;
-		}
-		case F_GrayAlpha: {
-			auto tmp = detail::broadcastGrayAlpha_to4c(in);
-			std::swap(in.AccessStorage(), tmp);
-			break;
-		}
-		default:
-			break;
-		}
+	void ConvertUint8ToFloat(const uint8_t* in, float* out, const size_t fileSize) {
+		#if X86_SIMD_LEVEL >= LV_AVX512
+			size_t iters = fileSize / 16;
+			size_t itersRem = fileSize % 16;
 
-		in.SetFormat(F_BGRA);
+			for (size_t i = 0; i < iters; i++) {
+				const __m128i pix_AVX512_8 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in + i*16));
+				const __m512i pix_AVX512_32 = _mm512_cvtepu8_epi32(pix_AVX512_8);
+				const __m512 pixf_AVX512 = _mm512_cvtepi32_ps(pix_AVX512_32);
+				_mm512_storeu_ps(out + i*16, pixf_AVX512);
+			}
+
+			for (size_t i = iters * 16; i < iters * 16 + itersRem; i++) {
+				out[i] = static_cast<float>(in[i]);
+			}
+		#elif X86_SIMD_LEVEL >= LV_AVX2
+			size_t iters = fileSize / 32;
+			size_t itersRem = fileSize % 32;
+
+			for (size_t i = 0; i < iters; i++) {
+				// Work on 32 bytes at once
+				const __m256i pixin = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(in + i*32));
+				// 128-bit lane swapped bytes
+				const __m256i pixin_swap = _mm256_permute2x128_si256(pixin, pixin, 1);
+
+				// First 8 bytes
+				__m128i pixin_0 = _mm256_castsi256_si128(pixin);
+				// Second 8 bytes
+				__m128i pixin_1 = _mm_bsrli_si128(_mm256_castsi256_si128(pixin), 8);
+				// Third 8 bytes
+				__m128i pixin_2 = _mm256_castsi256_si128(pixin_swap);
+				// Last 8 bytes
+				__m128i pixin_3 = _mm_bsrli_si128(_mm256_castsi256_si128(pixin_swap), 8);
+
+				// Extend 8-bit values to 32-bit
+				__m256i pix_0 = _mm256_cvtepu8_epi32(pixin_0);
+				__m256i pix_1 = _mm256_cvtepu8_epi32(pixin_1);
+				__m256i pix_2 = _mm256_cvtepu8_epi32(pixin_2);
+				__m256i pix_3 = _mm256_cvtepu8_epi32(pixin_3);
+
+				// Convert 32-bit values to floats
+				__m256 pixf_0 = _mm256_cvtepi32_ps(pix_0);
+				__m256 pixf_1 = _mm256_cvtepi32_ps(pix_1);
+				__m256 pixf_2 = _mm256_cvtepi32_ps(pix_2);
+				__m256 pixf_3 = _mm256_cvtepi32_ps(pix_3);
+
+				_mm256_storeu_ps(out + i * 32, pixf_0);
+				_mm256_storeu_ps(out + i * 32+8, pixf_1);
+				_mm256_storeu_ps(out + i * 32+16, pixf_2);
+				_mm256_storeu_ps(out + i * 32+24, pixf_3);
+			}
+
+			_mm256_zeroupper();
+
+			for (size_t i = iters * 32; i < iters * 32 + itersRem; i++) {
+				out[i] = static_cast<float>(in[i]);
+			}
+		#elif X86_SIMD_LEVEL >= LV_SSE41 // TODO: SSSE3 version
+			size_t iters = fileSize / 16;
+			size_t itersRem = fileSize % 16;
+
+			const __m128i shufmask0 = _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 1, 0);
+			const __m128i shufmask1 = _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 5, 4);
+			const __m128i shufmask2 = _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 10, 9, 8);
+			const __m128i shufmask3 = _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 14, 13, 12);
+
+			for (size_t i = 0; i < iters; i++) {
+				__m128i pixin = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in + i*16));
+
+				__m128i pix0 = _mm_shuffle_epi8(pixin, shufmask0);
+				__m128i pix1 = _mm_shuffle_epi8(pixin, shufmask1);
+				__m128i pix2 = _mm_shuffle_epi8(pixin, shufmask2);
+				__m128i pix3 = _mm_shuffle_epi8(pixin, shufmask3);
+
+				pix0 = _mm_cvtepu8_epi32(pix0);
+				pix1 = _mm_cvtepu8_epi32(pix1);
+				pix2 = _mm_cvtepu8_epi32(pix2);
+				pix3 = _mm_cvtepu8_epi32(pix3);
+
+				__m128 pixf0 = _mm_cvtepi32_ps(pix0);
+				__m128 pixf1 = _mm_cvtepi32_ps(pix1);
+				__m128 pixf2 = _mm_cvtepi32_ps(pix2);
+				__m128 pixf3 = _mm_cvtepi32_ps(pix3);
+
+				_mm_storeu_ps(out + i*16, pixf0);
+				_mm_storeu_ps(out + i*16+4, pixf1);
+				_mm_storeu_ps(out + i*16+8, pixf2);
+				_mm_storeu_ps(out + i*16+12, pixf3);
+			}
+
+			for (size_t i = iters * 16; i < iters * 16 + itersRem; i++) {
+				out[i] = static_cast<float>(in[i]);
+			}
+
+		#else
+			for (size_t i = 0; i < fileSize; i++) {
+				out[i] = static_cast<float>(in[i]);
+			}
+		#endif
 	}
-
 } // namespace wlib::image
 
 #endif

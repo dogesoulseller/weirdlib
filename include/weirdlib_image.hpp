@@ -31,7 +31,8 @@ namespace image
 	/// Luminosity: accounts for human perception of colors (default) (BT.709) <br>
 	/// Lightness: average of maximum and minimum intensity <br>
 	/// Average: simple average of components <br>
-	/// LuminosityBT601: Same as Luminosity, but uses BT.601 weights
+	/// LuminosityBT601: Same as Luminosity, but uses BT.601 weights <br>
+	/// LuminosityBT2100: Same as Luminosity, but uses BT.2100 weights <br>
 	enum class GrayscaleMethod
 	{
 		Luminosity = 0,
@@ -88,6 +89,34 @@ namespace image
 
 		~Image() = default;
 
+
+		/// Convert input image to RGBA
+		/// @param in input image
+		static void ConvertToRGBA(Image& in);
+
+		/// Convert input image to BGR
+		/// @param in input image
+		static void ConvertToBGR(Image& in);
+
+		/// Convert input image to RGB
+		/// @param in input image
+		static void ConvertToRGB(Image& in);
+
+		/// Convert input image to BGRA
+		/// @param in input image
+		static void ConvertToBGRA(Image& in);
+
+		/// Convert input image to RGBA
+		void ConvertToRGBA();
+
+		/// Convert input image to BGR
+		void ConvertToBGR();
+
+		/// Convert input image to RGB
+		void ConvertToRGB();
+
+		/// Convert input image to BGRA
+		void ConvertToBGRA();
 
 		/// Load image from a file readable by the filesystem
 		/// @param path absolute or relative path to supported image file
@@ -158,6 +187,8 @@ namespace image
 		std::vector<uint8_t> GetPixelsAsInt();
 	};
 
+	// TODO: Remove constructor from Image and replace with conversions
+	// TODO: Unify Image and ImageSoA interfaces
 	/// Class representing a 2D image in Structure of Arrays format (i.e. RRR GGG BBB) <br>
 	/// This format is more optimal for threading and vectorization at a relatively small conversion cost
 	class ImageSoA
@@ -186,11 +217,42 @@ namespace image
 		/// Move assignment operator
 		ImageSoA& operator=(ImageSoA&&);
 
-		~ImageSoA();
+
+		/// Convert input image to RGBA
+		/// @param in input image
+		static void ConvertToRGBA(ImageSoA& in);
+
+		/// Convert input image to BGR
+		/// @param in input image
+		static void ConvertToBGR(ImageSoA& in);
+
+		/// Convert input image to RGB
+		/// @param in input image
+		static void ConvertToRGB(ImageSoA& in);
+
+		/// Convert input image to BGRA
+		/// @param in input image
+		static void ConvertToBGRA(ImageSoA& in);
+
+
+		/// Convert input image to RGBA
+		void ConvertToRGBA();
+
+		/// Convert input image to BGR
+		void ConvertToBGR();
+
+		/// Convert input image to RGB
+		void ConvertToRGB();
+
+		/// Convert input image to BGRA
+		void ConvertToBGRA();
+
 
 		/// Realign channels
 		/// @return AoS @{link Image}
 		Image ConvertToImage();
+
+		~ImageSoA();
 	};
 
 	/// Convert image into a grayscale representation using various methods described in @{link GrayscaleMethod}
@@ -212,64 +274,32 @@ namespace image
 	/// @param fileSize total number of pixels
 	void ConvertUint16ToFloat(const uint16_t* in, float* out, const size_t fileSize);
 
-	/// Convert input image to RGBA
-	/// @param in input image
-	void ConvertToRGBA(ImageSoA& in);
-
-	/// Convert input image to BGR
-	/// @param in input image
-	void ConvertToBGR(ImageSoA& in);
-
-	/// Convert input image to RGB
-	/// @param in input image
-	void ConvertToRGB(ImageSoA& in);
-
-	/// Convert input image to BGRA
-	/// @param in input image
-	void ConvertToBGRA(ImageSoA& in);
-
-	/// Convert input image to RGBA
-	/// @param in input image
-	void ConvertToRGBA(Image& in);
-
-	/// Convert input image to BGR
-	/// @param in input image
-	void ConvertToBGR(Image& in);
-
-	/// Convert input image to RGB
-	/// @param in input image
-	void ConvertToRGB(Image& in);
-
-	/// Convert input image to BGRA
-	/// @param in input image
-	void ConvertToBGRA(Image& in);
-
 	/// Convert all color values to their image negative version <br>
 	/// Effectively does max_val - current_val
 	/// @param in input image
 	/// @param withAlpha whether to preserve alpha channel
 	void NegateValues(ImageSoA& in, bool withAlpha = false);
 
-namespace detail
-{
-	void swapRAndB_3c(float* in, size_t count);
+	namespace detail
+	{
+		void swapRAndB_3c(float* in, size_t count);
 
-	void swapRAndB_4c(float* in, size_t count);
+		void swapRAndB_4c(float* in, size_t count);
 
-	std::vector<float> dropAlpha_4c(Image& in);
+		std::vector<float> dropAlpha_4c(Image& in);
 
-	std::vector<float> dropAlpha_2c(Image& in);
+		std::vector<float> dropAlpha_2c(Image& in);
 
-	std::vector<float> appendAlpha_3c(Image& in);
+		std::vector<float> appendAlpha_3c(Image& in);
 
-	std::vector<float> broadcastGray_to3c(Image& in);
+		std::vector<float> broadcastGray_to3c(Image& in);
 
-	std::vector<float> broadcastGray_to4c(Image& in);
+		std::vector<float> broadcastGray_to4c(Image& in);
 
-	std::vector<float> broadcastGrayAlpha_to3c(Image& in);
+		std::vector<float> broadcastGrayAlpha_to3c(Image& in);
 
-	std::vector<float> broadcastGrayAlpha_to4c(Image& in);
-} // namespace detail
+		std::vector<float> broadcastGrayAlpha_to4c(Image& in);
+	} // namespace detail
 
 } // namespace image
 } // namespace wlib
