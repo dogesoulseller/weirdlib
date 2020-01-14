@@ -29,50 +29,104 @@ namespace wlib::image
 		return compatible;
 	}
 
-	// TODO: AVX SIMD
 	static float getChannelMSE_float(float* lhs, float* rhs, size_t count) noexcept {
-		#if X86_SIMD_LEVEL >= LV_SSE2
+		#if X86_SIMD_LEVEL >= LV_AVX
+			size_t iters = count / 8;
+			size_t itersRem = count % 8;
 
-		size_t iters = count / 4;
-		size_t itersRem = count % 4;
+			__m256 accumulatorVec = _mm256_setzero_ps();
 
-		__m128 accumulatorVec = _mm_setzero_ps();
+			for (size_t i = 0; i < iters; i++) {
+				__m256 lVals = _mm256_loadu_ps(lhs+8*i);
+				__m256 rVals = _mm256_loadu_ps(rhs+8*i);
+				__m256 diff = _mm256_sub_ps(lVals, rVals);
+				__m256 mseRes = _mm256_mul_ps(diff, diff);
 
-		// TODO: Maybe unroll?
-		for (size_t i = 0; i < iters; i++) {
-			__m128 lVals = _mm_loadu_ps(lhs+4*i);
-			__m128 rVals = _mm_loadu_ps(rhs+4*i);
-			__m128 diff = _mm_sub_ps(lVals, rVals);
-			__m128 mseRes = _mm_mul_ps(diff, diff);
+				accumulatorVec = _mm256_add_ps(accumulatorVec, mseRes);
+			}
 
-			accumulatorVec = _mm_add_ps(accumulatorVec, mseRes);
-		}
+			float accumulatorScal = 0.0f;
 
-		float accumulatorScal = 0.0f;
+			for (size_t i = 0; i < itersRem; i++) {
+				accumulatorScal += std::pow(lhs[iters*8+i] - rhs[iters*8+i], 2);
+			}
 
-		for (size_t i = 0; i < itersRem; i++) {
-			accumulatorScal += std::pow(lhs[iters*4+i] - rhs[iters*4+i], 2);
-		}
+			std::array<float, 8> accumulatorVec_arr;
+			_mm256_storeu_ps(accumulatorVec_arr.data(), accumulatorVec);
 
-		std::array<float, 4> accumulatorVec_arr;
-		_mm_storeu_ps(accumulatorVec_arr.data(), accumulatorVec);
+			accumulatorScal += std::reduce(std::execution::seq, accumulatorVec_arr.begin(), accumulatorVec_arr.end());
 
-		accumulatorScal += std::reduce(std::execution::seq, accumulatorVec_arr.begin(), accumulatorVec_arr.end());
+			return accumulatorScal / count;
 
-		return accumulatorScal / count;
+		#elif X86_SIMD_LEVEL >= LV_SSE2
+			size_t iters = count / 4;
+			size_t itersRem = count % 4;
+
+			__m128 accumulatorVec = _mm_setzero_ps();
+
+			// TODO: Maybe unroll?
+			for (size_t i = 0; i < iters; i++) {
+				__m128 lVals = _mm_loadu_ps(lhs+4*i);
+				__m128 rVals = _mm_loadu_ps(rhs+4*i);
+				__m128 diff = _mm_sub_ps(lVals, rVals);
+				__m128 mseRes = _mm_mul_ps(diff, diff);
+
+				accumulatorVec = _mm_add_ps(accumulatorVec, mseRes);
+			}
+
+			float accumulatorScal = 0.0f;
+
+			for (size_t i = 0; i < itersRem; i++) {
+				accumulatorScal += std::pow(lhs[iters*4+i] - rhs[iters*4+i], 2);
+			}
+
+			std::array<float, 4> accumulatorVec_arr;
+			_mm_storeu_ps(accumulatorVec_arr.data(), accumulatorVec);
+
+			accumulatorScal += std::reduce(std::execution::seq, accumulatorVec_arr.begin(), accumulatorVec_arr.end());
+
+			return accumulatorScal / count;
 
 		#else
-		float mseAccumulator = 0.0f;
-		for (size_t i = 0; i < count; i++) {
-			mseAccumulator += std::pow(lhs[i] - rhs[i], 2);
-		}
+			float mseAccumulator = 0.0f;
+			for (size_t i = 0; i < count; i++) {
+				mseAccumulator += std::pow(lhs[i] - rhs[i], 2);
+			}
 
-		return mseAccumulator / count;
+			return mseAccumulator / count;
 		#endif
 	}
 
 	static double getChannelMSE_double(float* lhs, float* rhs, size_t count) noexcept {
-		#if X86_SIMD_LEVEL >= LV_SSE2
+		#if X86_SIMD_LEVEL >= LV_AVX
+			size_t iters = count / 4;
+			size_t itersRem = count % 4;
+
+			__m256d accumulatorVec = _mm256_setzero_pd();
+
+			for (size_t i = 0; i < iters; i++) {
+				__m256d lVals = _mm256_cvtps_pd(_mm_loadu_ps(lhs+4*i));
+				__m256d rVals = _mm256_cvtps_pd(_mm_loadu_ps(rhs+4*i));
+
+				__m256d diff = _mm256_sub_pd(lVals, rVals);
+				__m256d mseRes = _mm256_mul_pd(diff, diff);
+
+				accumulatorVec = _mm256_add_pd(accumulatorVec, mseRes);
+			}
+
+			double accumulatorScal = 0.0;
+
+			for (size_t i = 0; i < itersRem; i++) {
+				accumulatorScal += std::pow(static_cast<double>(lhs[iters*4+i] - rhs[iters*4+i]), 2);
+			}
+
+			std::array<double, 4> accumulatorVec_arr;
+			_mm256_storeu_pd(accumulatorVec_arr.data(), accumulatorVec);
+
+			accumulatorScal += std::reduce(std::execution::seq, accumulatorVec_arr.begin(), accumulatorVec_arr.end());
+
+			return accumulatorScal / count;
+		#elif X86_SIMD_LEVEL >= LV_SSE2
 
 		size_t iters = count / 2;
 		size_t itersRem = count % 2;
