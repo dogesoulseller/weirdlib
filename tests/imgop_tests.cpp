@@ -34,7 +34,7 @@ TEST(ImgOps, ConvertToSoA) {
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
-	wlib::image::ImageSoA testSoA(testImg);
+	auto testSoA = wlib::image::MakeSoAFromAoS(testImg);
 
 	EXPECT_EQ(testSoA.channels.size(), 4);
 	EXPECT_FLOAT_EQ(testImg.GetPixels()[0], testSoA.channels[0][0]);
@@ -47,8 +47,8 @@ TEST(ImgOps, ConvertSoAToImage) {
 	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
-	wlib::image::ImageSoA testSoA(testImg);
-	wlib::image::Image testImgFromSoA = testSoA.ConvertToImage();
+	auto testSoA = wlib::image::MakeSoAFromAoS(testImg);
+	wlib::image::Image testImgFromSoA = wlib::image::MakeAoSFromSoA(testSoA);
 
 	EXPECT_FLOAT_EQ(testImg.GetPixels()[0], testImgFromSoA.GetPixels()[0]);
 	EXPECT_FLOAT_EQ(testImg.GetPixels()[1], testImgFromSoA.GetPixels()[1]);
@@ -64,7 +64,7 @@ TEST(ImgOps, LoadFromFormatted) {
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
 	wlib::image::Image testImgF(imgPathF);
 
-	wlib::image::ImageSoA testImgSoA(testImgF);
+	auto testImgSoA = wlib::image::MakeSoAFromAoS(testImgF);
 
 	EXPECT_EQ(testImg.GetWidth(), testImgF.GetWidth());
 	EXPECT_EQ(testImg.GetHeight(), testImgF.GetHeight());
@@ -86,13 +86,14 @@ TEST(ImgOps, ConvertRGBA_Grayscale) {
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
-	wlib::image::ImageSoA testSoAA(testImg);
-	wlib::image::ImageSoA testSoANA(testImg);
+	auto testSoA = wlib::image::MakeSoAFromAoS(testImg);
+	auto testSoAA = wlib::image::MakeSoAFromAoS(testImg);
+	auto testSoANA = wlib::image::MakeSoAFromAoS(testImg);
 
-	wlib::image::ImageSoA testSoA_Average(testImg);
-	wlib::image::ImageSoA testSoA_Lightness(testImg);
-	wlib::image::ImageSoA testSoA_LumBT601(testImg);
-	wlib::image::ImageSoA testSoA_LumBT2100(testImg);
+	auto testSoA_Average = wlib::image::MakeSoAFromAoS(testImg);
+	auto testSoA_Lightness = wlib::image::MakeSoAFromAoS(testImg);
+	auto testSoA_LumBT601 = wlib::image::MakeSoAFromAoS(testImg);
+	auto testSoA_LumBT2100 = wlib::image::MakeSoAFromAoS(testImg);
 
 	testSoAA = wlib::image::ConvertToGrayscale(testSoAA, true);
 	EXPECT_EQ(testSoAA.channels.size(), 2);
@@ -112,9 +113,9 @@ TEST(ImgOps, NegateValues) {
 	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
-	wlib::image::ImageSoA testSoA_Alpha(testImg);
-	wlib::image::ImageSoA testSoA_NoAlpha(testImg);
-	wlib::image::ImageSoA testSoABase(testImg);
+	auto testSoA_Alpha = wlib::image::MakeSoAFromAoS(testImg);
+	auto testSoA_NoAlpha = wlib::image::MakeSoAFromAoS(testImg);
+	auto testSoABase = wlib::image::MakeSoAFromAoS(testImg);
 
 	EXPECT_NO_FATAL_FAILURE(wlib::image::NegateValues(testSoA_Alpha, true));
 	EXPECT_NO_FATAL_FAILURE(wlib::image::NegateValues(testSoA_NoAlpha, false));
@@ -289,8 +290,8 @@ TEST(ImgOps, PSNR) {
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
 	wlib::image::Image testImgJPG(imgPathJPG);
 
-	wlib::image::ImageSoA testImgSoA(testImg);
-	wlib::image::ImageSoA testImgJPGSoA(testImgJPG);
+	auto testImgSoA = wlib::image::MakeSoAFromAoS(testImg);
+	auto testImgJPGSoA = wlib::image::MakeSoAFromAoS(testImgJPG);
 
 	auto outData = wlib::image::CalculatePSNR<float>(testImgSoA, testImgSoA);
 

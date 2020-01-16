@@ -301,13 +301,13 @@ namespace image
 		/// Convert input image to BGRA
 		void ConvertToBGRA();
 
-
-		/// Realign channels
-		/// @return AoS @{link Image}
-		Image ConvertToImage();
-
 		~ImageSoA();
 	};
+
+	ImageSoA MakeSoAFromAoS(const Image& in);
+
+	Image MakeAoSFromSoA(const ImageSoA& in);
+
 
 	namespace detail
 	{
