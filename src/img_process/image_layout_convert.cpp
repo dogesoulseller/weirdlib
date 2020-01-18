@@ -10,11 +10,11 @@ namespace wlib::image
 
 		switch (in.format)
 		{
-		case ColorFormat::F_Grayscale:
+		  case ColorFormat::F_Grayscale:
 			outputPix = new float[in.width*in.height];
 			std::copy(in.channels[0], in.channels[0]+in.width*in.height, outputPix);
 			break;
-		case ColorFormat::F_GrayAlpha:
+		  case ColorFormat::F_GrayAlpha:
 			outputPix = new float[in.width*in.height*2];
 			#pragma ivdep
 			for (size_t i = 0; i < in.width * in.height; i++) {
@@ -22,8 +22,8 @@ namespace wlib::image
 				outputPix[i*2+1] = in.channels[1][i];
 			}
 			break;
-		case ColorFormat::F_RGB:
-		case ColorFormat::F_BGR:
+		  case ColorFormat::F_RGB:
+		  case ColorFormat::F_BGR:
 			outputPix = new float[in.width*in.height*3];
 			#pragma ivdep
 			for (size_t i = 0; i < in.width * in.height; i++) {
@@ -32,9 +32,9 @@ namespace wlib::image
 				outputPix[i*3+2] = in.channels[2][i];
 			}
 			break;
-		case ColorFormat::F_Default:
-		case ColorFormat::F_RGBA:
-		case ColorFormat::F_BGRA:
+		  case ColorFormat::F_Default:
+		  case ColorFormat::F_RGBA:
+		  case ColorFormat::F_BGRA:
 			outputPix = new float[in.width*in.height*4];
 			#pragma ivdep
 			for (size_t i = 0; i < in.width * in.height; i++) {
@@ -64,7 +64,7 @@ namespace wlib::image
 
 		switch (outimg.format)
 		{
-		case ColorFormat::F_Grayscale: {
+		  case ColorFormat::F_Grayscale: {
 			alignas(64) auto c0 = new float[outimg.width*outimg.height];
 			auto source = img.GetPixels();
 
@@ -86,8 +86,8 @@ namespace wlib::image
 			outimg.channels.push_back(c0);
 
 			break;
-		}
-		case ColorFormat::F_GrayAlpha: {
+		  }
+		  case ColorFormat::F_GrayAlpha: {
 			alignas(64) auto c0 = new float[outimg.width*outimg.height];
 			alignas(64) auto c1 = new float[outimg.width*outimg.height];
 			auto source = img.GetPixels();
@@ -113,9 +113,9 @@ namespace wlib::image
 			outimg.channels.push_back(c1);
 
 			break;
-		}
-		case ColorFormat::F_RGB:
-		case ColorFormat::F_BGR: {
+		  }
+		  case ColorFormat::F_RGB:
+		  case ColorFormat::F_BGR: {
 			alignas(64) auto c0 = new float[outimg.width*outimg.height];
 			alignas(64) auto c1 = new float[outimg.width*outimg.height];
 			alignas(64) auto c2 = new float[outimg.width*outimg.height];
@@ -145,10 +145,10 @@ namespace wlib::image
 			outimg.channels.push_back(c2);
 
 			break;
-		}
-		case ColorFormat::F_RGBA:
-		case ColorFormat::F_BGRA:
-		case ColorFormat::F_Default: {
+		  }
+		  case ColorFormat::F_RGBA:
+		  case ColorFormat::F_BGRA:
+		  case ColorFormat::F_Default: {
 			alignas(64) auto c0 = new float[outimg.width*outimg.height];
 			alignas(64) auto c1 = new float[outimg.width*outimg.height];
 			alignas(64) auto c2 = new float[outimg.width*outimg.height];
@@ -182,8 +182,8 @@ namespace wlib::image
 			outimg.channels.push_back(c3);
 
 			break;
-		}
-		default:
+		  }
+		  default:
 			break;
 		}
 

@@ -88,7 +88,7 @@ namespace wlib::image
 
 		if (info.maxValue == 1) {	// PBM-like (1 bit per pixel)
 			size_t iters = info.width / 8;
-			size_t itersRem = info.width % 8;
+			uint_fast8_t itersRem = info.width % 8;
 
 			size_t totalOffset = 0;
 
@@ -96,20 +96,15 @@ namespace wlib::image
 				for (size_t b = 0; b < iters; b++) {	// For each full byte
 					const uint8_t val = *(headerEnd + (h*(iters+1)) + b);
 
-					info.pixels[totalOffset+0] = wlib::bop::test(val, 7) ? 0 : 255;
-					info.pixels[totalOffset+1] = wlib::bop::test(val, 6) ? 0 : 255;
-					info.pixels[totalOffset+2] = wlib::bop::test(val, 5) ? 0 : 255;
-					info.pixels[totalOffset+3] = wlib::bop::test(val, 4) ? 0 : 255;
-					info.pixels[totalOffset+4] = wlib::bop::test(val, 3) ? 0 : 255;
-					info.pixels[totalOffset+5] = wlib::bop::test(val, 2) ? 0 : 255;
-					info.pixels[totalOffset+6] = wlib::bop::test(val, 1) ? 0 : 255;
-					info.pixels[totalOffset+7] = wlib::bop::test(val, 0) ? 0 : 255;
+					for (int_fast8_t i = 0; i < 8; i++) { // For each bit in byte
+						info.pixels[totalOffset+i] = wlib::bop::test(val, 7-i) ? 0 : 255;
+					}
 
 					totalOffset += 8;
 				}
 
 				const uint8_t val = *(headerEnd + (h*(iters+1)) + iters);
-				for (size_t i = 0; i < itersRem; i++) {	// For each bit in last byte
+				for (uint_fast8_t i = 0; i < itersRem; i++) {	// For each bit in last byte
 					info.pixels[totalOffset] = wlib::bop::test(val, 7-i) ? 0 : 255;
 					totalOffset++;
 				}

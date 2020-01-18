@@ -86,57 +86,31 @@ namespace wlib::image
 		}
 	}
 
-	void ImageSoA::ConvertToRGBA() {
-		ImageSoA::ConvertToRGBA(*this);
-	}
-
-	void ImageSoA::ConvertToBGR() {
-		ImageSoA::ConvertToBGR(*this);
-	}
-
-	void ImageSoA::ConvertToRGB() {
-		ImageSoA::ConvertToRGB(*this);
-	}
-
-	void ImageSoA::ConvertToBGRA() {
-		ImageSoA::ConvertToBGRA(*this);
-	}
-
 	void ImageSoA::ConvertToRGB(ImageSoA& in) {
 		switch (in.format)
 		{
-		case F_BGRA:
+		  case F_BGRA:
 			std::swap(in.channels[0], in.channels[2]);
 			[[fallthrough]];
-		case F_RGBA:
+		  case F_RGBA:
 			delete[] in.channels[3];
 			in.channels.erase(in.channels.begin() + 3);
 			break;
-		case F_BGR:
+		  case F_BGR:
 			std::swap(in.channels[0], in.channels[2]);
 			break;
-		case F_Grayscale: {
+		  case F_Grayscale: {
 			in.channels.resize(3);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
+			detail::extendGSTo3Chan(in);
 			break;
-		}
-		case F_GrayAlpha: {
+		  }
+		  case F_GrayAlpha: {
 			delete[] in.channels[1];
 			in.channels.resize(3);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
+			detail::extendGSTo3Chan(in);
 			break;
-		}
-		default:
+		  }
+		  default:
 			break;
 		}
 
@@ -146,38 +120,28 @@ namespace wlib::image
 	void ImageSoA::ConvertToBGR(ImageSoA& in) {
 		switch (in.format)
 		{
-		case F_RGBA:
+		  case F_RGBA:
 			std::swap(in.channels[0], in.channels[2]);
 			[[fallthrough]];
-		case F_BGRA:
+		  case F_BGRA:
 			delete[] in.channels[3];
 			in.channels.erase(in.channels.begin() + 3);
 			break;
-		case F_RGB:
+		  case F_RGB:
 			std::swap(in.channels[0], in.channels[2]);
 			break;
-		case F_Grayscale: {
+		  case F_Grayscale: {
 			in.channels.resize(3);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
+			detail::extendGSTo3Chan(in);
 			break;
-		}
-		case F_GrayAlpha: {
+		  }
+		  case F_GrayAlpha: {
 			delete[] in.channels[1];
 			in.channels.resize(3);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
+			detail::extendGSTo3Chan(in);
 			break;
-		}
-		default:
+		  }
+		  default:
 			break;
 		}
 
@@ -187,44 +151,27 @@ namespace wlib::image
 	void ImageSoA::ConvertToRGBA(ImageSoA& in) {
 		switch (in.format)
 		{
-		case F_BGRA:
+		  case F_BGRA:
 			std::swap(in.channels[0], in.channels[2]);
 			break;
-		case F_BGR:
+		  case F_BGR:
 			std::swap(in.channels[0], in.channels[2]);
 			[[fallthrough]];
-		case F_RGB:
-		{
-			alignas(64) auto tmp = new float[in.width * in.height];
-			std::uninitialized_fill(tmp, tmp + in.width * in.height, 255.0f);
-			in.channels.push_back(tmp);
+		  case F_RGB: {
+			detail::appendConstantAlpha(in);
 			break;
-		}
-		case F_Grayscale: {
+		  }
+		  case F_Grayscale: {
 			in.channels.resize(4);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			alignas(64) auto tmp2 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			std::uninitialized_fill(tmp2, tmp2 + in.width * in.height, 255.0f);
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
-			in.channels[3] = tmp1;
+			detail::extendGSTo4Chan(in, true);
 			break;
-		}
-		case F_GrayAlpha: {
+		  }
+		  case F_GrayAlpha: {
 			in.channels.resize(4);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			in.channels[3] = in.channels[1];
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
+			detail::extendGSTo4Chan(in, false);
 			break;
-		}
-		default:
+		  }
+		  default:
 			break;
 		}
 
@@ -234,43 +181,27 @@ namespace wlib::image
 	void ImageSoA::ConvertToBGRA(ImageSoA& in) {
 		switch (in.format)
 		{
-		case F_RGBA:
+		  case F_RGBA:
 			std::swap(in.channels[0], in.channels[2]);
 			break;
-		case F_RGB:
+		  case F_RGB:
 			std::swap(in.channels[0], in.channels[2]);
 			[[fallthrough]];
-		case F_BGR: {
-			alignas(64) auto tmp = new float[in.width * in.height];
-			std::uninitialized_fill(tmp, tmp + in.width * in.height, 255.0f);
-			in.channels.push_back(tmp);
+		  case F_BGR: {
+			detail::appendConstantAlpha(in);
 			break;
-		}
-		case F_Grayscale: {
+		  }
+		  case F_Grayscale: {
 			in.channels.resize(4);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			alignas(64) auto tmp2 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			std::uninitialized_fill(tmp2, tmp2 + in.width * in.height, 255.0f);
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
-			in.channels[3] = tmp2;
+			detail::extendGSTo4Chan(in, true);
 			break;
-		}
-		case F_GrayAlpha: {
+		  }
+		  case F_GrayAlpha: {
 			in.channels.resize(4);
-			alignas(64) auto tmp0 = new float[in.width*in.height];
-			alignas(64) auto tmp1 = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp0);
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp1);
-			in.channels[3] = in.channels[1];
-			in.channels[1] = tmp0;
-			in.channels[2] = tmp1;
+			detail::extendGSTo4Chan(in, false);
 			break;
-		}
-		default:
+		  }
+		  default:
 			break;
 		}
 

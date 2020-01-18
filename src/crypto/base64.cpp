@@ -124,15 +124,16 @@ namespace wlib::crypto
 				} else if (*cursor == 0x2F) {
 					temp |= cursorVals[1];
 				} else if (*cursor == padCharacter) {
-					switch(input.end() - cursor) {
-					case 1:
+					switch(input.end() - cursor)
+					{
+					  case 1:
 						decodedBytes.push_back((temp >> 16) & 0x000000FF);
 						decodedBytes.push_back((temp >> 8) & 0x000000FF);
 						return decodedBytes;
-					case 2:
+					  case 2:
 						decodedBytes.push_back((temp >> 10) & 0x000000FF);
 						return decodedBytes;
-					default:
+					  default:
 						throw std::runtime_error("Invalid padding");
 					}
 				} else {

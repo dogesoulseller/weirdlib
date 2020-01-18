@@ -241,7 +241,6 @@ namespace image
 		std::vector<uint8_t> GetPixelsAsInt();
 	};
 
-	// TODO: Remove constructor from Image and replace with conversions
 	// TODO: Unify Image and ImageSoA interfaces
 	/// Class representing a 2D image in Structure of Arrays format (i.e. RRR GGG BBB) <br>
 	/// This format is more optimal for threading and vectorization at a relatively small conversion cost
@@ -290,16 +289,16 @@ namespace image
 
 
 		/// Convert input image to RGBA
-		void ConvertToRGBA();
+		inline void ConvertToRGBA() {ConvertToRGBA(*this);};
 
 		/// Convert input image to BGR
-		void ConvertToBGR();
+		inline void ConvertToBGR() {ConvertToBGR(*this);};
 
 		/// Convert input image to RGB
-		void ConvertToRGB();
+		inline void ConvertToRGB() {ConvertToRGB(*this);};
 
 		/// Convert input image to BGRA
-		void ConvertToBGRA();
+		inline void ConvertToBGRA() {ConvertToBGRA(*this);};
 
 		~ImageSoA();
 	};
@@ -311,13 +310,13 @@ namespace image
 
 	namespace detail
 	{
-		PSNRData<float> psnrFloat(ImageSoA& image0, ImageSoA& image1);
-		PSNRData<double> psnrDouble(ImageSoA& image0, ImageSoA& image1);
+		PSNRData<float> psnrFloat(const ImageSoA& image0, const ImageSoA& image1);
+		PSNRData<double> psnrDouble(const ImageSoA& image0, const ImageSoA& image1);
 	} // namespace detail
 
 
 	template<typename FloatT = float>
-	PSNRData<FloatT> CalculatePSNR(ImageSoA& image0, ImageSoA& image1) {
+	PSNRData<FloatT> CalculatePSNR(const ImageSoA& image0, const ImageSoA& image1) {
 		static_assert(std::is_same_v<FloatT, float> || std::is_same_v<FloatT, double>);
 
 		if constexpr (std::is_same_v<FloatT, float>) {
@@ -371,6 +370,12 @@ namespace image
 		std::vector<float> broadcastGrayAlpha_to3c(Image& in);
 
 		std::vector<float> broadcastGrayAlpha_to4c(Image& in);
+
+		void extendGSTo3Chan(ImageSoA& in);
+
+		void extendGSTo4Chan(ImageSoA& in, bool constantAlpha);
+
+		void appendConstantAlpha(ImageSoA& in);
 	} // namespace detail
 
 } // namespace image

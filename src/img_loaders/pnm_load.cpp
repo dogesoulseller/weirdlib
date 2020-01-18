@@ -37,6 +37,7 @@ inline static std::vector<uint8_t> GetASCIIPBMPixels(const char* pixin, size_t w
 
 inline static std::vector<uint8_t> GetASCIIPGMPixels(const char* pixin, size_t width, size_t height, size_t maxFileSize) noexcept {
 	static const std::regex multiWhitespaceRemoveRegex(R"(\s{2,})", std::regex_constants::ECMAScript | std::regex_constants::optimize);
+
 	auto pix_nowspace = std::make_unique<char[]>(maxFileSize);
 	std::vector<uint8_t> pixels(width*height);
 
@@ -62,6 +63,7 @@ inline static std::vector<uint8_t> GetASCIIPGMPixels(const char* pixin, size_t w
 
 inline static std::vector<uint8_t> GetASCIIPPMPixels(const char* pixin, size_t width, size_t height, size_t maxFileSize) noexcept {
 	static const std::regex multiWhitespaceRemoveRegex(R"(\s\s+)", std::regex_constants::ECMAScript | std::regex_constants::optimize);
+
 	auto pix_nowspace = std::make_unique<char[]>(maxFileSize);
 	std::vector<uint8_t> pixels(width*height*3);
 
@@ -107,14 +109,9 @@ inline static std::vector<uint8_t> GetBinaryPBMPixels(const char* pixin, size_t 
 		for (size_t b = 0; b < iters; b++) {	// For each full byte
 			const uint8_t val = *(pixin + (h*(iters+1)) + b);
 
-			pixels[totalOffset+0] = wlib::bop::test(val, 7) ? 0 : 255;
-			pixels[totalOffset+1] = wlib::bop::test(val, 6) ? 0 : 255;
-			pixels[totalOffset+2] = wlib::bop::test(val, 5) ? 0 : 255;
-			pixels[totalOffset+3] = wlib::bop::test(val, 4) ? 0 : 255;
-			pixels[totalOffset+4] = wlib::bop::test(val, 3) ? 0 : 255;
-			pixels[totalOffset+5] = wlib::bop::test(val, 2) ? 0 : 255;
-			pixels[totalOffset+6] = wlib::bop::test(val, 1) ? 0 : 255;
-			pixels[totalOffset+7] = wlib::bop::test(val, 0) ? 0 : 255;
+			for (int_fast8_t i = 0; i < 8; i++) { // For each bit in byte
+				pixels[totalOffset+i] = wlib::bop::test(val, 7-i) ? 0 : 255;
+			}
 
 			totalOffset += 8;
 		}
@@ -145,6 +142,7 @@ namespace wlib::image
 
 	ImageInfoPNM LoadPNM(std::ifstream& in) {
 		in.seekg(0, std::ios::end);
+
 		size_t fileSize = in.tellg();
 		if (fileSize == 0) {
 			throw except::file_open_error("PNM Loader: File size returned was 0");
@@ -201,6 +199,7 @@ namespace wlib::image
 		if (formatIdentifier == "P1") {	// PBM ASCII
 			info.colorChannels = 1;
 			info.maxValue = 255;
+
 			info.pixels = GetASCIIPBMPixels(reinterpret_cast<const char*>(in_nocomments.get())+currentOffset,
 				info.width, info.height, size-currentOffset+1);
 

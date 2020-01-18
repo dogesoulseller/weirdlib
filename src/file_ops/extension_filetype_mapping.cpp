@@ -5,74 +5,74 @@ namespace wlib::file
 	std::string GetFiletypeExtension(const FileType type) noexcept {
 		switch (type)
 		{
-		case FILETYPE_JPEG:
+		  case FILETYPE_JPEG:
 			return ".jpg";
-		case FILETYPE_PNG:
+		  case FILETYPE_PNG:
 			return ".png";
-		case FILETYPE_BMP:
+		  case FILETYPE_BMP:
 			return ".bmp";
-		case FILETYPE_TIFF:
+		  case FILETYPE_TIFF:
 			return ".tiff";
-		case FILETYPE_TGA:
+		  case FILETYPE_TGA:
 			return ".tga";
-		case FILETYPE_GIF:
+		  case FILETYPE_GIF:
 			return ".gif";
-		case FILETYPE_PSD:
+		  case FILETYPE_PSD:
 			return ".psd";
-		case FILETYPE_PSB:
+		  case FILETYPE_PSB:
 			return ".psb";
-		case FILETYPE_WEBP:
+		  case FILETYPE_WEBP:
 			return ".webp";
-		case FILETYPE_FLIF:
+		  case FILETYPE_FLIF:
 			return ".flif";
-		case FILETYPE_PBM:
+		  case FILETYPE_PBM:
 			return ".pbm";
-		case FILETYPE_PGM:
+		  case FILETYPE_PGM:
 			return ".pgm";
-		case FILETYPE_PPM:
+		  case FILETYPE_PPM:
 			return ".ppm";
-		case FILETYPE_PAM:
+		  case FILETYPE_PAM:
 			return ".pam";
-		case FILETYPE_SVG:
+		  case FILETYPE_SVG:
 			return ".svg";
-		case FILETYPE_PDF:
+		  case FILETYPE_PDF:
 			return ".pdf";
-		case FILETYPE_MATROSKA:
+		  case FILETYPE_MATROSKA:
 			return ".mkv";
-		case FILETYPE_AVI:
+		  case FILETYPE_AVI:
 			return ".avi";
-		case FILETYPE_MP4:
+		  case FILETYPE_MP4:
 			return ".mp4";
-		case FILETYPE_FLV:
+		  case FILETYPE_FLV:
 			return ".flv";
-		case FILETYPE_F4V:
+		  case FILETYPE_F4V:
 			return ".f4v";
-		case FILETYPE_WEBM:
+		  case FILETYPE_WEBM:
 			return ".webm";
-		case FILETYPE_WAVE:
+		  case FILETYPE_WAVE:
 			return ".wav";
-		case FILETYPE_OGG:
+		  case FILETYPE_OGG:
 			return ".ogg";
-		case FILETYPE_APE:
+		  case FILETYPE_APE:
 			return ".ape";
-		case FILETYPE_TTA:
+		  case FILETYPE_TTA:
 			return ".tta";
-		case FILETYPE_WAVPACK:
+		  case FILETYPE_WAVPACK:
 			return ".wv";
-		case FILETYPE_FLAC:
+		  case FILETYPE_FLAC:
 			return ".flac";
-		case FILETYPE_CAF:
+		  case FILETYPE_CAF:
 			return ".caf";
-		case FILETYPE_OPTIMFROG:
+		  case FILETYPE_OPTIMFROG:
 			return ".ofr";
-		case FILETYPE_3GP:
+		  case FILETYPE_3GP:
 			return ".3gp";
-		case FILETYPE_3G2:
+		  case FILETYPE_3G2:
 			return ".3g2";
-		case FILETYPE_AIFF:
+		  case FILETYPE_AIFF:
 			return ".aiff";
-		case FILETYPE_UNKNOWN:
-		default:
+		  case FILETYPE_UNKNOWN:
+		  default:
 			return "";
 		}
 	}

@@ -31,6 +31,7 @@ namespace wlib::parse
 
 	Comfyg::Comfyg(const std::string& path) {
 		std::vector<uint8_t> fileBytes;
+
 		std::ifstream file(path, std::ios::binary | std::ios::ate);
 		if (!file.good()) {
 			throw std::runtime_error("Comfyg loader: Failed to load file "s + path);
@@ -93,7 +94,7 @@ namespace wlib::parse
 
 			// Detect line with error
 			if (openBracketPos == std::string::npos || closeBracketPos == std::string::npos
-			|| eqSignPos == std::string::npos || startKeyPos == std::string::npos) {
+			  || eqSignPos == std::string::npos || startKeyPos == std::string::npos) {
 				auto errMsg = "Failed to tokenize value at line "s + std::to_string(currentLine);
 				errors.emplace_back(std::move(errMsg), ParseErrorType::TokenizeFailed);
 				currentLine++;
@@ -156,37 +157,37 @@ namespace wlib::parse
 					if (stringContents[i] == '\\') {
 						switch (stringContents[i+1])
 						{
-						case 'a':
+						  case 'a':
 							stringOutput.push_back('\a');
 							break;
-						case 'b':
+						  case 'b':
 							stringOutput.push_back('\b');
 							break;
-						case 't':
+						  case 't':
 							stringOutput.push_back('\t');
 							break;
-						case 'n':
+						  case 'n':
 							stringOutput.push_back('\n');
 							break;
-						case 'v':
+						  case 'v':
 							stringOutput.push_back('\v');
 							break;
-						case 'f':
+						  case 'f':
 							stringOutput.push_back('\f');
 							break;
-						case 'r':
+						  case 'r':
 							stringOutput.push_back('\r');
 							break;
-						case '0':
+						  case '0':
 							stringOutput.push_back('\0');
 							break;
-						case '\\':
+						  case '\\':
 							stringOutput.push_back('\\');
 							break;
-						case '\"':
+						  case '\"':
 							stringOutput.push_back('\"');
 							break;
-						default:
+						  default:
 							break;
 						}
 
@@ -212,8 +213,6 @@ namespace wlib::parse
 
 			currentLine++;
 		}
-
-
 	}
 
 } // namespace wlib::parse

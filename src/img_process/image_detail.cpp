@@ -1,22 +1,18 @@
 #include "../../include/weirdlib_image.hpp"
+#include <utility>
+#include <algorithm>
 
 namespace wlib::image::detail
 {
 	void swapRAndB_3c(float* in, size_t count) {
 		for (size_t i = 0; i < count; i++) {
-			auto tmp = in[i*3];
-
-			in[i*3] = in[i*3+2];
-			in[i*3+2] = tmp;
+			std::swap(in[i*3], in[i*3+2]);
 		}
 	}
 
 	void swapRAndB_4c(float* in, size_t count) {
 		for (size_t i = 0; i < count; i++) {
-			auto tmp = in[i*4];
-
-			in[i*4] = in[i*4+2];
-			in[i*4+2] = tmp;
+			std::swap(in[i*4], in[i*4+2]);
 		}
 	}
 
@@ -35,11 +31,8 @@ namespace wlib::image::detail
 
 	std::vector<float> dropAlpha_2c(Image& in) {
 		std::vector<float> tmp(in.GetWidth() * in.GetHeight());
-		auto inStorage = in.AccessStorage();
 
-		for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
-			tmp[i] = inStorage[i*2];
-		}
+		std::generate(tmp.begin(), tmp.end(), [i = 0, inStorage = in.AccessStorage()] () mutable { return inStorage[i*2]; } );
 
 		return tmp;
 	}
@@ -111,4 +104,35 @@ namespace wlib::image::detail
 
 		return tmp;
 	}
+
+	void extendGSTo3Chan(ImageSoA& in) {
+		for (int_fast8_t i = 1; i <= 2; i++) {
+			alignas(64) auto tmp = new float[in.width*in.height];
+			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp);
+			in.channels[i] = tmp;
+		}
+	}
+
+	void extendGSTo4Chan(ImageSoA& in, bool constantAlpha) {
+		for (int_fast8_t i = 1; i <= 2; i++) {
+			alignas(64) auto tmp = new float[in.width*in.height];
+			std::copy(in.channels[0], in.channels[0]+in.width*in.height, tmp);
+			in.channels[i] = tmp;
+		}
+
+		if (constantAlpha) {
+			alignas(64) auto tmp = new float[in.width*in.height];
+			std::uninitialized_fill(tmp, tmp + in.width * in.height, 255.0f);
+			in.channels[3] = tmp;
+		} else {
+			in.channels[3] = in.channels[1];
+		}
+	}
+
+	void appendConstantAlpha(ImageSoA& in) {
+		alignas(64) auto tmp = new float[in.width * in.height];
+		std::uninitialized_fill(tmp, tmp + in.width * in.height, 255.0f);
+		in.channels.push_back(tmp);
+	}
+
 } // namespace wlib::image::detail

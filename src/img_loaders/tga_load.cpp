@@ -46,17 +46,17 @@ namespace wlib::image
 
 		switch (bpp)
 		{
-		case 15:
-		case 16:
+		  case 15:
+		  case 16:
 			bytesPerPixel = 2;
 			break;
-		case 24:
+		  case 24:
 			bytesPerPixel = 3;
 			break;
-		case 32:
+		  case 32:
 			bytesPerPixel = 4;
 			break;
-		default:
+		  default:
 			break;
 		}
 
@@ -65,7 +65,7 @@ namespace wlib::image
 
 			switch (bytesPerPixel)
 			{
-			case 3:
+			  case 3:
 				// BGR to RGB
 				for (size_t i = 0; i < width*height; i++) {
 					tmp[i*3] = in[i*3+2];
@@ -73,7 +73,7 @@ namespace wlib::image
 					tmp[i*3+2] = in[i*3];
 				}
 				break;
-			case 4:
+			  case 4:
 				// BGRA to RGBA
 				for (size_t i = 0; i < width*height; i++) {
 					tmp[i*4] = in[i*4+2];
@@ -82,7 +82,7 @@ namespace wlib::image
 					tmp[i*4+3] = in[i*4+3];
 				}
 				break;
-			default:
+			  default:
 				break;
 			}
 		} else {
@@ -415,27 +415,27 @@ namespace wlib::image
 
 		switch (imageType)
 		{
-		case NoData:
+		  case NoData:
 			throw except::invalid_image_data("TGA Loader: Image type was 0 (no image data)");
-		case ColorMap:
-		case RLEColorMap:
+		  case ColorMap:
+		  case RLEColorMap:
 			throw except::unsupported_image_type("TGA Loader: Color mapped image are not yet supported");
-		case RLETrueColor:
+		  case RLETrueColor:
 			info.data = LoadRLETrueColorTGA(info.width, info.height, info.bpp, in+currentOffset);
 			break;
-		case RLEGrayscale:
+		  case RLEGrayscale:
 			info.data = LoadRLEGrayscaleTGA(info.width, info.height, in+currentOffset);
 			break;
-		case TrueColor: {
+		  case TrueColor: {
 			info.data = LoadTrueColorTGA(info.width, info.height, info.bpp, in+currentOffset);
 			break;
-		}
-		case Grayscale: {
+		  }
+		  case Grayscale: {
 			info.data.resize(info.width*info.height);
 			std::memcpy(info.data.data(), in+currentOffset, info.width*info.height);
 			break;
-		}
-		default:
+		  }
+		  default:
 			throw except::invalid_image_data("TGA Loader: Image type was outside of spec bounds");
 		}
 

@@ -14,8 +14,7 @@ namespace wlib::str
 				while (true) {
 					const auto chars = _mm512_load_si512(s + offset);
 
-					const auto mask = _mm512_cmpeq_epi8_mask(chars, simd::SIMD512B_zeroMask);
-					if (mask == 0) {
+					if (const auto mask = _mm512_cmpeq_epi8_mask(chars, simd::SIMD512B_zeroMask); mask == 0) {
 						offset += 64;
 						continue;
 					} else {
@@ -27,8 +26,7 @@ namespace wlib::str
 				while (true) {
 					const auto chars = _mm512_loadu_si512(s + offset);
 
-					const auto mask = _mm512_cmpeq_epi8_mask(chars, simd::SIMD512B_zeroMask);
-					if (mask == 0) {
+					if (const auto mask = _mm512_cmpeq_epi8_mask(chars, simd::SIMD512B_zeroMask); mask == 0) {
 						offset += 64;
 						continue;
 					} else {
@@ -42,8 +40,7 @@ namespace wlib::str
 				while (true) {
 					const auto chars = _mm256_load_si256(reinterpret_cast<const __m256i*>(s + offset));
 
-					const auto mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chars, simd::SIMD256B_zeroMask));
-					if (mask == 0) {
+					if (const auto mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chars, simd::SIMD256B_zeroMask)); mask == 0) {
 						offset += 32;
 						continue;
 					} else {
@@ -55,8 +52,7 @@ namespace wlib::str
 				while (true) {
 					const auto chars = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(s + offset));
 
-					const auto mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chars, simd::SIMD256B_zeroMask));
-					if (mask == 0) {
+					if (const auto mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chars, simd::SIMD256B_zeroMask)); mask == 0) {
 						offset += 32;
 						continue;
 					} else {
@@ -72,8 +68,7 @@ namespace wlib::str
 					const auto chars = _mm_load_si128(reinterpret_cast<const __m128i*>(s + offset));
 
 					// If no `\0` was found, check further
-					const auto mask = _mm_movemask_epi8(_mm_cmpeq_epi8(chars, simd::SIMD128B_zeroMask));
-					if (mask == 0) {
+					if (const auto mask = _mm_movemask_epi8(_mm_cmpeq_epi8(chars, simd::SIMD128B_zeroMask)); mask == 0) {
 						offset += 16;
 						continue;
 					} else {
@@ -86,8 +81,7 @@ namespace wlib::str
 					const auto chars = _mm_loadu_si128(reinterpret_cast<const __m128i*>(s + offset));
 
 					// If no `\0` was found, check further
-					const auto mask = _mm_movemask_epi8(_mm_cmpeq_epi8(chars, simd::SIMD128B_zeroMask));
-					if (mask == 0) {
+					if (const auto mask = _mm_movemask_epi8(_mm_cmpeq_epi8(chars, simd::SIMD128B_zeroMask)); mask == 0) {
 						offset += 16;
 						continue;
 					} else {

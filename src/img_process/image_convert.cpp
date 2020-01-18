@@ -115,23 +115,19 @@ namespace wlib::image
 
 		switch (method)
 		{
-		case GrayscaleMethod::Luminosity:
-		{
+		  case GrayscaleMethod::Luminosity: {
 			ProcessLuminosity(0.2126f, 0.7152f, 0.0722f);
 			break;
-		}
-		case GrayscaleMethod::LuminosityBT601:
-		{
+		  }
+		  case GrayscaleMethod::LuminosityBT601: {
 			ProcessLuminosity(0.299f, 0.587f, 0.114f);
 			break;
-		}
-		case GrayscaleMethod::LuminosityBT2100:
-		{
+		  }
+		  case GrayscaleMethod::LuminosityBT2100: {
 			ProcessLuminosity(0.2627f, 0.6780f, 0.0593f);
 			break;
-		}
-		case GrayscaleMethod::Lightness:
-		{
+		  }
+		  case GrayscaleMethod::Lightness: {
 			// Processing with SIMD
 			#if X86_SIMD_LEVEL >= LV_AVX
 				const auto maxMask = _mm256_set1_ps(255.0f);
@@ -216,9 +212,8 @@ namespace wlib::image
 				}
 			#endif
 			break;
-		}
-		case GrayscaleMethod::Average:
-		{
+		  }
+		  case GrayscaleMethod::Average: {
 			// Processing with SIMD
 			#if X86_SIMD_LEVEL >= LV_AVX
 				const auto maxMask = _mm256_set1_ps(255.0f);
@@ -291,8 +286,8 @@ namespace wlib::image
 				}
 			#endif
 			break;
-		}
-		default:
+		  }
+		  default:
 			break;
 		}
 

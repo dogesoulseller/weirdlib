@@ -50,9 +50,9 @@ namespace wlib::image
 		auto ftype = wlib::file::DetectFileType(path);
 		switch (ftype)
 		{
-		case wlib::file::FILETYPE_PBM:
-		case wlib::file::FILETYPE_PGM:
-		case wlib::file::FILETYPE_PPM: { // TODO: Scale input
+		  case wlib::file::FILETYPE_PBM:
+		  case wlib::file::FILETYPE_PGM:
+		  case wlib::file::FILETYPE_PPM: { // TODO: Scale input
 			auto pnmInfo = LoadPNM(path);
 			pnmInfo.colorChannels = static_cast<ColorFormat>(pnmInfo.colorChannels);
 			width = pnmInfo.width;
@@ -61,8 +61,8 @@ namespace wlib::image
 			pixels.shrink_to_fit();
 			ConvertUint8ToFloat(pnmInfo.pixels.data(), pixels.data(), GetTotalImageSize(width, height, format));
 			break;
-		}
-		case wlib::file::FILETYPE_PAM: { // TODO: Scale input
+		  }
+		  case wlib::file::FILETYPE_PAM: { // TODO: Scale input
 			auto pamInfo = LoadPAM(path);
 			pamInfo.colorChannels = static_cast<ColorFormat>(pamInfo.colorChannels);
 			width = pamInfo.width;
@@ -71,8 +71,8 @@ namespace wlib::image
 			pixels.shrink_to_fit();
 			ConvertUint16ToFloat(pamInfo.pixels.data(), pixels.data(), GetTotalImageSize(width, height, format));
 			break;
-		}
-		default: {
+		  }
+		  default: {
 			int w;
 			int h;
 			int chan;
@@ -80,40 +80,40 @@ namespace wlib::image
 
 			switch (requestedFormat)
 			{
-			case ColorFormat::F_Grayscale:
+			  case ColorFormat::F_Grayscale:
 				format = requestedFormat;
 				stbpix = stbi_load(path.c_str(), &w, &h, &chan, 1);
 				break;
-			case ColorFormat::F_GrayAlpha:
+			  case ColorFormat::F_GrayAlpha:
 				format = requestedFormat;
 				stbpix = stbi_load(path.c_str(), &w, &h, &chan, 2);
 				break;
-			case ColorFormat::F_RGB:
-			case ColorFormat::F_BGR:
+			  case ColorFormat::F_RGB:
+			  case ColorFormat::F_BGR:
 				format = requestedFormat;
 				stbpix = stbi_load(path.c_str(), &w, &h, &chan, 3);
 				break;
-			case ColorFormat::F_RGBA:
-			case ColorFormat::F_BGRA:
+			  case ColorFormat::F_RGBA:
+			  case ColorFormat::F_BGRA:
 				format = requestedFormat;
 				stbpix = stbi_load(path.c_str(), &w, &h, &chan, 4);
 				break;
-			case ColorFormat::F_Default:
+			  case ColorFormat::F_Default:
 				stbpix = stbi_load(path.c_str(), &w, &h, &chan, 0);
 				switch (chan)
 				{
-				case 4:
+				  case 4:
 					format = F_RGBA;
 					break;
-				case 3:
+				  case 3:
 					format = F_RGB;
 					break;
-				case 2:
+				  case 2:
 					format = F_GrayAlpha;
 					break;
-				case 1:
+				  case 1:
 					format = F_Grayscale;
-				default:
+				  default:
 					break;
 				}
 				break;
@@ -128,23 +128,23 @@ namespace wlib::image
 
 			switch (requestedFormat)
 			{
-			case F_BGR:
+			  case F_BGR:
 				for (size_t i = 0; i < GetTotalImageSize(width, height, format); i+=3) {
 					std::swap(pixels[0+i], pixels[2+i]);
 				}
 				break;
-			case F_BGRA:
+			  case F_BGRA:
 				for (size_t i = 0; i < GetTotalImageSize(width, height, format); i+=4) {
 					std::swap(pixels[0+i], pixels[2+i]);
 				}
 				break;
-			default:
+			  default:
 				break;
 			}
 
 			free(stbpix);
 			return;
-			}
+		  }
 		}
 	}
 
@@ -172,21 +172,22 @@ namespace wlib::image
 
 	size_t Image::GetTotalImageSize(const uint64_t width, const uint64_t height, const ColorFormat format) noexcept {
 		size_t result = width * height;
+
 		switch (format)
 		{
-		case F_GrayAlpha:
+		  case F_GrayAlpha:
 			result *= 2;
 			break;
-		case F_RGB:
-		case F_BGR:
+		  case F_RGB:
+		  case F_BGR:
 			result *= 3;
 			break;
-		case F_RGBA:
-		case F_BGRA:
+		  case F_RGBA:
+		  case F_BGRA:
 			result *= 4;
 			break;
-		case F_Grayscale:
-		default:
+		  case F_Grayscale:
+		  default:
 			break;
 		};
 
@@ -195,21 +196,22 @@ namespace wlib::image
 
 	size_t Image::GetTotalImageSize() const noexcept {
 		size_t result = width * height;
+
 		switch (format)
 		{
-		case F_GrayAlpha:
+		  case F_GrayAlpha:
 			result *= 2;
 			break;
-		case F_RGB:
-		case F_BGR:
+		  case F_RGB:
+		  case F_BGR:
 			result *= 3;
 			break;
-		case F_RGBA:
-		case F_BGRA:
+		  case F_RGBA:
+		  case F_BGRA:
 			result *= 4;
 			break;
-		case F_Grayscale:
-		default:
+		  case F_Grayscale:
+		  default:
 			break;
 		};
 
@@ -235,34 +237,33 @@ namespace wlib::image
 	void Image::ConvertToRGB(Image& in) {
 		switch (in.GetFormat())
 		{
-		case F_BGR: {
+		  case F_BGR: {
 			detail::swapRAndB_3c(in.GetPixels_Unsafe(), in.GetWidth() * in.GetHeight());
 			break;
-		}
-		case F_RGBA: {
+		  }
+		  case F_RGBA: {
 			auto tmp = detail::dropAlpha_4c(in);
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		case F_BGRA: {
+		  }
+		  case F_BGRA: {
 			detail::swapRAndB_4c(in.GetPixels_Unsafe(), in.GetWidth() * in.GetHeight());
 			auto tmp = detail::dropAlpha_4c(in);
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		case F_Grayscale: {
+		  }
+		  case F_Grayscale: {
 			auto tmp = detail::broadcastGray_to3c(in);
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		case F_GrayAlpha: {
+		  }
+		  case F_GrayAlpha: {
 			auto tmp = detail::broadcastGrayAlpha_to3c(in);
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		default:
+		  }
+		  default:
 			break;
-
 		};
 
 		in.SetFormat(F_RGB);
@@ -271,32 +272,32 @@ namespace wlib::image
 	void Image::ConvertToBGR(Image& in) {
 		switch (in.GetFormat())
 		{
-		case F_RGB: {
+		  case F_RGB: {
 			detail::swapRAndB_3c(in.GetPixels_Unsafe(), in.GetWidth() * in.GetHeight());
 			break;
-		}
-		case F_RGBA: {
+		  }
+		  case F_RGBA: {
 			detail::swapRAndB_4c(in.GetPixels_Unsafe(), in.GetWidth() * in.GetHeight());
 			auto tmp = detail::dropAlpha_4c(in);
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		case F_BGRA: {
+		  }
+		  case F_BGRA: {
 			auto tmp = detail::dropAlpha_4c(in);
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		case F_Grayscale: {
+		  }
+		  case F_Grayscale: {
 			auto tmp = detail::broadcastGray_to3c(in);
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		case F_GrayAlpha: {
+		  }
+		  case F_GrayAlpha: {
 			auto tmp = detail::broadcastGrayAlpha_to3c(in);
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		default:
+		  }
+		  default:
 			break;
 
 		};
@@ -307,32 +308,32 @@ namespace wlib::image
 	void Image::ConvertToRGBA(Image& in) {
 		switch (in.GetFormat())
 		{
-		case F_RGB: {
+		  case F_RGB: {
 			auto tmp = detail::appendAlpha_3c(in);
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		case F_BGR: {
+		  }
+		  case F_BGR: {
 			auto tmp = detail::appendAlpha_3c(in);
 			detail::swapRAndB_4c(tmp.data(), in.GetWidth() * in.GetHeight());
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		case F_BGRA: {
+		  }
+		  case F_BGRA: {
 			detail::swapRAndB_4c(in.GetPixels_Unsafe(), in.GetWidth() * in.GetHeight());
 			break;
-		}
-		case F_Grayscale: {
+		  }
+		  case F_Grayscale: {
 			auto tmp = detail::broadcastGray_to4c(in);
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		case F_GrayAlpha: {
+		  }
+		  case F_GrayAlpha: {
 			auto tmp = detail::broadcastGrayAlpha_to4c(in);
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		default:
+		  }
+		  default:
 			break;
 		}
 
@@ -342,32 +343,32 @@ namespace wlib::image
 	void Image::ConvertToBGRA(Image& in) {
 		switch (in.GetFormat())
 		{
-		case F_RGB: {
+		  case F_RGB: {
 			auto tmp = detail::appendAlpha_3c(in);
 			detail::swapRAndB_4c(tmp.data(), in.GetWidth() * in.GetHeight());
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		case F_RGBA: {
+		  }
+		  case F_RGBA: {
 			detail::swapRAndB_4c(in.GetPixels_Unsafe(), in.GetWidth() * in.GetHeight());
 			break;
-		}
-		case F_BGR: {
+		  }
+		  case F_BGR: {
 			auto tmp = detail::appendAlpha_3c(in);
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		case F_Grayscale: {
+		  }
+		  case F_Grayscale: {
 			auto tmp = detail::broadcastGray_to4c(in);
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		case F_GrayAlpha: {
+		  }
+		  case F_GrayAlpha: {
 			auto tmp = detail::broadcastGrayAlpha_to4c(in);
 			std::swap(in.AccessStorage(), tmp);
 			break;
-		}
-		default:
+		  }
+		  default:
 			break;
 		}
 

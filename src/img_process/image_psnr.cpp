@@ -17,7 +17,7 @@ namespace wlib::image
 	template<typename FloatT>
 	constexpr FloatT RSqr = static_cast<FloatT>(255*255);
 
-	static bool formatsAreCompatible(ColorFormat lhs, ColorFormat rhs) noexcept {
+	inline static bool formatsAreCompatible(ColorFormat lhs, ColorFormat rhs) noexcept {
 		bool compatible =
 			(lhs == rhs) ||
 			(lhs == F_RGB && rhs == F_RGBA) ||
@@ -30,7 +30,7 @@ namespace wlib::image
 		return compatible;
 	}
 
-	static float getChannelMSE_float(float* lhs, float* rhs, size_t count) noexcept {
+	inline static float getChannelMSE_float(const float* lhs, const float* rhs, size_t count) noexcept {
 		#if X86_SIMD_LEVEL >= LV_AVX
 			size_t iters = count / 8;
 			size_t itersRem = count % 8;
@@ -96,7 +96,7 @@ namespace wlib::image
 		#endif
 	}
 
-	static double getChannelMSE_double(float* lhs, float* rhs, size_t count) noexcept {
+	inline static double getChannelMSE_double(const float* lhs, const float* rhs, size_t count) noexcept {
 		#if X86_SIMD_LEVEL >= LV_AVX
 			size_t iters = count / 4;
 			size_t itersRem = count % 4;
@@ -180,7 +180,7 @@ namespace wlib::image
 	}
 
 	template<typename FloatT>
-	static PSNRData<FloatT> getPsnr(ImageSoA& image0, ImageSoA& image1) {
+	static PSNRData<FloatT> getPsnr(const ImageSoA& image0, const ImageSoA& image1) {
 		PSNRData<FloatT> outData;
 		if (!formatsAreCompatible(image0.format, image1.format)) {
 			throw image_channel_error("Image formats are not compatible");
@@ -192,43 +192,43 @@ namespace wlib::image
 
 		switch (image0.format)
 		{
-			case F_RGB:
-			case F_BGR:
-			case F_RGBA:
-			case F_BGRA:
-			{
-				outData.MSEPerChannel.resize(3);
-				outData.PSNRPerChannel.resize(3);
+		  case F_RGB:
+		  case F_BGR:
+		  case F_RGBA:
+		  case F_BGRA: {
+			outData.MSEPerChannel.resize(3);
+			outData.PSNRPerChannel.resize(3);
 
-				for (size_t i = 0; i < 3; i++) {
-					if constexpr (std::is_same_v<FloatT, float>) {
-						outData.MSEPerChannel[i] = getChannelMSE_float(image0.channels[i], image1.channels[i], image0.width * image0.height);
-					} else {
-						outData.MSEPerChannel[i] = getChannelMSE_double(image0.channels[i], image1.channels[i], image0.width * image0.height);
-					}
-
-					outData.PSNRPerChannel[i] = 10 * std::log10(RSqr<FloatT> / outData.MSEPerChannel[i]);
-				}
-
-			}
-				break;
-			case F_GrayAlpha:
-			case F_Grayscale:
-			{
-				outData.MSEPerChannel.resize(1);
-				outData.PSNRPerChannel.resize(1);
-
+			for (size_t i = 0; i < 3; i++) {
 				if constexpr (std::is_same_v<FloatT, float>) {
-					outData.MSEPerChannel[0] = getChannelMSE_float(image0.channels[0], image1.channels[0], image0.width * image0.height);
+					outData.MSEPerChannel[i] = getChannelMSE_float(image0.channels[i], image1.channels[i], image0.width * image0.height);
 				} else {
-					outData.MSEPerChannel[0] = getChannelMSE_double(image0.channels[0], image1.channels[0], image0.width * image0.height);
+					outData.MSEPerChannel[i] = getChannelMSE_double(image0.channels[i], image1.channels[i], image0.width * image0.height);
 				}
 
-				outData.PSNRPerChannel[0] = 10 * std::log10(RSqr<FloatT> / outData.MSEPerChannel[0]);
+				outData.PSNRPerChannel[i] = 10 * std::log10(RSqr<FloatT> / outData.MSEPerChannel[i]);
 			}
-			case F_Default:
-				throw image_channel_error("Image had invalid format");
-				break;
+
+			break;
+		  }
+		  case F_GrayAlpha:
+		  case F_Grayscale: {
+			outData.MSEPerChannel.resize(1);
+			outData.PSNRPerChannel.resize(1);
+
+			if constexpr (std::is_same_v<FloatT, float>) {
+				outData.MSEPerChannel[0] = getChannelMSE_float(image0.channels[0], image1.channels[0], image0.width * image0.height);
+			} else {
+				outData.MSEPerChannel[0] = getChannelMSE_double(image0.channels[0], image1.channels[0], image0.width * image0.height);
+			}
+
+			outData.PSNRPerChannel[0] = 10 * std::log10(RSqr<FloatT> / outData.MSEPerChannel[0]);
+
+			break;
+		  }
+		  case F_Default:
+			throw image_channel_error("Image had invalid format");
+			break;
 		}
 
 		return outData;
@@ -236,11 +236,11 @@ namespace wlib::image
 
 namespace detail
 {
-	PSNRData<float> psnrFloat(ImageSoA& image0, ImageSoA& image1) {
+	PSNRData<float> psnrFloat(const ImageSoA& image0, const ImageSoA& image1) {
 		return getPsnr<float>(image0, image1);
 	}
 
-	PSNRData<double> psnrDouble(ImageSoA& image0, ImageSoA& image1) {
+	PSNRData<double> psnrDouble(const ImageSoA& image0, const ImageSoA& image1) {
 		return getPsnr<double>(image0, image1);
 	}
 } // namespace detail
