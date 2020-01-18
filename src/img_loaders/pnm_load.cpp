@@ -3,15 +3,12 @@
 
 #include <tuple>
 #include <array>
-#include <memory>
 #include <utility>
-#include <stdexcept>
 #include <cstring>
 #include <string>
 #include <algorithm>
 #include <regex>
 #include <charconv>
-#include <type_traits>
 
 #include "../../include/weirdlib_bitops.hpp"
 #include "../../include/weirdlib_math.hpp"

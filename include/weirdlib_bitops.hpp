@@ -1,10 +1,9 @@
 #pragma once
 
-#include <cstdint>
-#include <utility>
+#include <type_traits>
 
-#include "weirdlib_traits.hpp"
 #include "cpu_detection.hpp"
+#include "weirdlib_traits.hpp"
 
 namespace wlib
 {
