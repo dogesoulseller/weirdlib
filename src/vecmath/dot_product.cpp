@@ -14,8 +14,8 @@ namespace wlib::vecmath
 			auto temp = _mm_shuffle_ps(prods, prods, _MM_SHUFFLE(0, 0, 0, 1));
 			auto result = _mm_add_ss(temp, prods);
 
-			std::array<float, 4> outvec;
-			_mm_storeu_ps(outvec.data(), result);
+			alignas(16) std::array<float, 4> outvec;
+			_mm_store_ps(outvec.data(), result);
 			return outvec[0];
 		#else
 			return (lhs.x * rhs.x) + (lhs.y * rhs.y);
@@ -31,8 +31,8 @@ namespace wlib::vecmath
 			auto temp = _mm_shuffle_pd(prods, prods, _MM_SHUFFLE2(0, 1));
 			auto result = _mm_add_sd(temp, prods);
 
-			std::array<double, 2> outvec;
-			_mm_storeu_pd(outvec.data(), result);
+			alignas(16) std::array<double, 2> outvec;
+			_mm_store_pd(outvec.data(), result);
 			return outvec[0];
 		#else
 			return (lhs.x * rhs.x) + (lhs.y * rhs.y);
@@ -50,8 +50,8 @@ namespace wlib::vecmath
 
 			auto result = _mm_add_ss(_mm_add_ss(prods, el1), el2);
 
-			std::array<float, 4> outvec;
-			_mm_storeu_ps(outvec.data(), result);
+			alignas(16) std::array<float, 4> outvec;
+			_mm_store_ps(outvec.data(), result);
 			return outvec[0];
 		#else
 			return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z);
@@ -74,8 +74,8 @@ namespace wlib::vecmath
 			// Add the now aligned values
 			auto result = _mm256_add_pd(prod_reversed, temp_hadd);
 
-			std::array<double, 4> outvec;
-			_mm256_storeu_pd(outvec.data(), result);
+			alignas(32) std::array<double, 4> outvec;
+			_mm256_store_pd(outvec.data(), result);
 			return outvec[0];
 		#elif X86_SIMD_LEVEL >= LV_SSE2
 			auto lhs0 = _mm_loadu_pd(&lhs.x);
@@ -91,8 +91,8 @@ namespace wlib::vecmath
 
 			auto result = _mm_add_sd(_mm_add_sd(prods0, prods1), temp);
 
-			std::array<double, 2> outvec;
-			_mm_storeu_pd(outvec.data(), result);
+			alignas(16) std::array<double, 2> outvec;
+			_mm_store_pd(outvec.data(), result);
 			return outvec[0];
 		#else
 			return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z);
@@ -104,10 +104,8 @@ namespace wlib::vecmath
 			auto lhs_vec = _mm_loadu_ps(&lhs.x);
 			auto rhs_vec = _mm_loadu_ps(&rhs.x);
 
-			std::array<float, 4> outvec;
-
-			_mm_storeu_ps(outvec.data(), _mm_dp_ps(lhs_vec, rhs_vec, 0xFF));
-
+			alignas(16)	std::array<float, 4> outvec;
+			_mm_store_ps(outvec.data(), _mm_dp_ps(lhs_vec, rhs_vec, 0xFF));
 			return outvec[0];
 
 			//TODO: SSE version
@@ -132,8 +130,8 @@ namespace wlib::vecmath
 			// Add up results
 			auto temp_fin = _mm256_add_pd(hadd_result_reversed, hadd_result);
 
-			std::array<double, 4> outvec;
-			_mm256_storeu_pd(outvec.data(), temp_fin);
+			alignas(32) std::array<double, 4> outvec;
+			_mm256_store_pd(outvec.data(), temp_fin);
 			return outvec[0];
 		#elif X86_SIMD_LEVEL >= LV_SSE2
 			auto lhs0 = _mm_loadu_pd(&lhs.x);
@@ -150,8 +148,8 @@ namespace wlib::vecmath
 
 			auto result = _mm_add_sd(temp, resCombined);
 
-			std::array<double, 2> outvec;
-			_mm_storeu_pd(outvec.data(), result);
+			alignas(16) std::array<double, 2> outvec;
+			_mm_store_pd(outvec.data(), result);
 			return outvec[0];
 		#else
 			return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z) + (lhs.w * rhs.w);

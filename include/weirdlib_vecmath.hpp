@@ -61,6 +61,13 @@ namespace wlib::vecmath
 	float Distance(const Vector4<float>& lhs, const Vector4<float>& rhs);
 	double Distance(const Vector4<double>& lhs, const Vector4<double>& rhs);
 
+	float Length(const Vector2<float>& vec);
+	double Length(const Vector2<double>& vec);
+	float Length(const Vector3<float>& vec);
+	double Length(const Vector3<double>& vec);
+	float Length(const Vector4<float>& vec);
+	double Length(const Vector4<double>& vec);
+
 	Vector3<float> CrossProduct(const Vector3<float>& lhs, const Vector3<float>& rhs);
 	Vector3<double> CrossProduct(const Vector3<double>& lhs, const Vector3<double>& rhs);
 

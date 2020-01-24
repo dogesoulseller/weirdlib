@@ -5,9 +5,33 @@
 #include <array>
 namespace wlib::vecmath
 {
+	#if X86_SIMD_LEVEL >= LV_AVX2
+		auto PERM_MASK_CROSSP_LHS = _mm256_set_epi32(0, 0, 1, 0, 2, 0, 2, 1);
+		auto PERM_MASK_CROSSP_RHS = _mm256_set_epi32(0, 0, 0, 2, 1, 1, 0, 2);
+		auto PERM_MASK_CROSSP_SUB = _mm256_set_epi32(0, 0, 5, 2, 4, 1, 3, 0);
+	#endif
+
 	Vector3<float> CrossProduct(const Vector3<float>& lhs, const Vector3<float>& rhs) {
-		// TODO: AVX, make yzx and zxy at the same time?
-		#if X86_SIMD_LEVEL >= LV_SSE
+		// TODO: This could be improved
+		#if X86_SIMD_LEVEL >= LV_AVX2
+			auto lhs_vec = _mm256_loadu_ps(&lhs.x);
+			auto rhs_vec = _mm256_loadu_ps(&rhs.x);
+
+			auto lhs_yzxzxy = _mm256_permutevar8x32_ps(lhs_vec, PERM_MASK_CROSSP_LHS);
+			auto rhs_zxyyzx = _mm256_permutevar8x32_ps(rhs_vec, PERM_MASK_CROSSP_RHS);
+
+			auto product = _mm256_mul_ps(lhs_yzxzxy, rhs_zxyyzx);
+
+			// Set up for subtraction
+			auto prod_hsub = _mm256_permutevar8x32_ps(product, PERM_MASK_CROSSP_SUB);
+			auto result = _mm256_hsub_ps(prod_hsub, prod_hsub);
+
+			alignas(32) std::array<float, 8> outvec;
+			_mm256_store_ps(outvec.data(), result);
+
+			return Vector3(outvec[0], outvec[1], outvec[4]);
+
+		#elif X86_SIMD_LEVEL >= LV_SSE
 			auto lhs_vec = _mm_loadu_ps(&lhs.x);
 			auto rhs_vec = _mm_loadu_ps(&rhs.x);
 
@@ -21,8 +45,8 @@ namespace wlib::vecmath
 			auto right_side = _mm_mul_ps(lhs_zxy, rhs_yzx);
 
 			auto result = _mm_sub_ps(left_side, right_side);
-			std::array<float, 4> outvec;
-			_mm_storeu_ps(outvec.data(), result);
+			alignas(16) std::array<float, 4> outvec;
+			_mm_store_ps(outvec.data(), result);
 
 			return Vector3(outvec[0], outvec[1], outvec[2]);
 		#else
@@ -50,7 +74,7 @@ namespace wlib::vecmath
 
 			auto result = _mm256_sub_pd(left_side, right_side);
 
-			std::array<double, 4> outvec;
+			alignas(32) std::array<double, 4> outvec;
 			_mm256_store_pd(outvec.data(), result);
 
 			return Vector3(outvec[0], outvec[1], outvec[2]);
@@ -79,7 +103,7 @@ namespace wlib::vecmath
 			auto result0 = _mm_sub_pd(l0, r0);
 			auto result1 = _mm_sub_pd(l1, r1);
 
-			std::array<double, 4> outvec;
+			alignas(16) std::array<double, 4> outvec;
 			_mm_store_pd(outvec.data(), result0);
 			_mm_store_pd(outvec.data()+2, result1);
 

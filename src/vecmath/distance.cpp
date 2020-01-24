@@ -22,8 +22,8 @@ namespace wlib::vecmath
 			auto sum = _mm_add_ps(pre_addition, comp1);
 			auto result = _mm_sqrt_ps(sum);
 
-			std::array<float, 4> outvec;
-			_mm_storeu_ps(outvec.data(), result);
+			alignas(16) std::array<float, 4> outvec;
+			_mm_store_ps(outvec.data(), result);
 
 			return outvec[0];
 		#else
@@ -48,8 +48,8 @@ namespace wlib::vecmath
 
 			auto result = _mm_sqrt_pd(sum);
 
-			std::array<double, 2> outvec;
-			_mm_storeu_pd(outvec.data(), result);
+			alignas(16) std::array<double, 2> outvec;
+			_mm_store_pd(outvec.data(), result);
 			return outvec[0];
 		#else
 			auto xs = std::pow(lhs.x - rhs.x, 2);
@@ -70,8 +70,8 @@ namespace wlib::vecmath
 			auto sum = _mm_add_ps(_mm_add_ps(pre_addition, comp1), comp2);
 			auto result = _mm_sqrt_ps(sum);
 
-			std::array<float, 4> outvec;
-			_mm_storeu_ps(outvec.data(), result);
+			alignas(16) std::array<float, 4> outvec;
+			_mm_store_ps(outvec.data(), result);
 
 			return outvec[0];
 		#else
@@ -97,8 +97,8 @@ namespace wlib::vecmath
 			auto sum = _mm256_add_pd(res_hadd, comp1);
 			auto result = _mm256_sqrt_pd(sum);
 
-			std::array<double, 4> outvec;
-			_mm256_storeu_pd(outvec.data(), result);
+			alignas(32) std::array<double, 4> outvec;
+			_mm256_store_pd(outvec.data(), result);
 			return outvec[0];
 		#elif X86_SIMD_LEVEL >= LV_SSE2
 			auto lhs_vec = _mm_loadu_pd(&lhs.x);
@@ -118,8 +118,8 @@ namespace wlib::vecmath
 
 			auto result = _mm_sqrt_pd(sum);
 
-			std::array<double, 2> outvec;
-			_mm_storeu_pd(outvec.data(), result);
+			alignas(16) std::array<double, 2> outvec;
+			_mm_store_pd(outvec.data(), result);
 			return outvec[0];
 		#else
 			auto xs = std::pow(lhs.x - rhs.x, 2);
@@ -143,8 +143,8 @@ namespace wlib::vecmath
 			auto sum = _mm_add_ps(_mm_add_ps(_mm_add_ps(pre_addition, comp1), comp2), comp3);
 			auto result = _mm_sqrt_ps(sum);
 
-			std::array<float, 4> outvec;
-			_mm_storeu_ps(outvec.data(), result);
+			alignas(16) std::array<float, 4> outvec;
+			_mm_store_ps(outvec.data(), result);
 			return outvec[0];
 		#else
 			auto xs = std::pow(lhs.x - rhs.x, 2);
@@ -170,8 +170,8 @@ namespace wlib::vecmath
 			auto sum = _mm256_add_pd(res_hadd, res_hadd_rev);
 			auto result = _mm256_sqrt_pd(sum);
 
-			std::array<double, 4> outvec;
-			_mm256_storeu_pd(outvec.data(), result);
+			alignas(32) std::array<double, 4> outvec;
+			_mm256_store_pd(outvec.data(), result);
 			return outvec[0];
 		#elif X86_SIMD_LEVEL >= LV_SSE2
 			auto lhs_vec = _mm_loadu_pd(&lhs.x);
@@ -192,8 +192,8 @@ namespace wlib::vecmath
 
 			auto result = _mm_sqrt_pd(sum);
 
-			std::array<double, 2> outvec;
-			_mm_storeu_pd(outvec.data(), result);
+			alignas(16) std::array<double, 2> outvec;
+			_mm_store_pd(outvec.data(), result);
 			return outvec[0];
 		#else
 			auto xs = std::pow(lhs.x - rhs.x, 2);

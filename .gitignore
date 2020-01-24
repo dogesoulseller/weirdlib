@@ -15,3 +15,5 @@ docs/latex
 # Handwritten documentation
 docsrc/*
 !docsrc/weirdlib.tex
+
+.clangd
