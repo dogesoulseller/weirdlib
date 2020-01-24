@@ -136,3 +136,36 @@ TEST(Vecmath, Length) {
 	EXPECT_FLOAT_EQ(Length(vec4), 5.47722557505166113456969728f);
 	EXPECT_DOUBLE_EQ(Length(vec4d), 5.47722557505166113456997828);
 }
+
+TEST(Vecmath, Normalize) {
+	Vector2 vec2(1.0f, 2.0f);
+	Vector2 vec2d(1.0, 2.0);
+
+	Vector3 vec3(1.0f, 2.0f, 3.0f);
+	Vector3 vec3d(1.0, 2.0, 3.0);
+
+	Vector4 vec4(1.0f, 2.0f, 3.0f, 4.0f);
+	Vector4 vec4d(1.0, 2.0, 3.0, 4.0);
+
+	auto vec2_norm = Normalize(vec2);
+	auto vec2d_norm = Normalize(vec2d);
+	auto vec3_norm = Normalize(vec3);
+	auto vec3d_norm = Normalize(vec3d);
+	auto vec4_norm = Normalize(vec4);
+	auto vec4d_norm = Normalize(vec4d);
+
+	auto vec2_norm_approx = NormalizeApprox(vec2);
+	auto vec3_norm_approx = NormalizeApprox(vec3);
+	auto vec4_norm_approx = NormalizeApprox(vec4);
+
+	EXPECT_FLOAT_EQ(Length(vec2_norm), 1.0f);
+	EXPECT_DOUBLE_EQ(Length(vec2d_norm), 1.0);
+	EXPECT_FLOAT_EQ(Length(vec3_norm), 1.0f);
+	EXPECT_DOUBLE_EQ(Length(vec3d_norm), 1.0);
+	EXPECT_FLOAT_EQ(Length(vec4_norm), 1.0f);
+	EXPECT_DOUBLE_EQ(Length(vec4d_norm), 1.0);
+
+	EXPECT_FLOAT_EQ(Length(vec2_norm_approx), 0.99997985f);
+	EXPECT_FLOAT_EQ(Length(vec3_norm_approx), 1.0000437f);
+	EXPECT_FLOAT_EQ(Length(vec4_norm_approx), 1.0000683f);
+}

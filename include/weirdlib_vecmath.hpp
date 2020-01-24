@@ -68,6 +68,16 @@ namespace wlib::vecmath
 	float Length(const Vector4<float>& vec);
 	double Length(const Vector4<double>& vec);
 
+	Vector2<double> Normalize(const Vector2<double>& vec);
+	Vector3<double> Normalize(const Vector3<double>& vec);
+	Vector4<double> Normalize(const Vector4<double>& vec);
+	Vector2<float> Normalize(const Vector2<float>& vec);
+	Vector3<float> Normalize(const Vector3<float>& vec);
+	Vector4<float> Normalize(const Vector4<float>& vec);
+	Vector2<float> NormalizeApprox(const Vector2<float>& vec);
+	Vector3<float> NormalizeApprox(const Vector3<float>& vec);
+	Vector4<float> NormalizeApprox(const Vector4<float>& vec);
+
 	Vector3<float> CrossProduct(const Vector3<float>& lhs, const Vector3<float>& rhs);
 	Vector3<double> CrossProduct(const Vector3<double>& lhs, const Vector3<double>& rhs);
 
