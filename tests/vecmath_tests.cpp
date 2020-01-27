@@ -222,3 +222,60 @@ TEST(Vecmath, Reflect) {
 	EXPECT_DOUBLE_EQ(vec4reflectiond.z, -2.9991905291915391);
 	EXPECT_DOUBLE_EQ(vec4reflectiond.w, -3.9469796620459352);
 }
+
+TEST(Vecmath, Refract) {
+	float eta = 3.0f;
+	double etad = 3.0;
+
+	Vector2 vec2i(1.0f, 2.0f);
+	Vector2 vec2n(432.0f, 832.0f);
+
+	Vector2 vec2id(1.0, 2.0);
+	Vector2 vec2nd(432.0, 832.0);
+
+	Vector3 vec3i(1.0f, 2.0f, 3.0f);
+	Vector3 vec3n(432.0f, 832.0f, 1232.0f);
+
+	Vector3 vec3id(1.0, 2.0, 3.0);
+	Vector3 vec3nd(432.0, 832.0, 1232.0);
+
+	Vector4 vec4i(1.0f, 2.0f, 3.0f, 4.0f);
+	Vector4 vec4n(432.0f, 832.0f, 1232.0f, 1632.0f);
+
+	Vector4 vec4id(1.0, 2.0, 3.0, 4.0);
+	Vector4 vec4nd(432.0, 832.0, 1232.0, 1632.0);
+
+	auto vec2refraction = Refract(Normalize(vec2i), Normalize(vec2n), eta);
+	auto vec2refractiond = Refract(Normalize(vec2id), Normalize(vec2nd), etad);
+
+	auto vec3refraction = Refract(Normalize(vec3i), Normalize(vec3n), eta);
+	auto vec3refractiond = Refract(Normalize(vec3id), Normalize(vec3nd), etad);
+
+	auto vec4refraction = Refract(Normalize(vec4i), Normalize(vec4n), eta);
+	auto vec4refractiond = Refract(Normalize(vec4id), Normalize(vec4nd), etad);
+
+	EXPECT_FLOAT_EQ(vec2refraction.x, -0.50097549f);
+	EXPECT_FLOAT_EQ(vec2refraction.y, -0.86546063f);
+
+	EXPECT_DOUBLE_EQ(vec2refractiond.x, -0.50097572392144785);
+	EXPECT_DOUBLE_EQ(vec2refractiond.y, -0.86546133595983488);
+
+	EXPECT_FLOAT_EQ(vec3refraction.x, -0.31410253f);
+	EXPECT_FLOAT_EQ(vec3refraction.y, -0.54554677f);
+	EXPECT_FLOAT_EQ(vec3refraction.z, -0.77699113f);
+
+	EXPECT_DOUBLE_EQ(vec3refractiond.x, -0.3141029611661329);
+	EXPECT_DOUBLE_EQ(vec3refractiond.y, -0.54554764922831001);
+	EXPECT_LE(vec3refractiond.z, -0.7769923372903);
+	EXPECT_GE(vec3refractiond.z, -0.7769923372906);
+
+	EXPECT_FLOAT_EQ(vec4refraction.x, -0.22030413f);
+	EXPECT_FLOAT_EQ(vec4refraction.y, -0.38371742f);
+	EXPECT_FLOAT_EQ(vec4refraction.z, -0.54713082f);
+	EXPECT_FLOAT_EQ(vec4refraction.w, -0.71054387f);
+
+	EXPECT_DOUBLE_EQ(vec4refractiond.x, -0.22030436328164349);
+	EXPECT_DOUBLE_EQ(vec4refractiond.y, -0.38371784354204186);
+	EXPECT_DOUBLE_EQ(vec4refractiond.z, -0.54713132380244001);
+	EXPECT_DOUBLE_EQ(vec4refractiond.w, -0.7105448040628386);
+}

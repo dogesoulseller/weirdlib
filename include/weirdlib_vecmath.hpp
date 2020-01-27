@@ -85,6 +85,13 @@ namespace wlib::vecmath
 	Vector3<float> Reflect(const Vector3<float>& incident, const Vector3<float>& surfaceNormal);
 	Vector4<float> Reflect(const Vector4<float>& incident, const Vector4<float>& surfaceNormal);
 
+	Vector2<double> Refract(const Vector2<double>& incident, const Vector2<double>& surfaceNormal, double eta);
+	Vector3<double> Refract(const Vector3<double>& incident, const Vector3<double>& surfaceNormal, double eta);
+	Vector4<double> Refract(const Vector4<double>& incident, const Vector4<double>& surfaceNormal, double eta);
+	Vector2<float> Refract(const Vector2<float>& incident, const Vector2<float>& surfaceNormal, float eta);
+	Vector3<float> Refract(const Vector3<float>& incident, const Vector3<float>& surfaceNormal, float eta);
+	Vector4<float> Refract(const Vector4<float>& incident, const Vector4<float>& surfaceNormal, float eta);
+
 	Vector3<float> CrossProduct(const Vector3<float>& lhs, const Vector3<float>& rhs);
 	Vector3<double> CrossProduct(const Vector3<double>& lhs, const Vector3<double>& rhs);
 
