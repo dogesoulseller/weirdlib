@@ -64,6 +64,6 @@
 #endif
 
 // Detect FMA presence separately (because AMD)
-#ifdef __FMA__
+#if defined(__FMA__) || X86_SIMD_LEVEL >= LV_AVX2
 	#define X86_SIMD_FMA
 #endif
