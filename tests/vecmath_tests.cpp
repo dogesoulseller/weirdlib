@@ -169,3 +169,56 @@ TEST(Vecmath, Normalize) {
 	EXPECT_FLOAT_EQ(Length(vec3_norm_approx), 1.0000437f);
 	EXPECT_FLOAT_EQ(Length(vec4_norm_approx), 1.0000683f);
 }
+
+TEST(Vecmath, Reflect) {
+	Vector2 vec2i(1.0f, 2.0f);
+	Vector2 vec2n(432.0f, 832.0f);
+
+	Vector2 vec2id(1.0, 2.0);
+	Vector2 vec2nd(432.0, 832.0);
+
+	Vector3 vec3i(1.0f, 2.0f, 3.0f);
+	Vector3 vec3n(432.0f, 832.0f, 1232.0f);
+
+	Vector3 vec3id(1.0, 2.0, 3.0);
+	Vector3 vec3nd(432.0, 832.0, 1232.0);
+
+	Vector4 vec4i(1.0f, 2.0f, 3.0f, 4.0f);
+	Vector4 vec4n(432.0f, 832.0f, 1232.0f, 1632.0f);
+
+	Vector4 vec4id(1.0, 2.0, 3.0, 4.0);
+	Vector4 vec4nd(432.0, 832.0, 1232.0, 1632.0);
+
+	auto vec2reflection = Reflect(vec2i, Normalize(vec2n));
+	auto vec2reflectiond = Reflect(vec2id, Normalize(vec2nd));
+
+	auto vec3reflection = Reflect(vec3i, Normalize(vec3n));
+	auto vec3reflectiond = Reflect(vec3id, Normalize(vec3nd));
+
+	auto vec4reflection = Reflect(vec4i, Normalize(vec4n));
+	auto vec4reflectiond = Reflect(vec4id, Normalize(vec4nd));
+
+	EXPECT_FLOAT_EQ(vec2reflection.x, -1.0605884f);
+	EXPECT_FLOAT_EQ(vec2reflection.y, -1.9685404f);
+
+	EXPECT_DOUBLE_EQ(vec2reflectiond.x, -1.0605884066414211);
+	EXPECT_DOUBLE_EQ(vec2reflectiond.y, -1.9685406350131078);
+
+	EXPECT_FLOAT_EQ(vec3reflection.x, -1.0880151f);
+	EXPECT_FLOAT_EQ(vec3reflection.y, -2.0213628f);
+	EXPECT_FLOAT_EQ(vec3reflection.z, -2.95471f);
+
+	EXPECT_DOUBLE_EQ(vec3reflectiond.x, -1.0880153813287756);
+	EXPECT_DOUBLE_EQ(vec3reflectiond.y, -2.0213629566331983);
+	EXPECT_DOUBLE_EQ(vec3reflectiond.z, -2.9547105319376197);
+
+	EXPECT_FLOAT_EQ(vec4reflection.x, -1.1036122f);
+	EXPECT_FLOAT_EQ(vec4reflection.y, -2.0514016f);
+	EXPECT_FLOAT_EQ(vec4reflection.z, -2.9991903f);
+	EXPECT_FLOAT_EQ(vec4reflection.w, -3.9469795f);
+
+	EXPECT_DOUBLE_EQ(vec4reflectiond.x, -1.1036122634827477);
+	EXPECT_DOUBLE_EQ(vec4reflectiond.y, -2.0514013963371438);
+	EXPECT_DOUBLE_EQ(vec4reflectiond.z, -2.9991905291915391);
+	EXPECT_DOUBLE_EQ(vec4reflectiond.w, -3.9469796620459352);
+}

@@ -78,6 +78,13 @@ namespace wlib::vecmath
 	Vector3<float> NormalizeApprox(const Vector3<float>& vec);
 	Vector4<float> NormalizeApprox(const Vector4<float>& vec);
 
+	Vector2<double> Reflect(const Vector2<double>& incident, const Vector2<double>& surfaceNormal);
+	Vector3<double> Reflect(const Vector3<double>& incident, const Vector3<double>& surfaceNormal);
+	Vector4<double> Reflect(const Vector4<double>& incident, const Vector4<double>& surfaceNormal);
+	Vector2<float> Reflect(const Vector2<float>& incident, const Vector2<float>& surfaceNormal);
+	Vector3<float> Reflect(const Vector3<float>& incident, const Vector3<float>& surfaceNormal);
+	Vector4<float> Reflect(const Vector4<float>& incident, const Vector4<float>& surfaceNormal);
+
 	Vector3<float> CrossProduct(const Vector3<float>& lhs, const Vector3<float>& rhs);
 	Vector3<double> CrossProduct(const Vector3<double>& lhs, const Vector3<double>& rhs);
 
