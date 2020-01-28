@@ -6,9 +6,9 @@
 namespace wlib::vecmath
 {
 	#if X86_SIMD_LEVEL >= LV_AVX2
-		auto PERM_MASK_CROSSP_LHS = _mm256_set_epi32(0, 0, 1, 0, 2, 0, 2, 1);
-		auto PERM_MASK_CROSSP_RHS = _mm256_set_epi32(0, 0, 0, 2, 1, 1, 0, 2);
-		auto PERM_MASK_CROSSP_SUB = _mm256_set_epi32(0, 0, 5, 2, 4, 1, 3, 0);
+		static const auto PERM_MASK_CROSSP_LHS = _mm256_set_epi32(0, 0, 1, 0, 2, 0, 2, 1);
+		static const auto PERM_MASK_CROSSP_RHS = _mm256_set_epi32(0, 0, 0, 2, 1, 1, 0, 2);
+		static const auto PERM_MASK_CROSSP_SUB = _mm256_set_epi32(0, 0, 5, 2, 4, 1, 3, 0);
 	#endif
 
 	Vector3<float> CrossProduct(const Vector3<float>& lhs, const Vector3<float>& rhs) {

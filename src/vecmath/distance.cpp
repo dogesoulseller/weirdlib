@@ -6,7 +6,7 @@
 
 namespace wlib::vecmath
 {
-	__m128 getPreAdd(const __m128 lhs, const __m128 rhs) {
+	static __m128 getPreAdd(const __m128 lhs, const __m128 rhs) {
 		auto res_sub = _mm_sub_ps(lhs, rhs);
 		return _mm_mul_ps(res_sub, res_sub);
 	}
