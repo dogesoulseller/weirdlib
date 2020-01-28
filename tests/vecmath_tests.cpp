@@ -3,38 +3,104 @@
 
 using namespace wlib::vecmath;
 
-TEST(Vecmath, VectorInitialize) {
-	Vector2 vec2(1.0f, 2.0f);
-	Vector2 vec2d(1.0, 2.0);
+TEST(Vecmath, Operators) {
+	Vector2 vec2(2.0f);
+	Vector3 vec3(3.0f);
+	Vector4 vec4(4.0f);
 
-	EXPECT_FLOAT_EQ(vec2.x, 1.0f);
-	EXPECT_FLOAT_EQ(vec2.y, 2.0f);
-	EXPECT_DOUBLE_EQ(vec2d.x, 1.0);
-	EXPECT_DOUBLE_EQ(vec2d.y, 2.0);
+	Vector2 vec2d(2.0);
+	Vector3 vec3d(3.0);
+	Vector4 vec4d(4.0);
+
+	auto vec2_lmul = vec2 * 2.0f;
+	auto vec3_lmul = vec3 * 2.0f;
+	auto vec4_lmul = vec4 * 2.0f;
+	auto vec2_lmuld = vec2d * 2.0;
+	auto vec3_lmuld = vec3d * 2.0;
+	auto vec4_lmuld = vec4d * 2.0;
+
+	auto vec2_rmul = 2.0f * vec2;
+	auto vec3_rmul = 2.0f * vec3;
+	auto vec4_rmul = 2.0f * vec4;
+	auto vec2_rmuld = 2.0 * vec2d;
+	auto vec3_rmuld = 2.0 * vec3d;
+	auto vec4_rmuld = 2.0 * vec4d;
 
 
-	Vector3 vec3{1.0f, 2.0f, 3.0f};
-	Vector3 vec3d{1.0, 2.0, 3.0};
 
-	EXPECT_FLOAT_EQ(vec3.x, 1.0f);
-	EXPECT_FLOAT_EQ(vec3.y, 2.0f);
-	EXPECT_FLOAT_EQ(vec3.z, 3.0f);
-	EXPECT_DOUBLE_EQ(vec3d.x, 1.0);
-	EXPECT_DOUBLE_EQ(vec3d.y, 2.0);
-	EXPECT_DOUBLE_EQ(vec3d.z, 3.0);
+	// L(vec) * R(float)
+	EXPECT_FLOAT_EQ(vec2_lmul.x, 4.0f);
+	EXPECT_FLOAT_EQ(vec2_lmul.y, 4.0f);
+	EXPECT_FLOAT_EQ(vec3_lmul.x, 6.0f);
+	EXPECT_FLOAT_EQ(vec3_lmul.y, 6.0f);
+	EXPECT_FLOAT_EQ(vec3_lmul.z, 6.0f);
+	EXPECT_FLOAT_EQ(vec4_lmul.x, 8.0f);
+	EXPECT_FLOAT_EQ(vec4_lmul.y, 8.0f);
+	EXPECT_FLOAT_EQ(vec4_lmul.z, 8.0f);
+	EXPECT_FLOAT_EQ(vec4_lmul.w, 8.0f);
+	EXPECT_DOUBLE_EQ(vec2_lmuld.x, 4.0);
+	EXPECT_DOUBLE_EQ(vec2_lmuld.y, 4.0);
+	EXPECT_DOUBLE_EQ(vec3_lmuld.x, 6.0);
+	EXPECT_DOUBLE_EQ(vec3_lmuld.y, 6.0);
+	EXPECT_DOUBLE_EQ(vec3_lmuld.z, 6.0);
+	EXPECT_DOUBLE_EQ(vec4_lmuld.x, 8.0);
+	EXPECT_DOUBLE_EQ(vec4_lmuld.y, 8.0);
+	EXPECT_DOUBLE_EQ(vec4_lmuld.z, 8.0);
+	EXPECT_DOUBLE_EQ(vec4_lmuld.w, 8.0);
+
+	// L(float) * R(vec)
+	EXPECT_FLOAT_EQ(vec2_rmul.x, 4.0f);
+	EXPECT_FLOAT_EQ(vec2_rmul.y, 4.0f);
+	EXPECT_FLOAT_EQ(vec3_rmul.x, 6.0f);
+	EXPECT_FLOAT_EQ(vec3_rmul.y, 6.0f);
+	EXPECT_FLOAT_EQ(vec3_rmul.z, 6.0f);
+	EXPECT_FLOAT_EQ(vec4_rmul.x, 8.0f);
+	EXPECT_FLOAT_EQ(vec4_rmul.y, 8.0f);
+	EXPECT_FLOAT_EQ(vec4_rmul.z, 8.0f);
+	EXPECT_FLOAT_EQ(vec4_rmul.w, 8.0f);
+	EXPECT_DOUBLE_EQ(vec2_rmuld.x, 4.0);
+	EXPECT_DOUBLE_EQ(vec2_rmuld.y, 4.0);
+	EXPECT_DOUBLE_EQ(vec3_rmuld.x, 6.0);
+	EXPECT_DOUBLE_EQ(vec3_rmuld.y, 6.0);
+	EXPECT_DOUBLE_EQ(vec3_rmuld.z, 6.0);
+	EXPECT_DOUBLE_EQ(vec4_rmuld.x, 8.0);
+	EXPECT_DOUBLE_EQ(vec4_rmuld.y, 8.0);
+	EXPECT_DOUBLE_EQ(vec4_rmuld.z, 8.0);
+	EXPECT_DOUBLE_EQ(vec4_rmuld.w, 8.0);
 
 
-	Vector4 vec4{1.0f, 2.0f, 3.0f, 4.0f};
-	Vector4 vec4d{1.0, 2.0, 3.0, 4.0};
+	Vector2 vec2_mulassign(2.0f);
+	Vector3 vec3_mulassign(3.0f);
+	Vector4 vec4_mulassign(4.0f);
+	Vector2 vec2_mulassignd(2.0);
+	Vector3 vec3_mulassignd(3.0);
+	Vector4 vec4_mulassignd(4.0);
 
-	EXPECT_FLOAT_EQ(vec4.x, 1.0f);
-	EXPECT_FLOAT_EQ(vec4.y, 2.0f);
-	EXPECT_FLOAT_EQ(vec4.z, 3.0f);
-	EXPECT_FLOAT_EQ(vec4.w, 4.0f);
-	EXPECT_DOUBLE_EQ(vec4d.x, 1.0);
-	EXPECT_DOUBLE_EQ(vec4d.y, 2.0);
-	EXPECT_DOUBLE_EQ(vec4d.z, 3.0);
-	EXPECT_DOUBLE_EQ(vec4d.w, 4.0);
+	vec2_mulassign *= 2.0f;
+	vec3_mulassign *= 2.0f;
+	vec4_mulassign *= 2.0f;
+	vec2_mulassignd *= 2.0;
+	vec3_mulassignd *= 2.0;
+	vec4_mulassignd *= 2.0;
+
+	EXPECT_FLOAT_EQ(vec2_mulassign.x, 4.0f);
+	EXPECT_FLOAT_EQ(vec2_mulassign.y, 4.0f);
+	EXPECT_FLOAT_EQ(vec3_mulassign.x, 6.0f);
+	EXPECT_FLOAT_EQ(vec3_mulassign.y, 6.0f);
+	EXPECT_FLOAT_EQ(vec3_mulassign.z, 6.0f);
+	EXPECT_FLOAT_EQ(vec4_mulassign.x, 8.0f);
+	EXPECT_FLOAT_EQ(vec4_mulassign.y, 8.0f);
+	EXPECT_FLOAT_EQ(vec4_mulassign.z, 8.0f);
+	EXPECT_FLOAT_EQ(vec4_mulassign.w, 8.0f);
+	EXPECT_DOUBLE_EQ(vec2_mulassignd.x, 4.0);
+	EXPECT_DOUBLE_EQ(vec2_mulassignd.y, 4.0);
+	EXPECT_DOUBLE_EQ(vec3_mulassignd.x, 6.0);
+	EXPECT_DOUBLE_EQ(vec3_mulassignd.y, 6.0);
+	EXPECT_DOUBLE_EQ(vec3_mulassignd.z, 6.0);
+	EXPECT_DOUBLE_EQ(vec4_mulassignd.x, 8.0);
+	EXPECT_DOUBLE_EQ(vec4_mulassignd.y, 8.0);
+	EXPECT_DOUBLE_EQ(vec4_mulassignd.z, 8.0);
+	EXPECT_DOUBLE_EQ(vec4_mulassignd.w, 8.0);
 }
 
 TEST(Vecmath, DotProduct) {
