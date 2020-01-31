@@ -1,4 +1,9 @@
 #ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
+
+#if !defined(WEIRDLIB_ENABLE_FILE_OPERATIONS)
+	#error "Image operations module requires the file operations module"
+#endif
+
 #include "../../include/weirdlib_image.hpp"
 #include "../../include/cpu_detection.hpp"
 #include "../../include/weirdlib_traits.hpp"

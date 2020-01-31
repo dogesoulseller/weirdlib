@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
 #include "../../include/weirdlib_image.hpp"
 #if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
 	#include <tbb/tbb.h>
@@ -190,3 +191,4 @@ namespace wlib::image
 		return outimg;
 	}
 } // namespace wlib::image
+#endif

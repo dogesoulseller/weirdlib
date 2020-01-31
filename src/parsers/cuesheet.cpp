@@ -1,3 +1,8 @@
+#ifdef WEIRDLIB_ENABLE_FILE_PARSERS
+#if !defined(WEIRDLIB_ENABLE_STRING_OPERATIONS)
+	#error "File parsers module requires the string operations module"
+#endif
+
 #include "../../include/weirdlib_parsers.hpp"
 #include "../../include/weirdlib_traits.hpp"
 #include "../../include/weirdlib_string.hpp"
@@ -371,3 +376,4 @@ namespace wlib::parse
 
 	}
 } // namespace wlib::parse
+#endif

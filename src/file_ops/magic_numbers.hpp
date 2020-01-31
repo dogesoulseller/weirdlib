@@ -1,4 +1,5 @@
 #pragma once
+#ifdef WEIRDLIB_ENABLE_FILE_OPERATIONS
 #include <array>
 #include <cstdint>
 
@@ -65,3 +66,4 @@ namespace wlib::file
 	constexpr std::array<uint8_t, 3> OPTIMFROG_IDENTIFIER {'O', 'F', 'R'};
 
 } // namespace wlib::file
+#endif

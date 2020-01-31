@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_VECTOR_MATH
 #include "../../include/weirdlib_vecmath.hpp"
 #include "../../include/cpu_detection.hpp"
 #include "../../include/weirdlib_simdhelper.hpp"
@@ -183,3 +184,4 @@ namespace wlib::vecmath
 		#endif
 	}
 } // namespace wlib::vecmath
+#endif

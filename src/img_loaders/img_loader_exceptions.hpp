@@ -1,4 +1,5 @@
 #pragma once
+#ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
 #include <stdexcept>
 #include <exception>
 
@@ -79,3 +80,4 @@ namespace wlib::image::except
 	};
 
 } // namespace wlib::image::except
+#endif

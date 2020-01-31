@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_VECTOR_MATH
 #include <gtest/gtest.h>
 #include "../include/weirdlib.hpp"
 
@@ -345,3 +346,4 @@ TEST(Vecmath, Refract) {
 	EXPECT_DOUBLE_EQ(vec4refractiond.z, -0.54713132380244001);
 	EXPECT_DOUBLE_EQ(vec4refractiond.w, -0.7105448040628386);
 }
+#endif

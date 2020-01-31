@@ -1,4 +1,5 @@
 #pragma once
+#ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
 #include <cstddef>
 #include <cstdint>
 
@@ -114,3 +115,4 @@ namespace wlib::image
 	/// @return @{link ImageInfoTGA}
 	ImageInfoTGA LoadTGA(const uint8_t* in, size_t size = 0);
 } // namespace wlib::image
+#endif

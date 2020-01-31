@@ -1,5 +1,5 @@
+#ifdef WEIRDLIB_ENABLE_CRYPTOGRAPHY
 #include "../../include/weirdlib_crypto.hpp"
-
 constexpr const char* Base64DefaultCharset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 // Implementation based on https://en.wikibooks.org/wiki/Algorithm_Implementation/Miscellaneous/Base64
@@ -151,3 +151,4 @@ namespace wlib::crypto
 		return decodedBytes;
 	}
 } // namespace wlib::crypto
+#endif

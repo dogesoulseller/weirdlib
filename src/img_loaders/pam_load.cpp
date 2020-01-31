@@ -1,3 +1,8 @@
+#ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
+#if !defined(WEIRDLIB_ENABLE_STRING_OPERATIONS)
+	#error "Image operations module requires the string operations module"
+#endif
+
 #include "image_format_loaders.hpp"
 #include "img_loader_exceptions.hpp"
 #include "../common.hpp"
@@ -125,3 +130,4 @@ namespace wlib::image
 		return info;
 	}
 } // namespace wlib::image
+#endif

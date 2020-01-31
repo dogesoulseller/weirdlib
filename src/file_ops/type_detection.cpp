@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_FILE_OPERATIONS
 #include "../../include/weirdlib_fileops.hpp"
 #include "../../include/cpu_detection.hpp"
 
@@ -405,3 +406,4 @@ namespace wlib::file
 	}
 
 } // namespace wlib::file
+#endif

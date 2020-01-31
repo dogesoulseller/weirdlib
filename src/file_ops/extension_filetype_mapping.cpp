@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_FILE_OPERATIONS
 #include "../../include/weirdlib_fileops.hpp"
 
 namespace wlib::file
@@ -78,3 +79,4 @@ namespace wlib::file
 	}
 
 } // namespace wlib::file
+#endif

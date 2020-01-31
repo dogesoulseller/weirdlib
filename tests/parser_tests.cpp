@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_FILE_PARSERS
 #include <gtest/gtest.h>
 #include <cstring>
 #include <array>
@@ -119,3 +120,4 @@ TEST(Parse, CuesheetMultifile) {
 	EXPECT_EQ(cue.GetContents()[14].tracks[0].title, "Encoder"s);
 
 }
+#endif

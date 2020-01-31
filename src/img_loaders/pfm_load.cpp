@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
 #include "image_format_loaders.hpp"
 #include "img_loader_exceptions.hpp"
 #include "../common.hpp"
@@ -68,3 +69,4 @@ namespace wlib::image
 		return info;
 	}
 } // namespace wlib::image
+#endif

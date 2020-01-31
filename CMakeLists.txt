@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9.6)
 project(weirdlib C CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
+# TODO: Remove unnecessary files from build sources when module disabled
 
 
 ##|-----------------------|##
@@ -16,6 +16,9 @@ option(WEIRDLIB_ENABLE_APPLICATIONS "Enable building example applications" OFF)
 option(WEIRDLIB_ENABLE_BUILD_STRINGOPS "Enable building of string module" ON)
 option(WEIRDLIB_ENABLE_BUILD_CRYPTO "Enable building of crypto module" ON)
 option(WERIDLIB_ENABLE_BUILD_IMAGEOPS "Enable building image operations module" ON)
+option(WERIDLIB_ENABLE_BUILD_FILEOPS "Enable building file operations module" ON)
+option(WERIDLIB_ENABLE_BUILD_PARSERS "Enable building parsers module" ON)
+option(WERIDLIB_ENABLE_BUILD_VECMATH "Enable building vector math module" ON)
 
 option(WEIRDLIB_INSTRUMENT_COVERAGE "Enable generating coverage instrumentation" OFF)
 option(WEIRDLIB_ENABLE_MULTITHREADING "Enable use of external threading library" ON)
@@ -38,6 +41,21 @@ endif(WEIRDLIB_ENABLE_BUILD_STRINGOPS)
 if(WERIDLIB_ENABLE_BUILD_IMAGEOPS)
 	add_compile_definitions(WEIRDLIB_ENABLE_IMAGE_OPERATIONS)
 endif(WERIDLIB_ENABLE_BUILD_IMAGEOPS)
+
+# File operations module
+if(WERIDLIB_ENABLE_BUILD_FILEOPS)
+	add_compile_definitions(WEIRDLIB_ENABLE_FILE_OPERATIONS)
+endif(WERIDLIB_ENABLE_BUILD_FILEOPS)
+
+# File parsers module
+if(WERIDLIB_ENABLE_BUILD_PARSERS)
+	add_compile_definitions(WEIRDLIB_ENABLE_FILE_PARSERS)
+endif(WERIDLIB_ENABLE_BUILD_PARSERS)
+
+# Vector math module
+if(WERIDLIB_ENABLE_BUILD_VECMATH)
+	add_compile_definitions(WEIRDLIB_ENABLE_VECTOR_MATH)
+endif(WERIDLIB_ENABLE_BUILD_VECMATH)
 
 # Conditionally enable use of prefetch instructions
 if(WEIRDLIB_ENABLE_PREFETCH)

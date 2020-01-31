@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_STRING_OPERATIONS
 #include "../../include/weirdlib_string.hpp"
 #include "../common.hpp"
 #include <vector>
@@ -171,3 +172,4 @@ namespace wlib::str::detail
 	}
 
 } // namespace wlib::str::detail
+#endif

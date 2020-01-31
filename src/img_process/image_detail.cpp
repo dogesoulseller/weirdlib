@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_IMAGE_OPERATIONS
 #include "../../include/weirdlib_image.hpp"
 #include <utility>
 #include <algorithm>
@@ -136,3 +137,4 @@ namespace wlib::image::detail
 	}
 
 } // namespace wlib::image::detail
+#endif

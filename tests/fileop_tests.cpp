@@ -1,3 +1,4 @@
+#ifdef WEIRDLIB_ENABLE_FILE_OPERATIONS
 #include <gtest/gtest.h>
 #include "../include/weirdlib.hpp"
 #include <filesystem>
@@ -169,3 +170,4 @@ TEST(WlibFileop, FiletypeExtension) {
 
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_UNKNOWN), "");
 }
+#endif
