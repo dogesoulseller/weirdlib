@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.9.6)
 project(weirdlib C CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-# TODO: Remove unnecessary files from build sources when module disabled
-
 
 ##|-----------------------|##
 ##| COMPILATION SELECTION |##
@@ -27,35 +25,64 @@ option(WEIRDLIB_BUILD_NATIVE "Enable building version specific to host system (w
 option(WEIRDLIB_ENABLE_PREFETCH "Enable use of prefetch instructions in optimized code.
 This can lead to potential performance improvements, or massive slowdowns in some cases (Intel Ivy Bridge[43 cycles], AMD Jaguar[~100 cycles])" ON)
 
+set(WEIRDLIB_SOURCES "")
+set(WEIRDLIB_INCLUDE_SOURCES "")
+
 # Cryptography module
 if(WEIRDLIB_ENABLE_BUILD_CRYPTO)
+	file(GLOB_RECURSE WEIRDLIB_CRYPTO_SOURCES "src/crypto/*.*")
+	list(APPEND WEIRDLIB_SOURCES ${WEIRDLIB_CRYPTO_SOURCES})
+	list(APPEND WEIRDLIB_INCLUDE_SOURCES "include/weirdlib_crypto.hpp")
 	add_compile_definitions(WEIRDLIB_ENABLE_CRYPTOGRAPHY)
 endif(WEIRDLIB_ENABLE_BUILD_CRYPTO)
 
 # String operations module
 if(WEIRDLIB_ENABLE_BUILD_STRINGOPS)
+	file(GLOB_RECURSE WEIRDLIB_STRINGOPS_SOURCES "src/stringops/*.*")
+	list(APPEND WEIRDLIB_SOURCES ${WEIRDLIB_STRINGOPS_SOURCES})
+	list(APPEND WEIRDLIB_INCLUDE_SOURCES "include/weirdlib_string.hpp")
 	add_compile_definitions(WEIRDLIB_ENABLE_STRING_OPERATIONS)
 endif(WEIRDLIB_ENABLE_BUILD_STRINGOPS)
 
 # Image operations module
 if(WERIDLIB_ENABLE_BUILD_IMAGEOPS)
+	file(GLOB_RECURSE WEIRDLIB_IMAGEOP_SOURCES "src/img_process/*.*" "src/img_loaders/*.*")
+	list(APPEND WEIRDLIB_SOURCES ${WEIRDLIB_IMAGEOP_SOURCES})
+	list(APPEND WEIRDLIB_INCLUDE_SOURCES "include/weirdlib_image.hpp")
 	add_compile_definitions(WEIRDLIB_ENABLE_IMAGE_OPERATIONS)
 endif(WERIDLIB_ENABLE_BUILD_IMAGEOPS)
 
 # File operations module
 if(WERIDLIB_ENABLE_BUILD_FILEOPS)
+	file(GLOB_RECURSE WEIRDLIB_FILEOPS_SOURCES "src/file_ops/*.*")
+	list(APPEND WEIRDLIB_SOURCES ${WEIRDLIB_FILEOPS_SOURCES})
+	list(APPEND WEIRDLIB_INCLUDE_SOURCES "include/weirdlib_fileops.hpp")
 	add_compile_definitions(WEIRDLIB_ENABLE_FILE_OPERATIONS)
 endif(WERIDLIB_ENABLE_BUILD_FILEOPS)
 
 # File parsers module
 if(WERIDLIB_ENABLE_BUILD_PARSERS)
+	file(GLOB_RECURSE WEIRDLIB_FILEPARSE_SOURCES "src/parsers/*.*")
+	list(APPEND WEIRDLIB_SOURCES ${WEIRDLIB_FILEPARSE_SOURCES})
+	list(APPEND WEIRDLIB_INCLUDE_SOURCES "include/weirdlib_parsers.hpp")
 	add_compile_definitions(WEIRDLIB_ENABLE_FILE_PARSERS)
 endif(WERIDLIB_ENABLE_BUILD_PARSERS)
 
 # Vector math module
 if(WERIDLIB_ENABLE_BUILD_VECMATH)
+	file(GLOB_RECURSE WEIRDLIB_VECMATH_SOURCES "src/vecmath/*.*")
+	list(APPEND WEIRDLIB_SOURCES ${WEIRDLIB_VECMATH_SOURCES})
+	list(APPEND WEIRDLIB_INCLUDE_SOURCES "include/weirdlib_vecmath.hpp")
 	add_compile_definitions(WEIRDLIB_ENABLE_VECTOR_MATH)
 endif(WERIDLIB_ENABLE_BUILD_VECMATH)
+
+# Remaining files
+list(APPEND WEIRDLIB_INCLUDE_SOURCES
+	"include/weirdlib_bitops.hpp" "include/weirdlib_containers.hpp" "include/weirdlib_math.hpp"
+	"include/weirdlib_simdhelper.hpp" "include/weirdlib_traits.hpp"
+)
+
+list(APPEND WEIRDLIB_SOURCES "src/common.cpp" "src/common.hpp" "src/weirdlib.cpp")
 
 # Conditionally enable use of prefetch instructions
 if(WEIRDLIB_ENABLE_PREFETCH)
@@ -180,8 +207,7 @@ string(APPEND CMAKE_CXX_FLAGS " ${WEIRDLIB_ADDITIONAL_CXX_FLAGS} ")
 message(STATUS "Configuring main library")
 
 # Library sources and headers
-file(GLOB_RECURSE WEIRDLIB_SOURCES "src/*.cpp" "src/*.hpp")
-file(GLOB WEIRDLIB_INCLUDE_SOURCES "include/*.hpp")
+
 
 # Primary build target
 add_library(weirdlib ${WEIRDLIB_SOURCES} ${WEIRDLIB_INCLUDE_SOURCES})
@@ -227,13 +253,46 @@ endif(WEIRDLIB_BUILD_DOCS)
 ##| TEST SUITE CONFIGURATION |##
 ##|--------------------------|##
 
-if (WEIRDLIB_ENABLE_TESTING)
+if(WEIRDLIB_ENABLE_TESTING)
 	message(STATUS "Configuring tests")
 
 	enable_testing()
 	find_package(GTest REQUIRED)
 	include(GoogleTest)
-	file(GLOB WEIRDLIB_TEST_SOURCES "tests/*.c*")
+
+	set(WEIRDLIB_TEST_SOURCES "tests/bitop_tests.cpp" "tests/container_tests.cpp"
+		"tests/math_tests.cpp" "tests/simdop_tests.cpp" "tests/test_main.cpp"
+	)
+
+	# Cryptography module
+	if(WEIRDLIB_ENABLE_BUILD_CRYPTO)
+		list(APPEND WEIRDLIB_TEST_SOURCES "tests/crypto_tests.cpp")
+	endif(WEIRDLIB_ENABLE_BUILD_CRYPTO)
+
+	# String operations module
+	if(WEIRDLIB_ENABLE_BUILD_STRINGOPS)
+		list(APPEND WEIRDLIB_TEST_SOURCES "tests/stringop_tests.cpp")
+	endif(WEIRDLIB_ENABLE_BUILD_STRINGOPS)
+
+	# Image operations module
+	if(WERIDLIB_ENABLE_BUILD_IMAGEOPS)
+		list(APPEND WEIRDLIB_TEST_SOURCES "tests/imgloader_tests.cpp" "tests/imgop_tests.cpp")
+	endif(WERIDLIB_ENABLE_BUILD_IMAGEOPS)
+
+	# File operations module
+	if(WERIDLIB_ENABLE_BUILD_FILEOPS)
+		list(APPEND WEIRDLIB_TEST_SOURCES "tests/fileop_tests.cpp")
+	endif(WERIDLIB_ENABLE_BUILD_FILEOPS)
+
+	# File parsers module
+	if(WERIDLIB_ENABLE_BUILD_PARSERS)
+		list(APPEND WEIRDLIB_TEST_SOURCES "tests/parser_tests.cpp")
+	endif(WERIDLIB_ENABLE_BUILD_PARSERS)
+
+	# Vector math module
+	if(WERIDLIB_ENABLE_BUILD_VECMATH)
+		list(APPEND WEIRDLIB_TEST_SOURCES "tests/vecmath_tests.cpp")
+	endif(WERIDLIB_ENABLE_BUILD_VECMATH)
 
 	add_executable(weirdlib_tests ${WEIRDLIB_TEST_SOURCES})
 	target_link_libraries(weirdlib_tests Threads::Threads weirdlib ${WEIRDLIB_LINKER_LIBRARIES} GTest::GTest)
@@ -265,7 +324,7 @@ if (WEIRDLIB_ENABLE_TESTING)
 			DEPENDS wlib-coverage
 		)
 	endif(WEIRDLIB_INSTRUMENT_COVERAGE)
-endif (WEIRDLIB_ENABLE_TESTING)
+endif(WEIRDLIB_ENABLE_TESTING)
 
 
 if(WEIRDLIB_ENABLE_APPLICATIONS)
