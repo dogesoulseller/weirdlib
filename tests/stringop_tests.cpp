@@ -179,4 +179,53 @@ TEST(StringOps, Parse_Float) {
 	EXPECT_FLOAT_EQ(ldblNeg, -3.14L);
 }
 
+TEST(StringOps, SplitAtChar) {
+	std::string str = "test0;test1;;2test;test3;";
+
+	auto out = wlib::str::SplitAt(str, ';');
+
+	EXPECT_EQ(out.size(), 4);
+	EXPECT_EQ(out[0], "test0");
+	EXPECT_EQ(out[1], "test1");
+	EXPECT_EQ(out[2], "2test");
+	EXPECT_EQ(out[3], "test3");
+
+	auto outOnce = wlib::str::SplitOnce(str, ';');
+
+	EXPECT_EQ(outOnce.first, "test0");
+	EXPECT_EQ(outOnce.second, "test1;;2test;test3;");
+}
+
+TEST(StringOps, SplitAtChars) {
+	std::string str = "test0;test1;:2test.test3;";
+
+	auto out = wlib::str::SplitAt(str, ";.:");
+
+	EXPECT_EQ(out.size(), 4);
+	EXPECT_EQ(out[0], "test0");
+	EXPECT_EQ(out[1], "test1");
+	EXPECT_EQ(out[2], "2test");
+	EXPECT_EQ(out[3], "test3");
+
+	auto outOnce = wlib::str::SplitOnce(str, ";.:");
+
+	EXPECT_EQ(outOnce.first, "test0");
+	EXPECT_EQ(outOnce.second, "test1;:2test.test3;");
+}
+
+TEST(StringOps, Lines) {
+	std::string str = "\n0,1\n,2,3,4\n";
+
+	// From string to lines
+	auto lines = wlib::str::ToLines(str);
+
+	EXPECT_EQ(lines.size(), 2);
+	EXPECT_EQ(lines[0], "0,1");
+	EXPECT_EQ(lines[1], ",2,3,4");
+
+	// From lines to string
+	auto unlined = wlib::str::FromLines(lines.cbegin(), lines.cend());
+	EXPECT_EQ(unlined, "0,1\n,2,3,4");
+}
+
 #endif //WEIRDLIB_ENABLE_STRING_OPERATIONS

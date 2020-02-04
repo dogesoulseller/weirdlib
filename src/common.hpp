@@ -59,3 +59,14 @@ inline static NumberParseResult<PtrT, OutputT> GetNextNumber(const PtrT startPtr
 
 	return std::move(std::make_tuple(digitLocation, whitespaceLocation, out));
 }
+
+template<typename ElemT, typename IterT>
+inline static bool EqualToOneOf(const ElemT& elem, IterT start, IterT end) noexcept {
+	while (start != end) {
+		if (elem == *start) {
+			return true;
+		}
+		++start;
+	}
+	return false;
+}

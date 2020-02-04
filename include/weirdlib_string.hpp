@@ -3,6 +3,10 @@
 #include <string>
 #include <tuple>
 #include <type_traits>
+#include <vector>
+#include <utility>
+#include <sstream>
+#include <iomanip>
 
 namespace wlib
 {
@@ -20,6 +24,54 @@ namespace detail
 	std::tuple<float, bool> parseStringToFloat(const std::string& str);
 	std::tuple<double, bool> parseStringToDouble(const std::string& str);
 } // namespace detail
+
+	/// Split string into multiple strings at every **delimiter**
+	/// @param str string to split
+	/// @param delimiter char to use for splitting
+	/// @return vector of strings resulting from split
+	std::vector<std::string> SplitAt(const std::string& str, char delimiter);
+
+	/// Split string into multiple strings at every element of **delimiters**
+	/// @param str string to split
+	/// @param delimiter char to use for splitting
+	/// @return vector of strings resulting from split
+	std::vector<std::string> SplitAt(const std::string& str, const std::string& delimiters);
+
+	/// Split string into two strings at first **delimiter**
+	/// @param str string to split
+	/// @param delimiter char to use for splitting
+	/// @return pair of strings resulting from split
+	std::pair<std::string, std::string> SplitOnce(const std::string& str, char delimiter);
+
+	/// Split string into two strings at first element of **delimiters**
+	/// @param str string to split
+	/// @param delimiter char to use for splitting
+	/// @return pair of strings resulting from split
+	std::pair<std::string, std::string> SplitOnce(const std::string& str, const std::string& delimiters);
+
+	/// Split string by newline (LF, not CRLF)
+	/// @param str string to split
+	/// @return vector of resulting lines
+	std::vector<std::string> ToLines(const std::string& str);
+
+	/// Join strings with newlines
+	/// @param lines lines of text
+	/// @return string containing lines joined with Line Feed characters
+	template<typename IterT>
+	std::string FromLines(IterT start, IterT end) {
+		std::stringstream out;
+		out << std::noskipws;
+
+		while (start != end) {
+			out << *start << '\n';
+			++start;
+		}
+
+		auto outstr = out.str();
+		outstr.pop_back();
+
+		return outstr;
+	}
 
 	/// Get length of string
 	/// @param s pointer to start of string
