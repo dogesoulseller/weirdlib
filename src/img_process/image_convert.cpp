@@ -20,7 +20,7 @@ namespace wlib::image
 {
 	ImageSoA& ConvertToGrayscale(ImageSoA& inImg, const bool preserveAlpha, const GrayscaleMethod method) {
 		// Converting to grayscale from grayscale...
-		if (inImg.format == F_GrayAlpha || inImg.format == F_Grayscale) {
+		if (inImg.GetFormat() == F_GrayAlpha || inImg.GetFormat() == F_Grayscale) {
 			return inImg;
 		}
 
@@ -28,7 +28,7 @@ namespace wlib::image
 		size_t channelGreenN = 1;
 		size_t channelBlueN;
 
-		if (inImg.format == F_RGB || inImg.format == F_RGBA) {
+		if (inImg.GetFormat() == F_RGB || inImg.GetFormat() == F_RGBA) {
 			channelRedN = 0;
 			channelBlueN = 2;
 		} else {
@@ -36,7 +36,7 @@ namespace wlib::image
 			channelBlueN = 0;
 		}
 
-		alignas(32) auto outGr = new float[inImg.width * inImg.height];
+		alignas(32) auto outGr = new float[inImg.GetWidth() * inImg.GetHeight()];
 
 		auto ProcessLuminosity = [&](const float rWeight, const float gWeight, const float bWeight) {
 			// Processing with SIMD
@@ -46,8 +46,8 @@ namespace wlib::image
 				const auto blueMul = _mm256_set1_ps(bWeight);
 				const auto maxMask = _mm256_set1_ps(255.0f);
 
-				const auto iter_AVX = (inImg.width * inImg.height) / 8;
-				const auto iterRem_AVX = (inImg.width * inImg.height) % 8;
+				const auto iter_AVX = (inImg.GetWidth() * inImg.GetHeight()) / 8;
+				const auto iterRem_AVX = (inImg.GetWidth() * inImg.GetHeight()) % 8;
 
 				for (size_t i = 0; i < iter_AVX; i++) {
 					const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
@@ -78,8 +78,8 @@ namespace wlib::image
 				const auto blueMul = _mm_set1_ps(bWeight);
 				const auto maxMask = _mm_set1_ps(255.0f);
 
-				const auto iter_SSE = (inImg.width * inImg.height) / 4;
-				const auto iterRem_SSE = (inImg.width * inImg.height) % 4;
+				const auto iter_SSE = (inImg.GetWidth() * inImg.GetHeight()) / 4;
+				const auto iterRem_SSE = (inImg.GetWidth() * inImg.GetHeight()) % 4;
 
 				for (size_t i = 0; i < iter_SSE; i++) {
 					const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
@@ -103,7 +103,7 @@ namespace wlib::image
 					}
 				}
 			#else
-				for (size_t i = 0; i < inImg.width * inImg.height; i++) {
+				for (size_t i = 0; i < inImg.GetWidth() * inImg.GetHeight(); i++) {
 					if (const auto result = std::fma(inImg.channels[channelRedN][i], rWeight, std::fma(inImg.channels[channelGreenN][i], gWeight, inImg.channels[channelBlueN][i] * bWeight)); result > 255.0f) {
 						outGr[i] = 255.0f;
 					} else {
@@ -133,8 +133,8 @@ namespace wlib::image
 				const auto maxMask = _mm256_set1_ps(255.0f);
 				const auto divMask = _mm256_set1_ps(0.5f);
 
-				const auto iter_AVX = (inImg.width * inImg.height) / 8;
-				const auto iterRem_AVX = (inImg.width * inImg.height) % 8;
+				const auto iter_AVX = (inImg.GetWidth() * inImg.GetHeight()) / 8;
+				const auto iterRem_AVX = (inImg.GetWidth() * inImg.GetHeight()) % 8;
 
 				for (size_t i = 0; i < iter_AVX; i++) {
 					const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
@@ -170,8 +170,8 @@ namespace wlib::image
 				const auto maxMask = _mm_set1_ps(255.0f);
 				const auto divMask = _mm_set1_ps(0.5f);
 
-				const auto iter_SSE = (inImg.width * inImg.height) / 4;
-				const auto iterRem_SSE = (inImg.width * inImg.height) % 4;
+				const auto iter_SSE = (inImg.GetWidth() * inImg.GetHeight()) / 4;
+				const auto iterRem_SSE = (inImg.GetWidth() * inImg.GetHeight()) % 4;
 
 				for (size_t i = 0; i < iter_SSE; i++) {
 					const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
@@ -199,7 +199,7 @@ namespace wlib::image
 				}
 
 			#else
-				for (size_t i = 0; i < inImg.width * inImg.height; i++) {
+				for (size_t i = 0; i < inImg.GetWidth() * inImg.GetHeight(); i++) {
 					const auto maxValue = std::max(std::max(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
 					const auto minValue = std::min(std::min(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
 					const auto result = (maxValue + minValue) * 0.5f;
@@ -219,8 +219,8 @@ namespace wlib::image
 				const auto maxMask = _mm256_set1_ps(255.0f);
 				const auto divMask = _mm256_set1_ps(0.3333333333f);
 
-				const auto iter_AVX = (inImg.width * inImg.height) / 8;
-				const auto iterRem_AVX = (inImg.width * inImg.height) % 8;
+				const auto iter_AVX = (inImg.GetWidth() * inImg.GetHeight()) / 8;
+				const auto iterRem_AVX = (inImg.GetWidth() * inImg.GetHeight()) % 8;
 
 				for (size_t i = 0; i < iter_AVX; i++) {
 					const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
@@ -251,8 +251,8 @@ namespace wlib::image
 				const auto maxMask = _mm_set1_ps(255.0f);
 				const auto divMask = _mm_set1_ps(0.3333333333f);
 
-				const auto iter_AVX = (inImg.width * inImg.height) / 4;
-				const auto iterRem_AVX = (inImg.width * inImg.height) % 4;
+				const auto iter_AVX = (inImg.GetWidth() * inImg.GetHeight()) / 4;
+				const auto iterRem_AVX = (inImg.GetWidth() * inImg.GetHeight()) % 4;
 
 				for (size_t i = 0; i < iter_AVX; i++) {
 					const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
@@ -275,7 +275,7 @@ namespace wlib::image
 				}
 
 			#else
-				for (size_t i = 0; i < inImg.width * inImg.height; i++) {
+				for (size_t i = 0; i < inImg.GetWidth() * inImg.GetHeight(); i++) {
 					const auto result = (inImg.channels[channelRedN][i] + inImg.channels[channelGreenN][i] + inImg.channels[channelBlueN][i]) * 0.3333333333f;
 
 					if (result > 255.0f) {
@@ -292,8 +292,8 @@ namespace wlib::image
 		}
 
 		// Copy channels
-		if (inImg.format == F_RGB || inImg.format == F_BGR || !preserveAlpha) {
-			inImg.format = F_Grayscale;
+		if (inImg.GetFormat() == F_RGB || inImg.GetFormat() == F_BGR || !preserveAlpha) {
+			inImg.SetFormat(F_Grayscale);
 
 			for (auto& ptr : inImg.channels) {
 				delete[] ptr;
@@ -302,8 +302,8 @@ namespace wlib::image
 			inImg.channels.resize(1);
 			inImg.channels.shrink_to_fit();
 			inImg.channels[0] = outGr;
-		} else if (inImg.format == F_RGBA || inImg.format == F_BGRA) {
-			inImg.format = F_GrayAlpha;
+		} else if (inImg.GetFormat() == F_RGBA || inImg.GetFormat() == F_BGRA) {
+			inImg.SetFormat(F_GrayAlpha);
 
 			for (size_t i = 0; i < inImg.channels.size()-1; i++) {
 				delete[] inImg.channels[i];

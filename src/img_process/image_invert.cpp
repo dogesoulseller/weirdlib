@@ -6,8 +6,8 @@ namespace wlib::image
 {
 	#if X86_SIMD_LEVEL >= LV_AVX512
 	static void FV_AVX512_GRAY_IGNORE_ALPHA(ImageSoA& in) noexcept {
-		const size_t SIMDIter = (in.width * in.height) / 16;
-		const size_t SIMDIRem = (in.width * in.height) % 16;
+		const size_t SIMDIter = (in.GetWidth() * in.GetHeight()) / 16;
+		const size_t SIMDIRem = (in.GetWidth() * in.GetHeight()) % 16;
 
 		const __m512 subt = _mm512_set1_ps(255.0f);
 		for (size_t i = 0; i < SIMDIter; i++) {
@@ -23,8 +23,8 @@ namespace wlib::image
 	}
 
 	static void FV_AVX512_RGB_IGNORE_ALPHA(ImageSoA& in) noexcept {
-		const size_t SIMDIter = (in.width * in.height) / 16;
-		const size_t SIMDIRem = (in.width * in.height) % 16;
+		const size_t SIMDIter = (in.GetWidth() * in.GetHeight()) / 16;
+		const size_t SIMDIRem = (in.GetWidth() * in.GetHeight()) % 16;
 
 		const __m512 subt = _mm512_set1_ps(255.0f);
 		for (size_t c = 0; c < 3; c++)  {
@@ -42,8 +42,8 @@ namespace wlib::image
 	}
 
 	static void FV_AVX512_ALL_PROCESS_ALPHA(ImageSoA& in) noexcept {
-		const size_t SIMDIter = (in.width * in.height) / 16;
-		const size_t SIMDIRem = (in.width * in.height) % 16;
+		const size_t SIMDIter = (in.GetWidth() * in.GetHeight()) / 16;
+		const size_t SIMDIRem = (in.GetWidth() * in.GetHeight()) % 16;
 
 		const __m512 subt = _mm512_set1_ps(255.0f);
 		for (auto& c : in.channels)  {
@@ -62,8 +62,8 @@ namespace wlib::image
 	}
 	#elif X86_SIMD_LEVEL >= LV_AVX
 	static void FV_AVX_GRAY_IGNORE_ALPHA(ImageSoA& in) noexcept {
-		const size_t SIMDIter = (in.width * in.height) / 8;
-		const size_t SIMDIRem = (in.width * in.height) % 8;
+		const size_t SIMDIter = (in.GetWidth() * in.GetHeight()) / 8;
+		const size_t SIMDIRem = (in.GetWidth() * in.GetHeight()) % 8;
 
 		const __m256 subt = _mm256_set1_ps(255.0f);
 		for (size_t i = 0; i < SIMDIter; i++) {
@@ -79,8 +79,8 @@ namespace wlib::image
 	}
 
 	static void FV_AVX_RGB_IGNORE_ALPHA(ImageSoA& in) noexcept {
-		const size_t SIMDIter = (in.width * in.height) / 8;
-		const size_t SIMDIRem = (in.width * in.height) % 8;
+		const size_t SIMDIter = (in.GetWidth() * in.GetHeight()) / 8;
+		const size_t SIMDIRem = (in.GetWidth() * in.GetHeight()) % 8;
 
 		const __m256 subt = _mm256_set1_ps(255.0f);
 		for (size_t c = 0; c < 3; c++)  {
@@ -98,8 +98,8 @@ namespace wlib::image
 	}
 
 	static void FV_AVX_ALL_PROCESS_ALPHA(ImageSoA& in) noexcept {
-		const size_t SIMDIter = (in.width * in.height) / 8;
-		const size_t SIMDIRem = (in.width * in.height) % 8;
+		const size_t SIMDIter = (in.GetWidth() * in.GetHeight()) / 8;
+		const size_t SIMDIRem = (in.GetWidth() * in.GetHeight()) % 8;
 
 		const __m256 subt = _mm256_set1_ps(255.0f);
 		for (auto& c : in.channels)  {
@@ -118,8 +118,8 @@ namespace wlib::image
 	}
 	#elif X86_SIMD_LEVEL >= LV_SSE
 	static void FV_SSE_GRAY_IGNORE_ALPHA(ImageSoA& in) noexcept {
-		const size_t SIMDIter = (in.width * in.height) / 4;
-		const size_t SIMDIRem = (in.width * in.height) % 4;
+		const size_t SIMDIter = (in.GetWidth() * in.GetHeight()) / 4;
+		const size_t SIMDIRem = (in.GetWidth() * in.GetHeight()) % 4;
 
 		const __m128 subt = _mm_set1_ps(255.0f);
 		for (size_t i = 0; i < SIMDIter; i++) {
@@ -135,8 +135,8 @@ namespace wlib::image
 	}
 
 	static void FV_SSE_RGB_IGNORE_ALPHA(ImageSoA& in) noexcept {
-		const size_t SIMDIter = (in.width * in.height) / 4;
-		const size_t SIMDIRem = (in.width * in.height) % 4;
+		const size_t SIMDIter = (in.GetWidth() * in.GetHeight()) / 4;
+		const size_t SIMDIRem = (in.GetWidth() * in.GetHeight()) % 4;
 
 		const __m128 subt = _mm_set1_ps(255.0f);
 		for (size_t c = 0; c < 3; c++)  {
@@ -154,8 +154,8 @@ namespace wlib::image
 	}
 
 	static void FV_SSE_ALL_PROCESS_ALPHA(ImageSoA& in) noexcept {
-		const size_t SIMDIter = (in.width * in.height) / 4;
-		const size_t SIMDIRem = (in.width * in.height) % 4;
+		const size_t SIMDIter = (in.GetWidth() * in.GetHeight()) / 4;
+		const size_t SIMDIRem = (in.GetWidth() * in.GetHeight()) % 4;
 
 		const __m128 subt = _mm_set1_ps(255.0f);
 		for (auto& c : in.channels)  {
@@ -174,14 +174,14 @@ namespace wlib::image
 	}
 	#else
 	static void FV_GENERIC_GRAY_IGNORE_ALPHA(ImageSoA& in) noexcept {
-		for (size_t i = 0; i < in.width * in.height; i++) {
+		for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
 			in.channels[0][i] = 255.0f - in.channels[0][i];
 		}
 	}
 
 	static void FV_GENERIC_RGB_IGNORE_ALPHA(ImageSoA& in) noexcept {
 		for (size_t c = 0; c < 3; c++) {
-			for (size_t i = 0; i < in.width * in.height; i++) {
+			for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
 				in.channels[c][i] = 255.0f - in.channels[c][i];
 			}
 		}
@@ -189,7 +189,7 @@ namespace wlib::image
 
 	static void FV_GENERIC_ALL_PROCESS_ALPHA(ImageSoA& in) noexcept {
 		for (auto& c : in.channels) {
-			for (size_t i = 0 ; i < in.width * in.height; i++) {
+			for (size_t i = 0 ; i < in.GetWidth() * in.GetHeight(); i++) {
 				c[i] = 255.0f - c[i];
 			}
 		}

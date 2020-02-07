@@ -246,10 +246,12 @@ namespace image
 	/// This format is more optimal for threading and vectorization at a relatively small conversion cost
 	class ImageSoA
 	{
-		public:
+		private:
 		uint64_t width;
 		uint64_t height;
 		ColorFormat format;
+
+		public:
 		std::vector<float*> channels;
 
 		/// Object is in invalid state after default construction
@@ -299,6 +301,43 @@ namespace image
 
 		/// Convert input image to BGRA
 		inline void ConvertToBGRA() {ConvertToBGRA(*this);};
+
+
+		/// Get image width
+		/// @return width
+		inline auto GetWidth()  const noexcept { return width;  }
+
+		/// Get image height
+		/// @return height
+		inline auto GetHeight() const noexcept { return height; }
+
+		/// Get image format
+		/// @return format as specified in @{link ColorFormat}
+		inline auto GetFormat() const noexcept { return format; }
+
+
+		/// Set image width
+		inline void SetWidth(uint64_t newVal) noexcept { width = newVal; }
+
+		/// Set image height
+		inline void SetHeight(uint64_t newVal) noexcept { height = newVal; }
+
+		/// Set image format
+		inline void SetFormat(ColorFormat _format) noexcept { format = _format; }
+
+
+		/// Get total image size (i.e. width * height * format)
+		/// @param width image width
+		/// @param height image height
+		/// @param format image format @{link ColorFormat}
+		/// @return pixel count
+		static size_t GetTotalImageSize(uint64_t width, uint64_t height, ColorFormat format) noexcept {return Image::GetTotalImageSize(width, height, format);}
+
+		/// Get total image size (i.e. width * height * format)
+		/// @return pixel count
+		inline size_t GetTotalImageSize() const noexcept { return GetTotalImageSize(width, height, format);}
+
+
 
 		~ImageSoA();
 	};

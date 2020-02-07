@@ -183,15 +183,15 @@ namespace wlib::image
 	template<typename FloatT>
 	static PSNRData<FloatT> getPsnr(const ImageSoA& image0, const ImageSoA& image1) {
 		PSNRData<FloatT> outData;
-		if (!formatsAreCompatible(image0.format, image1.format)) {
+		if (!formatsAreCompatible(image0.GetFormat(), image1.GetFormat())) {
 			throw image_channel_error("Image formats are not compatible");
 		}
 
-		if (image0.width != image1.width || image0.height != image1.height) {
+		if (image0.GetWidth() != image1.GetWidth() || image0.GetHeight() != image1.GetHeight()) {
 			throw image_dimensions_error("Image dimensions are different");
 		}
 
-		switch (image0.format)
+		switch (image0.GetFormat())
 		{
 		  case F_RGB:
 		  case F_BGR:
@@ -202,9 +202,9 @@ namespace wlib::image
 
 			for (size_t i = 0; i < 3; i++) {
 				if constexpr (std::is_same_v<FloatT, float>) {
-					outData.MSEPerChannel[i] = getChannelMSE_float(image0.channels[i], image1.channels[i], image0.width * image0.height);
+					outData.MSEPerChannel[i] = getChannelMSE_float(image0.channels[i], image1.channels[i], image0.GetWidth() * image0.GetHeight());
 				} else {
-					outData.MSEPerChannel[i] = getChannelMSE_double(image0.channels[i], image1.channels[i], image0.width * image0.height);
+					outData.MSEPerChannel[i] = getChannelMSE_double(image0.channels[i], image1.channels[i], image0.GetWidth() * image0.GetHeight());
 				}
 
 				outData.PSNRPerChannel[i] = 10 * std::log10(RSqr<FloatT> / outData.MSEPerChannel[i]);
@@ -218,9 +218,9 @@ namespace wlib::image
 			outData.PSNRPerChannel.resize(1);
 
 			if constexpr (std::is_same_v<FloatT, float>) {
-				outData.MSEPerChannel[0] = getChannelMSE_float(image0.channels[0], image1.channels[0], image0.width * image0.height);
+				outData.MSEPerChannel[0] = getChannelMSE_float(image0.channels[0], image1.channels[0], image0.GetWidth() * image0.GetHeight());
 			} else {
-				outData.MSEPerChannel[0] = getChannelMSE_double(image0.channels[0], image1.channels[0], image0.width * image0.height);
+				outData.MSEPerChannel[0] = getChannelMSE_double(image0.channels[0], image1.channels[0], image0.GetWidth() * image0.GetHeight());
 			}
 
 			outData.PSNRPerChannel[0] = 10 * std::log10(RSqr<FloatT> / outData.MSEPerChannel[0]);

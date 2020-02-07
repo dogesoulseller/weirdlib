@@ -9,25 +9,25 @@ namespace wlib::image
 	Image MakeAoSFromSoA(const ImageSoA& in) {
 		alignas(64) float* outputPix = nullptr;
 
-		switch (in.format)
+		switch (in.GetFormat())
 		{
 		  case ColorFormat::F_Grayscale:
-			outputPix = new float[in.width*in.height];
-			std::copy(in.channels[0], in.channels[0]+in.width*in.height, outputPix);
+			outputPix = new float[in.GetWidth()*in.GetHeight()];
+			std::copy(in.channels[0], in.channels[0]+in.GetWidth()*in.GetHeight(), outputPix);
 			break;
 		  case ColorFormat::F_GrayAlpha:
-			outputPix = new float[in.width*in.height*2];
+			outputPix = new float[in.GetWidth()*in.GetHeight()*2];
 			#pragma ivdep
-			for (size_t i = 0; i < in.width * in.height; i++) {
+			for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
 				outputPix[i*2] = in.channels[0][i];
 				outputPix[i*2+1] = in.channels[1][i];
 			}
 			break;
 		  case ColorFormat::F_RGB:
 		  case ColorFormat::F_BGR:
-			outputPix = new float[in.width*in.height*3];
+			outputPix = new float[in.GetWidth()*in.GetHeight()*3];
 			#pragma ivdep
-			for (size_t i = 0; i < in.width * in.height; i++) {
+			for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
 				outputPix[i*3] = in.channels[0][i];
 				outputPix[i*3+1] = in.channels[1][i];
 				outputPix[i*3+2] = in.channels[2][i];
@@ -36,9 +36,9 @@ namespace wlib::image
 		  case ColorFormat::F_Default:
 		  case ColorFormat::F_RGBA:
 		  case ColorFormat::F_BGRA:
-			outputPix = new float[in.width*in.height*4];
+			outputPix = new float[in.GetWidth()*in.GetHeight()*4];
 			#pragma ivdep
-			for (size_t i = 0; i < in.width * in.height; i++) {
+			for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
 				outputPix[i*4] = in.channels[0][i];
 				outputPix[i*4+1] = in.channels[1][i];
 				outputPix[i*4+2] = in.channels[2][i];
@@ -47,7 +47,7 @@ namespace wlib::image
 			break;
 		}
 
-		Image imgOut(outputPix, in.width, in.height, in.format);
+		Image imgOut(outputPix, in.GetWidth(), in.GetHeight(), in.GetFormat());
 		delete[] outputPix;
 		return imgOut;
 	}
@@ -55,22 +55,22 @@ namespace wlib::image
 	ImageSoA MakeSoAFromAoS(const Image& img) {
 		ImageSoA outimg;
 
-		outimg.format = img.GetFormat();
-		outimg.width = img.GetWidth();
-		outimg.height = img.GetHeight();
+		outimg.SetFormat(img.GetFormat());
+		outimg.SetWidth(img.GetWidth());
+		outimg.SetHeight(img.GetHeight());
 
 		#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
 		tbb::task_scheduler_init tSched(8);
 		#endif
 
-		switch (outimg.format)
+		switch (outimg.GetFormat())
 		{
 		  case ColorFormat::F_Grayscale: {
-			alignas(64) auto c0 = new float[outimg.width*outimg.height];
+			alignas(64) auto c0 = new float[outimg.GetWidth()*outimg.GetHeight()];
 			auto source = img.GetPixels();
 
 			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
-			tbb::parallel_for(tbb::blocked_range<size_t>(0, outimg.width*outimg.height, 10000), [&c0, &source](tbb::blocked_range<size_t>& i){
+			tbb::parallel_for(tbb::blocked_range<size_t>(0, outimg.GetWidth()*outimg.GetHeight(), 10000), [&c0, &source](tbb::blocked_range<size_t>& i){
 				for (size_t j = i.begin(); j != i.end(); j++) {
 					c0[j] = static_cast<float>(source[j]);
 				}
@@ -79,7 +79,7 @@ namespace wlib::image
 			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_OMP
 			#pragma omp parallel for simd num_threads(8)
 			#endif
-			for (size_t i = 0; i < outimg.width * outimg.height; i++) {
+			for (size_t i = 0; i < outimg.GetWidth() * outimg.GetHeight(); i++) {
 				c0[i] = static_cast<float>(source[i]);
 			}
 			#endif
@@ -89,12 +89,12 @@ namespace wlib::image
 			break;
 		  }
 		  case ColorFormat::F_GrayAlpha: {
-			alignas(64) auto c0 = new float[outimg.width*outimg.height];
-			alignas(64) auto c1 = new float[outimg.width*outimg.height];
+			alignas(64) auto c0 = new float[outimg.GetWidth()*outimg.GetHeight()];
+			alignas(64) auto c1 = new float[outimg.GetWidth()*outimg.GetHeight()];
 			auto source = img.GetPixels();
 
 			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
-			tbb::parallel_for(tbb::blocked_range<size_t>(0, outimg.width*outimg.height, 10000), [&c0, &c1, &source](tbb::blocked_range<size_t>& i){
+			tbb::parallel_for(tbb::blocked_range<size_t>(0, outimg.GetWidth()*outimg.GetHeight(), 10000), [&c0, &c1, &source](tbb::blocked_range<size_t>& i){
 				for (size_t j = i.begin(); j != i.end(); j++) {
 					c0[j] = static_cast<float>(source[j*2]);
 					c1[j] = static_cast<float>(source[j*2+1]);
@@ -104,7 +104,7 @@ namespace wlib::image
 			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_OMP
 			#pragma omp parallel for simd num_threads(8)
 			#endif
-			for (size_t i = 0; i < outimg.width * outimg.height; i++) {
+			for (size_t i = 0; i < outimg.GetWidth() * outimg.GetHeight(); i++) {
 				c0[i] = static_cast<float>(source[i*2]);
 				c1[i] = static_cast<float>(source[i*2+1]);
 			}
@@ -117,13 +117,13 @@ namespace wlib::image
 		  }
 		  case ColorFormat::F_RGB:
 		  case ColorFormat::F_BGR: {
-			alignas(64) auto c0 = new float[outimg.width*outimg.height];
-			alignas(64) auto c1 = new float[outimg.width*outimg.height];
-			alignas(64) auto c2 = new float[outimg.width*outimg.height];
+			alignas(64) auto c0 = new float[outimg.GetWidth()*outimg.GetHeight()];
+			alignas(64) auto c1 = new float[outimg.GetWidth()*outimg.GetHeight()];
+			alignas(64) auto c2 = new float[outimg.GetWidth()*outimg.GetHeight()];
 			auto source = img.GetPixels();
 
 			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
-			tbb::parallel_for(tbb::blocked_range<size_t>(0, outimg.width*outimg.height, 10000), [&c0, &c1, &c2, &source](tbb::blocked_range<size_t>& i){
+			tbb::parallel_for(tbb::blocked_range<size_t>(0, outimg.GetWidth()*outimg.GetHeight(), 10000), [&c0, &c1, &c2, &source](tbb::blocked_range<size_t>& i){
 				for (size_t j = i.begin(); j != i.end(); j++) {
 					c0[j] = static_cast<float>(source[j*3]);
 					c1[j] = static_cast<float>(source[j*3+1]);
@@ -134,7 +134,7 @@ namespace wlib::image
 			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_OMP
 			#pragma omp parallel for simd num_threads(8)
 			#endif
-			for (size_t i = 0; i < outimg.width * outimg.height; i++) {
+			for (size_t i = 0; i < outimg.GetWidth() * outimg.GetHeight(); i++) {
 				c0[i] = static_cast<float>(source[i*3]);
 				c1[i] = static_cast<float>(source[i*3+1]);
 				c2[i] = static_cast<float>(source[i*3+2]);
@@ -150,14 +150,14 @@ namespace wlib::image
 		  case ColorFormat::F_RGBA:
 		  case ColorFormat::F_BGRA:
 		  case ColorFormat::F_Default: {
-			alignas(64) auto c0 = new float[outimg.width*outimg.height];
-			alignas(64) auto c1 = new float[outimg.width*outimg.height];
-			alignas(64) auto c2 = new float[outimg.width*outimg.height];
-			alignas(64) auto c3 = new float[outimg.width*outimg.height];
+			alignas(64) auto c0 = new float[outimg.GetWidth()*outimg.GetHeight()];
+			alignas(64) auto c1 = new float[outimg.GetWidth()*outimg.GetHeight()];
+			alignas(64) auto c2 = new float[outimg.GetWidth()*outimg.GetHeight()];
+			alignas(64) auto c3 = new float[outimg.GetWidth()*outimg.GetHeight()];
 			auto source = img.GetPixels();
 
 			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_TBB
-			tbb::parallel_for(tbb::blocked_range<size_t>(0, outimg.width*outimg.height, 10000), [&c0, &c1, &c2, &c3, &source](tbb::blocked_range<size_t>& i){
+			tbb::parallel_for(tbb::blocked_range<size_t>(0, outimg.GetWidth()*outimg.GetHeight(), 10000), [&c0, &c1, &c2, &c3, &source](tbb::blocked_range<size_t>& i){
 				for (size_t j = i.begin(); j != i.end(); j++) {
 					c0[j] = static_cast<float>(source[j*4]);
 					c1[j] = static_cast<float>(source[j*4+1]);
@@ -169,7 +169,7 @@ namespace wlib::image
 			#if WEIRDLIB_MULTITHREADING_MODE == WEIRDLIB_MTMODE_OMP
 			#pragma omp parallel for simd num_threads(8)
 			#endif
-			for (size_t i = 0; i < outimg.width * outimg.height; i++) {
+			for (size_t i = 0; i < outimg.GetWidth() * outimg.GetHeight(); i++) {
 				c0[i] = static_cast<float>(source[i*4]);
 				c1[i] = static_cast<float>(source[i*4+1]);
 				c2[i] = static_cast<float>(source[i*4+2]);

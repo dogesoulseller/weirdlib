@@ -122,7 +122,7 @@ TEST(ImgOps, NegateValues) {
 
 	std::random_device dev;
 	std::mt19937_64 rng(dev());
-	std::uniform_int_distribution<uint64_t> dist(0, testSoABase.width * testSoABase.height - 1);
+	std::uniform_int_distribution<uint64_t> dist(0, testSoABase.GetWidth() * testSoABase.GetHeight() - 1);
 
 	std::array<uint64_t, PixelSampleCount> Samples;
 	std::generate(Samples.begin(), Samples.end(), [&dist, &rng](){return dist(rng);});
