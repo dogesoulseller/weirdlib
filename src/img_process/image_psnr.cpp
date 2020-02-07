@@ -202,9 +202,9 @@ namespace wlib::image
 
 			for (size_t i = 0; i < 3; i++) {
 				if constexpr (std::is_same_v<FloatT, float>) {
-					outData.MSEPerChannel[i] = getChannelMSE_float(image0.channels[i], image1.channels[i], image0.GetWidth() * image0.GetHeight());
+					outData.MSEPerChannel[i] = getChannelMSE_float(image0.GetChannels()[i], image1.GetChannels()[i], image0.GetWidth() * image0.GetHeight());
 				} else {
-					outData.MSEPerChannel[i] = getChannelMSE_double(image0.channels[i], image1.channels[i], image0.GetWidth() * image0.GetHeight());
+					outData.MSEPerChannel[i] = getChannelMSE_double(image0.GetChannels()[i], image1.GetChannels()[i], image0.GetWidth() * image0.GetHeight());
 				}
 
 				outData.PSNRPerChannel[i] = 10 * std::log10(RSqr<FloatT> / outData.MSEPerChannel[i]);
@@ -218,9 +218,9 @@ namespace wlib::image
 			outData.PSNRPerChannel.resize(1);
 
 			if constexpr (std::is_same_v<FloatT, float>) {
-				outData.MSEPerChannel[0] = getChannelMSE_float(image0.channels[0], image1.channels[0], image0.GetWidth() * image0.GetHeight());
+				outData.MSEPerChannel[0] = getChannelMSE_float(image0.GetChannels()[0], image1.GetChannels()[0], image0.GetWidth() * image0.GetHeight());
 			} else {
-				outData.MSEPerChannel[0] = getChannelMSE_double(image0.channels[0], image1.channels[0], image0.GetWidth() * image0.GetHeight());
+				outData.MSEPerChannel[0] = getChannelMSE_double(image0.GetChannels()[0], image1.GetChannels()[0], image0.GetWidth() * image0.GetHeight());
 			}
 
 			outData.PSNRPerChannel[0] = 10 * std::log10(RSqr<FloatT> / outData.MSEPerChannel[0]);

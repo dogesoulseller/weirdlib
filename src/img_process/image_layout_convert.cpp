@@ -13,14 +13,14 @@ namespace wlib::image
 		{
 		  case ColorFormat::F_Grayscale:
 			outputPix = new float[in.GetWidth()*in.GetHeight()];
-			std::copy(in.channels[0], in.channels[0]+in.GetWidth()*in.GetHeight(), outputPix);
+			std::copy(in.GetChannels()[0], in.GetChannels()[0]+in.GetWidth()*in.GetHeight(), outputPix);
 			break;
 		  case ColorFormat::F_GrayAlpha:
 			outputPix = new float[in.GetWidth()*in.GetHeight()*2];
 			#pragma ivdep
 			for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
-				outputPix[i*2] = in.channels[0][i];
-				outputPix[i*2+1] = in.channels[1][i];
+				outputPix[i*2] = in.GetChannels()[0][i];
+				outputPix[i*2+1] = in.GetChannels()[1][i];
 			}
 			break;
 		  case ColorFormat::F_RGB:
@@ -28,9 +28,9 @@ namespace wlib::image
 			outputPix = new float[in.GetWidth()*in.GetHeight()*3];
 			#pragma ivdep
 			for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
-				outputPix[i*3] = in.channels[0][i];
-				outputPix[i*3+1] = in.channels[1][i];
-				outputPix[i*3+2] = in.channels[2][i];
+				outputPix[i*3] = in.GetChannels()[0][i];
+				outputPix[i*3+1] = in.GetChannels()[1][i];
+				outputPix[i*3+2] = in.GetChannels()[2][i];
 			}
 			break;
 		  case ColorFormat::F_Default:
@@ -39,10 +39,10 @@ namespace wlib::image
 			outputPix = new float[in.GetWidth()*in.GetHeight()*4];
 			#pragma ivdep
 			for (size_t i = 0; i < in.GetWidth() * in.GetHeight(); i++) {
-				outputPix[i*4] = in.channels[0][i];
-				outputPix[i*4+1] = in.channels[1][i];
-				outputPix[i*4+2] = in.channels[2][i];
-				outputPix[i*4+3] = in.channels[3][i];
+				outputPix[i*4] = in.GetChannels()[0][i];
+				outputPix[i*4+1] = in.GetChannels()[1][i];
+				outputPix[i*4+2] = in.GetChannels()[2][i];
+				outputPix[i*4+3] = in.GetChannels()[3][i];
 			}
 			break;
 		}
@@ -84,7 +84,7 @@ namespace wlib::image
 			}
 			#endif
 
-			outimg.channels.push_back(c0);
+			outimg.AccessChannels().push_back(c0);
 
 			break;
 		  }
@@ -110,8 +110,8 @@ namespace wlib::image
 			}
 			#endif
 
-			outimg.channels.push_back(c0);
-			outimg.channels.push_back(c1);
+			outimg.AccessChannels().push_back(c0);
+			outimg.AccessChannels().push_back(c1);
 
 			break;
 		  }
@@ -141,9 +141,9 @@ namespace wlib::image
 			}
 			#endif
 
-			outimg.channels.push_back(c0);
-			outimg.channels.push_back(c1);
-			outimg.channels.push_back(c2);
+			outimg.AccessChannels().push_back(c0);
+			outimg.AccessChannels().push_back(c1);
+			outimg.AccessChannels().push_back(c2);
 
 			break;
 		  }
@@ -177,10 +177,10 @@ namespace wlib::image
 			}
 			#endif
 
-			outimg.channels.push_back(c0);
-			outimg.channels.push_back(c1);
-			outimg.channels.push_back(c2);
-			outimg.channels.push_back(c3);
+			outimg.AccessChannels().push_back(c0);
+			outimg.AccessChannels().push_back(c1);
+			outimg.AccessChannels().push_back(c2);
+			outimg.AccessChannels().push_back(c3);
 
 			break;
 		  }

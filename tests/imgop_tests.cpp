@@ -36,11 +36,11 @@ TEST(ImgOps, ConvertToSoA) {
 	wlib::image::Image testImg(imgPath, true, imageWidth, imageHeight, wlib::image::F_RGBA);
 	auto testSoA = wlib::image::MakeSoAFromAoS(testImg);
 
-	EXPECT_EQ(testSoA.channels.size(), 4);
-	EXPECT_FLOAT_EQ(testImg.GetPixels()[0], testSoA.channels[0][0]);
-	EXPECT_FLOAT_EQ(testImg.GetPixels()[1], testSoA.channels[1][0]);
-	EXPECT_FLOAT_EQ(testImg.GetPixels()[2], testSoA.channels[2][0]);
-	EXPECT_FLOAT_EQ(testImg.GetPixels()[3], testSoA.channels[3][0]);
+	EXPECT_EQ(testSoA.GetChannels().size(), 4);
+	EXPECT_FLOAT_EQ(testImg.GetPixels()[0], testSoA.GetChannels()[0][0]);
+	EXPECT_FLOAT_EQ(testImg.GetPixels()[1], testSoA.GetChannels()[1][0]);
+	EXPECT_FLOAT_EQ(testImg.GetPixels()[2], testSoA.GetChannels()[2][0]);
+	EXPECT_FLOAT_EQ(testImg.GetPixels()[3], testSoA.GetChannels()[3][0]);
 }
 
 TEST(ImgOps, ConvertSoAToImage) {
@@ -75,10 +75,10 @@ TEST(ImgOps, LoadFromFormatted) {
 	EXPECT_FLOAT_EQ(testImg.GetPixels()[2], testImgF.GetPixels()[2]);
 	EXPECT_FLOAT_EQ(testImg.GetPixels()[3], testImgF.GetPixels()[3]);
 
-	EXPECT_FLOAT_EQ(testImg.GetPixels()[0], testImgSoA.channels[0][0]);
-	EXPECT_FLOAT_EQ(testImg.GetPixels()[1], testImgSoA.channels[1][0]);
-	EXPECT_FLOAT_EQ(testImg.GetPixels()[2], testImgSoA.channels[2][0]);
-	EXPECT_FLOAT_EQ(testImg.GetPixels()[3], testImgSoA.channels[3][0]);
+	EXPECT_FLOAT_EQ(testImg.GetPixels()[0], testImgSoA.GetChannels()[0][0]);
+	EXPECT_FLOAT_EQ(testImg.GetPixels()[1], testImgSoA.GetChannels()[1][0]);
+	EXPECT_FLOAT_EQ(testImg.GetPixels()[2], testImgSoA.GetChannels()[2][0]);
+	EXPECT_FLOAT_EQ(testImg.GetPixels()[3], testImgSoA.GetChannels()[3][0]);
 }
 
 TEST(ImgOps, ConvertRGBA_Grayscale) {
@@ -96,10 +96,10 @@ TEST(ImgOps, ConvertRGBA_Grayscale) {
 	auto testSoA_LumBT2100 = wlib::image::MakeSoAFromAoS(testImg);
 
 	testSoAA = wlib::image::ConvertToGrayscale(testSoAA, true);
-	EXPECT_EQ(testSoAA.channels.size(), 2);
+	EXPECT_EQ(testSoAA.GetChannels().size(), 2);
 
 	testSoANA = wlib::image::ConvertToGrayscale(testSoANA, false);
-	EXPECT_EQ(testSoANA.channels.size(), 1);
+	EXPECT_EQ(testSoANA.GetChannels().size(), 1);
 
 	testSoA_Average = wlib::image::ConvertToGrayscale(testSoA_Average, false, wlib::image::GrayscaleMethod::Average);
 	testSoA_Lightness = wlib::image::ConvertToGrayscale(testSoA_Lightness, false, wlib::image::GrayscaleMethod::Lightness);
@@ -128,12 +128,12 @@ TEST(ImgOps, NegateValues) {
 	std::generate(Samples.begin(), Samples.end(), [&dist, &rng](){return dist(rng);});
 
 	for (size_t i = 0; i < Samples.size(); i++) {
-		for (size_t c = 0; c < testSoA_NoAlpha.channels.size() - 1; c++) {
-			EXPECT_FLOAT_EQ(testSoA_NoAlpha.channels[c][Samples[i]], 255.0f - testSoABase.channels[c][Samples[i]]);
+		for (size_t c = 0; c < testSoA_NoAlpha.GetChannels().size() - 1; c++) {
+			EXPECT_FLOAT_EQ(testSoA_NoAlpha.GetChannels()[c][Samples[i]], 255.0f - testSoABase.GetChannels()[c][Samples[i]]);
 		}
 
-		for (size_t c = 0; c < testSoA_Alpha.channels.size(); c++) {
-			EXPECT_FLOAT_EQ(testSoA_Alpha.channels[c][Samples[i]], 255.0f - testSoABase.channels[c][Samples[i]]);
+		for (size_t c = 0; c < testSoA_Alpha.GetChannels().size(); c++) {
+			EXPECT_FLOAT_EQ(testSoA_Alpha.GetChannels()[c][Samples[i]], 255.0f - testSoABase.GetChannels()[c][Samples[i]]);
 		}
 	}
 }

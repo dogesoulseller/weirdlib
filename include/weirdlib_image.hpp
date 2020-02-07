@@ -250,10 +250,9 @@ namespace image
 		uint64_t width;
 		uint64_t height;
 		ColorFormat format;
-
-		public:
 		std::vector<float*> channels;
 
+		public:
 		/// Object is in invalid state after default construction
 		ImageSoA() = default;
 
@@ -315,6 +314,12 @@ namespace image
 		/// @return format as specified in @{link ColorFormat}
 		inline auto GetFormat() const noexcept { return format; }
 
+		/// Get read-only reference to vector of channels
+		inline auto& GetChannels() const noexcept { return channels; }
+
+		/// Get read-write reference to vector of channels
+		inline auto& AccessChannels() noexcept { return channels; }
+
 
 		/// Set image width
 		inline void SetWidth(uint64_t newVal) noexcept { width = newVal; }
@@ -336,8 +341,6 @@ namespace image
 		/// Get total image size (i.e. width * height * format)
 		/// @return pixel count
 		inline size_t GetTotalImageSize() const noexcept { return GetTotalImageSize(width, height, format);}
-
-
 
 		~ImageSoA();
 	};

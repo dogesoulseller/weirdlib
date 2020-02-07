@@ -50,9 +50,9 @@ namespace wlib::image
 				const auto iterRem_AVX = (inImg.GetWidth() * inImg.GetHeight()) % 8;
 
 				for (size_t i = 0; i < iter_AVX; i++) {
-					const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
-					const auto gChan = _mm256_loadu_ps(inImg.channels[channelGreenN]+i*8);
-					const auto bChan = _mm256_loadu_ps(inImg.channels[channelBlueN]+i*8);
+					const auto rChan = _mm256_loadu_ps(inImg.AccessChannels()[channelRedN]+i*8);
+					const auto gChan = _mm256_loadu_ps(inImg.AccessChannels()[channelGreenN]+i*8);
+					const auto bChan = _mm256_loadu_ps(inImg.AccessChannels()[channelBlueN]+i*8);
 
 					#ifdef X86_SIMD_FMA
 						const auto resultGr = _mm256_min_ps(_mm256_fmadd_ps(rChan, redMul, _mm256_fmadd_ps(gChan, greenMul, _mm256_mul_ps(bChan, blueMul))), maxMask);
@@ -64,7 +64,7 @@ namespace wlib::image
 				}
 
 				for (size_t i = iter_AVX * 8; i < iterRem_AVX + iter_AVX*8; i++) {
-					if (const auto result = std::fma(inImg.channels[channelRedN][i], rWeight, std::fma(inImg.channels[channelGreenN][i], gWeight, inImg.channels[channelBlueN][i] * bWeight)); result > 255.0f) {
+					if (const auto result = std::fma(inImg.AccessChannels()[channelRedN][i], rWeight, std::fma(inImg.AccessChannels()[channelGreenN][i], gWeight, inImg.AccessChannels()[channelBlueN][i] * bWeight)); result > 255.0f) {
 						outGr[i] = 255.0f;
 					} else {
 						outGr[i] = result;
@@ -82,9 +82,9 @@ namespace wlib::image
 				const auto iterRem_SSE = (inImg.GetWidth() * inImg.GetHeight()) % 4;
 
 				for (size_t i = 0; i < iter_SSE; i++) {
-					const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
-					const auto gChan = _mm_loadu_ps(inImg.channels[channelGreenN]+i*4);
-					const auto bChan = _mm_loadu_ps(inImg.channels[channelBlueN]+i*4);
+					const auto rChan = _mm_loadu_ps(inImg.AccessChannels()[channelRedN]+i*4);
+					const auto gChan = _mm_loadu_ps(inImg.AccessChannels()[channelGreenN]+i*4);
+					const auto bChan = _mm_loadu_ps(inImg.AccessChannels()[channelBlueN]+i*4);
 
 					#ifdef X86_SIMD_FMA	// Technically shouldn't be possible
 						const auto resultGr = _mm_min_ps(_mm_fmadd_ps(rChan, redMul, _mm256_fmadd_ps(gChan, greenMul, _mm_mul_ps(bChan, blueMul))), maxMask);
@@ -96,7 +96,7 @@ namespace wlib::image
 				}
 
 				for (size_t i = iter_SSE * 4; i < iterRem_SSE + iter_SSE * 4; i++) {
-					if (const auto result = std::fma(inImg.channels[channelRedN][i], rWeight, std::fma(inImg.channels[channelGreenN][i], gWeight, inImg.channels[channelBlueN][i] * bWeight)); result > 255.0f) {
+					if (const auto result = std::fma(inImg.AccessChannels()[channelRedN][i], rWeight, std::fma(inImg.AccessChannels()[channelGreenN][i], gWeight, inImg.AccessChannels()[channelBlueN][i] * bWeight)); result > 255.0f) {
 						outGr[i] = 255.0f;
 					} else {
 						outGr[i] = result;
@@ -104,7 +104,7 @@ namespace wlib::image
 				}
 			#else
 				for (size_t i = 0; i < inImg.GetWidth() * inImg.GetHeight(); i++) {
-					if (const auto result = std::fma(inImg.channels[channelRedN][i], rWeight, std::fma(inImg.channels[channelGreenN][i], gWeight, inImg.channels[channelBlueN][i] * bWeight)); result > 255.0f) {
+					if (const auto result = std::fma(inImg.AccessChannels()[channelRedN][i], rWeight, std::fma(inImg.AccessChannels()[channelGreenN][i], gWeight, inImg.AccessChannels()[channelBlueN][i] * bWeight)); result > 255.0f) {
 						outGr[i] = 255.0f;
 					} else {
 						outGr[i] = result;
@@ -137,9 +137,9 @@ namespace wlib::image
 				const auto iterRem_AVX = (inImg.GetWidth() * inImg.GetHeight()) % 8;
 
 				for (size_t i = 0; i < iter_AVX; i++) {
-					const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
-					const auto gChan = _mm256_loadu_ps(inImg.channels[channelGreenN]+i*8);
-					const auto bChan = _mm256_loadu_ps(inImg.channels[channelBlueN]+i*8);
+					const auto rChan = _mm256_loadu_ps(inImg.AccessChannels()[channelRedN]+i*8);
+					const auto gChan = _mm256_loadu_ps(inImg.AccessChannels()[channelGreenN]+i*8);
+					const auto bChan = _mm256_loadu_ps(inImg.AccessChannels()[channelBlueN]+i*8);
 
 					const auto maxValues = _mm256_max_ps(rChan, _mm256_max_ps(gChan, bChan));
 					const auto minValues = _mm256_min_ps(rChan, _mm256_min_ps(gChan, bChan));
@@ -154,8 +154,8 @@ namespace wlib::image
 				}
 
 				for (size_t i = iter_AVX * 8; i < iterRem_AVX + iter_AVX*8; i++) {
-					const auto maxValue = std::max(std::max(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
-					const auto minValue = std::min(std::min(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto maxValue = std::max(std::max(inImg.AccessChannels()[channelRedN][i], inImg.AccessChannels()[channelGreenN][i]), inImg.AccessChannels()[channelBlueN][i]);
+					const auto minValue = std::min(std::min(inImg.AccessChannels()[channelRedN][i], inImg.AccessChannels()[channelGreenN][i]), inImg.AccessChannels()[channelBlueN][i]);
 					const auto result = (maxValue + minValue) * 0.5f;
 
 					if (result > 255.0f) {
@@ -174,9 +174,9 @@ namespace wlib::image
 				const auto iterRem_SSE = (inImg.GetWidth() * inImg.GetHeight()) % 4;
 
 				for (size_t i = 0; i < iter_SSE; i++) {
-					const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
-					const auto gChan = _mm_loadu_ps(inImg.channels[channelGreenN]+i*4);
-					const auto bChan = _mm_loadu_ps(inImg.channels[channelBlueN]+i*4);
+					const auto rChan = _mm_loadu_ps(inImg.AccessChannels()[channelRedN]+i*4);
+					const auto gChan = _mm_loadu_ps(inImg.AccessChannels()[channelGreenN]+i*4);
+					const auto bChan = _mm_loadu_ps(inImg.AccessChannels()[channelBlueN]+i*4);
 
 					const auto maxValues = _mm_max_ps(rChan, _mm_max_ps(gChan, bChan));
 					const auto minValues = _mm_min_ps(rChan, _mm_min_ps(gChan, bChan));
@@ -187,8 +187,8 @@ namespace wlib::image
 				}
 
 				for (size_t i = iter_SSE * 4; i < iterRem_SSE + iter_SSE*4; i++) {
-					const auto maxValue = std::max(std::max(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
-					const auto minValue = std::min(std::min(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto maxValue = std::max(std::max(inImg.AccessChannels()[channelRedN][i], inImg.AccessChannels()[channelGreenN][i]), inImg.AccessChannels()[channelBlueN][i]);
+					const auto minValue = std::min(std::min(inImg.AccessChannels()[channelRedN][i], inImg.AccessChannels()[channelGreenN][i]), inImg.AccessChannels()[channelBlueN][i]);
 					const auto result = (maxValue + minValue) * 0.5f;
 
 					if (result > 255.0f) {
@@ -200,8 +200,8 @@ namespace wlib::image
 
 			#else
 				for (size_t i = 0; i < inImg.GetWidth() * inImg.GetHeight(); i++) {
-					const auto maxValue = std::max(std::max(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
-					const auto minValue = std::min(std::min(inImg.channels[channelRedN][i], inImg.channels[channelGreenN][i]), inImg.channels[channelBlueN][i]);
+					const auto maxValue = std::max(std::max(inImg.AccessChannels()[channelRedN][i], inImg.AccessChannels()[channelGreenN][i]), inImg.AccessChannels()[channelBlueN][i]);
+					const auto minValue = std::min(std::min(inImg.AccessChannels()[channelRedN][i], inImg.AccessChannels()[channelGreenN][i]), inImg.AccessChannels()[channelBlueN][i]);
 					const auto result = (maxValue + minValue) * 0.5f;
 
 					if (result > 255.0f) {
@@ -223,9 +223,9 @@ namespace wlib::image
 				const auto iterRem_AVX = (inImg.GetWidth() * inImg.GetHeight()) % 8;
 
 				for (size_t i = 0; i < iter_AVX; i++) {
-					const auto rChan = _mm256_loadu_ps(inImg.channels[channelRedN]+i*8);
-					const auto gChan = _mm256_loadu_ps(inImg.channels[channelGreenN]+i*8);
-					const auto bChan = _mm256_loadu_ps(inImg.channels[channelBlueN]+i*8);
+					const auto rChan = _mm256_loadu_ps(inImg.AccessChannels()[channelRedN]+i*8);
+					const auto gChan = _mm256_loadu_ps(inImg.AccessChannels()[channelGreenN]+i*8);
+					const auto bChan = _mm256_loadu_ps(inImg.AccessChannels()[channelBlueN]+i*8);
 
 					#ifdef X86_SIMD_FMA
 					const auto resultGr = _mm256_min_ps(_mm256_fmadd_ps(_mm256_add_ps(rChan, gChan), bChan, divMask), maxMask);
@@ -237,7 +237,7 @@ namespace wlib::image
 				}
 
 				for (size_t i = iter_AVX * 8; i < iterRem_AVX + iter_AVX*8; i++) {
-					const auto result = (inImg.channels[channelRedN][i] + inImg.channels[channelGreenN][i] + inImg.channels[channelBlueN][i]) * 0.3333333333f;
+					const auto result = (inImg.AccessChannels()[channelRedN][i] + inImg.AccessChannels()[channelGreenN][i] + inImg.AccessChannels()[channelBlueN][i]) * 0.3333333333f;
 
 					if (result > 255.0f) {
 						outGr[i] = 255.0f;
@@ -255,9 +255,9 @@ namespace wlib::image
 				const auto iterRem_AVX = (inImg.GetWidth() * inImg.GetHeight()) % 4;
 
 				for (size_t i = 0; i < iter_AVX; i++) {
-					const auto rChan = _mm_loadu_ps(inImg.channels[channelRedN]+i*4);
-					const auto gChan = _mm_loadu_ps(inImg.channels[channelGreenN]+i*4);
-					const auto bChan = _mm_loadu_ps(inImg.channels[channelBlueN]+i*4);
+					const auto rChan = _mm_loadu_ps(inImg.AccessChannels()[channelRedN]+i*4);
+					const auto gChan = _mm_loadu_ps(inImg.AccessChannels()[channelGreenN]+i*4);
+					const auto bChan = _mm_loadu_ps(inImg.AccessChannels()[channelBlueN]+i*4);
 
 					const auto resultGr = _mm_min_ps(_mm_mul_ps(_mm_add_ps(rChan, _mm_add_ps(gChan, bChan)), divMask), maxMask);
 
@@ -265,7 +265,7 @@ namespace wlib::image
 				}
 
 				for (size_t i = iter_AVX * 4; i < iterRem_AVX + iter_AVX*4; i++) {
-					const auto result = (inImg.channels[channelRedN][i] + inImg.channels[channelGreenN][i] + inImg.channels[channelBlueN][i]) * 0.3333333333f;
+					const auto result = (inImg.AccessChannels()[channelRedN][i] + inImg.AccessChannels()[channelGreenN][i] + inImg.AccessChannels()[channelBlueN][i]) * 0.3333333333f;
 
 					if (result > 255.0f) {
 						outGr[i] = 255.0f;
@@ -276,7 +276,7 @@ namespace wlib::image
 
 			#else
 				for (size_t i = 0; i < inImg.GetWidth() * inImg.GetHeight(); i++) {
-					const auto result = (inImg.channels[channelRedN][i] + inImg.channels[channelGreenN][i] + inImg.channels[channelBlueN][i]) * 0.3333333333f;
+					const auto result = (inImg.AccessChannels()[channelRedN][i] + inImg.AccessChannels()[channelGreenN][i] + inImg.AccessChannels()[channelBlueN][i]) * 0.3333333333f;
 
 					if (result > 255.0f) {
 						outGr[i] = 255.0f;
@@ -295,26 +295,26 @@ namespace wlib::image
 		if (inImg.GetFormat() == F_RGB || inImg.GetFormat() == F_BGR || !preserveAlpha) {
 			inImg.SetFormat(F_Grayscale);
 
-			for (auto& ptr : inImg.channels) {
+			for (auto& ptr : inImg.AccessChannels()) {
 				delete[] ptr;
 			}
 
-			inImg.channels.resize(1);
-			inImg.channels.shrink_to_fit();
-			inImg.channels[0] = outGr;
+			inImg.AccessChannels().resize(1);
+			inImg.AccessChannels().shrink_to_fit();
+			inImg.AccessChannels()[0] = outGr;
 		} else if (inImg.GetFormat() == F_RGBA || inImg.GetFormat() == F_BGRA) {
 			inImg.SetFormat(F_GrayAlpha);
 
-			for (size_t i = 0; i < inImg.channels.size()-1; i++) {
-				delete[] inImg.channels[i];
+			for (size_t i = 0; i < inImg.AccessChannels().size()-1; i++) {
+				delete[] inImg.AccessChannels()[i];
 			}
 
-			auto imgAlpha = inImg.channels[3];
+			auto imgAlpha = inImg.AccessChannels()[3];
 
-			inImg.channels.resize(2);
-			inImg.channels.shrink_to_fit();
-			inImg.channels[0] = outGr;
-			inImg.channels[1] = imgAlpha;
+			inImg.AccessChannels().resize(2);
+			inImg.AccessChannels().shrink_to_fit();
+			inImg.AccessChannels()[0] = outGr;
+			inImg.AccessChannels()[1] = imgAlpha;
 		}
 
 		return inImg;

@@ -109,31 +109,31 @@ namespace wlib::image::detail
 	void extendGSTo3Chan(ImageSoA& in) {
 		for (int_fast8_t i = 1; i <= 2; i++) {
 			alignas(64) auto tmp = new float[in.GetWidth()*in.GetHeight()];
-			std::copy(in.channels[0], in.channels[0]+in.GetWidth()*in.GetHeight(), tmp);
-			in.channels[i] = tmp;
+			std::copy(in.AccessChannels()[0], in.AccessChannels()[0]+in.GetWidth()*in.GetHeight(), tmp);
+			in.AccessChannels()[i] = tmp;
 		}
 	}
 
 	void extendGSTo4Chan(ImageSoA& in, bool constantAlpha) {
 		for (int_fast8_t i = 1; i <= 2; i++) {
 			alignas(64) auto tmp = new float[in.GetWidth()*in.GetHeight()];
-			std::copy(in.channels[0], in.channels[0]+in.GetWidth()*in.GetHeight(), tmp);
-			in.channels[i] = tmp;
+			std::copy(in.AccessChannels()[0], in.AccessChannels()[0]+in.GetWidth()*in.GetHeight(), tmp);
+			in.AccessChannels()[i] = tmp;
 		}
 
 		if (constantAlpha) {
 			alignas(64) auto tmp = new float[in.GetWidth()*in.GetHeight()];
 			std::uninitialized_fill(tmp, tmp + in.GetWidth() * in.GetHeight(), 255.0f);
-			in.channels[3] = tmp;
+			in.AccessChannels()[3] = tmp;
 		} else {
-			in.channels[3] = in.channels[1];
+			in.AccessChannels()[3] = in.AccessChannels()[1];
 		}
 	}
 
 	void appendConstantAlpha(ImageSoA& in) {
 		alignas(64) auto tmp = new float[in.GetWidth() * in.GetHeight()];
 		std::uninitialized_fill(tmp, tmp + in.GetWidth() * in.GetHeight(), 255.0f);
-		in.channels.push_back(tmp);
+		in.AccessChannels().push_back(tmp);
 	}
 
 } // namespace wlib::image::detail
