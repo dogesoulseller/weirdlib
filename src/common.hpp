@@ -13,9 +13,6 @@
 
 
 /// Get optimal thread count for processing image of given size
-/// @param width image width
-/// @param height image height
-/// @return thread count
 int getImagePreferredThreadCount(int width, int height);
 
 inline constexpr std::array<char, 10> digits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};

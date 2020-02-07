@@ -48,20 +48,17 @@ namespace file
 	};
 
 	/// Detect file type based on identifying features
-	/// @param path path to the file to detect
-	/// @return {@link FileType} enum value
 	FileType DetectFileType(const std::string& path);
 
 	/// Detect file type based on identifying features
-	/// @param fileData pointer to start of file data
 	/// @param size maximum number of bytes to access
-	/// @return {@link FileType} enum value
 	FileType DetectFileType(const uint8_t* fileData, size_t size);
 
 	/// Get extension (including .) corresponding to file type
-	/// @param type file type to get extension for
-	/// @return extension
 	std::string GetFiletypeExtension(FileType type) noexcept;
+
+	// TODO:
+	// bool ChangeExtensionToMatchType();
 
 } // namespace file
 } // namespace wlib

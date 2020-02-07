@@ -96,7 +96,7 @@ namespace image
 	};
 
 
-	/// Class representing a 2D image in Array of Structures (i.e. RGB RGB RGB), converts to a floating point representation on load
+	/// Class representing a 2D image in Array of Structures (i.e. RGB RGB RGB), converts to a non-normalized floating point representation on load
 	class Image
 	{
 	  private:
@@ -106,58 +106,42 @@ namespace image
 		uint64_t height;
 
 	  public:
-	  	/// Default constructor
 		Image() = default;
 
 		/// Constructor from a file readable by the filesystem
-		/// @param path absolute or relative path to supported image file
 		/// @param isRawData whether to load data as a dump of pixel values
-		/// @param width width in pixels
-		/// @param height height in pixels
 		/// @param requestedFormat format to convert to on load, or in case of raw data, to interpret as
 		Image(const std::string& path, bool isRawData = false, uint64_t width = 0, uint64_t height = 0, ColorFormat requestedFormat = F_Default);
 
 		/// Constructor from in-memory 8-bit per color pixel data
-		/// @param width width in pixels
-		/// @param height height in pixels
 		/// @param format format to interpret data as
 		Image(const uint8_t* pixels, uint64_t width, uint64_t height, ColorFormat format);
 
-		/// Constructor from in-memory floating point pixel data
-		/// @param width width in pixels
-		/// @param height height in pixels
+		// TODO: Allow loading from normalized pixel data
+
+		/// Constructor from in-memory non-normalized floating point pixel data
 		/// @param format format to interpret data as
 		Image(const float* pixels, uint64_t width, uint64_t height, ColorFormat format);
 
-		/// Copy constructor
 		Image(const Image&) = default;
-
-		/// Copy assignment operator
-		Image& operator=(const Image&) = default;
-
-		/// Move constructor
 		Image(Image&&) = default;
 
-		/// Move assignment operator
+		Image& operator=(const Image&) = default;
 		Image& operator=(Image&&) = default;
 
 		~Image() = default;
 
 
 		/// Convert input image to RGBA
-		/// @param in input image
 		static void ConvertToRGBA(Image& in);
 
 		/// Convert input image to BGR
-		/// @param in input image
 		static void ConvertToBGR(Image& in);
 
 		/// Convert input image to RGB
-		/// @param in input image
 		static void ConvertToRGB(Image& in);
 
 		/// Convert input image to BGRA
-		/// @param in input image
 		static void ConvertToBGRA(Image& in);
 
 		/// Convert input image to RGBA
@@ -173,39 +157,28 @@ namespace image
 		void ConvertToBGRA();
 
 		/// Load image from a file readable by the filesystem
-		/// @param path absolute or relative path to supported image file
 		/// @param isRawData whether to load data as a dump of pixel values
-		/// @param width width in pixels
-		/// @param height height in pixels
 		/// @param requestedFormat format to convert to on load, or in case of raw data, to interpret as
 		void LoadImage(const std::string& path, bool isRawData = false, uint64_t width = 0, uint64_t height = 0, ColorFormat requestedFormat = F_Default);
 
 		/// Load image from in-memory 8-bit per color pixel data
-		/// @param width width in pixels
-		/// @param height height in pixels
 		/// @param format format to interpret data as
 		void LoadImage(const uint8_t* pixels, uint64_t width, uint64_t height, ColorFormat format);
 
 		/// Load image from in-memory floating point pixel data
-		/// @param width width in pixels
-		/// @param height height in pixels
 		/// @param format format to interpret data as
 		void LoadImage(const float* pixels, uint64_t width, uint64_t height, ColorFormat format);
 
 		/// Get image width
-		/// @return width
 		inline auto GetWidth()  const noexcept { return width;  }
 
 		/// Get image height
-		/// @return height
 		inline auto GetHeight() const noexcept { return height; }
 
 		/// Get image format
-		/// @return format as specified in @{link ColorFormat}
 		inline auto GetFormat() const noexcept { return format; }
 
 		/// Get read-only raw image pixel data
-		/// @return pointer to raw pixel data
 		inline auto GetPixels() const noexcept { return pixels.data(); }
 
 		/// Set image width
@@ -218,7 +191,6 @@ namespace image
 		inline void SetFormat(ColorFormat _format) noexcept { format = _format; }
 
 		/// Get raw image pixel data
-		/// @return pointer to raw pixel data
 		inline auto GetPixels_Unsafe() noexcept { return pixels.data(); }
 
 		/// Get underlying vector <br>
@@ -226,14 +198,9 @@ namespace image
 		inline std::vector<float>& AccessStorage() { return pixels; }
 
 		/// Get total image size (i.e. width * height * format)
-		/// @param width image width
-		/// @param height image height
-		/// @param format image format @{link ColorFormat}
-		/// @return pixel count
 		static size_t GetTotalImageSize(uint64_t width, uint64_t height, ColorFormat format) noexcept;
 
 		/// Get total image size (i.e. width * height * format)
-		/// @return pixel count
 		size_t GetTotalImageSize() const noexcept;
 
 		/// Get pixel values as 8-bit integers
@@ -256,36 +223,24 @@ namespace image
 		/// Object is in invalid state after default construction
 		ImageSoA() = default;
 
-		/// Construct from AoS @{link Image}
 		ImageSoA(const Image&);
 
-		/// Copy constructor
 		ImageSoA(const ImageSoA&);
-
-		/// Move constructor
 		ImageSoA(ImageSoA&&);
 
-		/// Copy assignment operator
 		ImageSoA& operator=(const ImageSoA&);
-
-		/// Move assignment operator
 		ImageSoA& operator=(ImageSoA&&);
 
-
 		/// Convert input image to RGBA
-		/// @param in input image
 		static void ConvertToRGBA(ImageSoA& in);
 
 		/// Convert input image to BGR
-		/// @param in input image
 		static void ConvertToBGR(ImageSoA& in);
 
 		/// Convert input image to RGB
-		/// @param in input image
 		static void ConvertToRGB(ImageSoA& in);
 
 		/// Convert input image to BGRA
-		/// @param in input image
 		static void ConvertToBGRA(ImageSoA& in);
 
 
@@ -303,11 +258,9 @@ namespace image
 
 
 		/// Get image width
-		/// @return width
 		inline auto GetWidth()  const noexcept { return width;  }
 
 		/// Get image height
-		/// @return height
 		inline auto GetHeight() const noexcept { return height; }
 
 		/// Get image format
@@ -332,21 +285,18 @@ namespace image
 
 
 		/// Get total image size (i.e. width * height * format)
-		/// @param width image width
-		/// @param height image height
-		/// @param format image format @{link ColorFormat}
-		/// @return pixel count
 		static size_t GetTotalImageSize(uint64_t width, uint64_t height, ColorFormat format) noexcept {return Image::GetTotalImageSize(width, height, format);}
 
 		/// Get total image size (i.e. width * height * format)
-		/// @return pixel count
 		inline size_t GetTotalImageSize() const noexcept { return GetTotalImageSize(width, height, format);}
 
 		~ImageSoA();
 	};
 
+	/// Make new SoA image using AoS image as source
 	ImageSoA MakeSoAFromAoS(const Image& in);
 
+	/// Make new AoS image using AoS image as source
 	Image MakeAoSFromSoA(const ImageSoA& in);
 
 
@@ -368,20 +318,19 @@ namespace image
 		}
 	}
 
-	/// Convert image into a grayscale representation using various methods described in @{link GrayscaleMethod}
-	/// @param inImg image to be modified
+	/// Convert image into a grayscale representation using methods described in @{link GrayscaleMethod}
 	/// @param preserveAlpha whether alpha should be kept or discarded
 	/// @param method grayscale calculation method
 	/// @return reference to modified input image
 	ImageSoA& ConvertToGrayscale(ImageSoA& inImg, bool preserveAlpha = false, GrayscaleMethod method = GrayscaleMethod::Luminosity);
 
-	/// Function converting 8bpc into 32bpc float
+	/// Convert 8bpc unsigned int data into 32bpc float data
 	/// @param in pointer to raw image data
 	/// @param out caller-managed pointer to destination
 	/// @param fileSize total number of pixels
 	void ConvertUint8ToFloat(const uint8_t* in, float* out, size_t fileSize);
 
-	/// Function converting 16bpc into 32bpc float
+	/// Convert 16bpc unsigned int data into 32bpc float data
 	/// @param in pointer to raw image data
 	/// @param out caller-managed pointer to destination
 	/// @param fileSize total number of pixels
@@ -389,7 +338,6 @@ namespace image
 
 	/// Convert all color values to their image negative version <br>
 	/// Effectively does max_val - current_val
-	/// @param in input image
 	/// @param withAlpha whether to preserve alpha channel
 	void NegateValues(ImageSoA& in, bool withAlpha = false);
 

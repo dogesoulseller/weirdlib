@@ -30,31 +30,20 @@ namespace wlib
 		size_t findByKey(const KeyT& key) const noexcept;
 
 		public:
-		/// Default constructor
 		unordered_flat_map() = default;
-
-		/// Copy constructor
 		unordered_flat_map(const unordered_flat_map&) = default;
-
-		/// Move constructor
 		unordered_flat_map(unordered_flat_map&&) noexcept = default;
 
-		/// Initializer list constructor
 		template<typename PairT>
 		unordered_flat_map(std::initializer_list<PairT> l);
 
-		/// Copy assignment operator
 		unordered_flat_map& operator=(const unordered_flat_map&) = default;
-
-		/// Move assignment operator
 		unordered_flat_map& operator=(unordered_flat_map&&) noexcept = default;
 
-		/// Get total count of key-value pair
-		/// @return Element count
+		/// Get count of key-value pairs
 		[[nodiscard]] size_t size() const noexcept;
 
 		/// Get preallocated element count
-		/// @return Preallocated element count
 		[[nodiscard]] size_t capacity() const noexcept;
 
 		/// Free excess preallocated memory
@@ -64,50 +53,35 @@ namespace wlib
 		void clear() noexcept;
 
 		/// Preallocate memory for `size` elements
-		/// @param size new size
 		void reserve(const size_t size);
 
 		/// Get max element count possible for container
-		/// @return max element count
 		[[nodiscard]] size_t max_size() const noexcept;
 
 		/// Look up reference to value with `key`
-		/// @return value reference
-		/// @param key key to search for
 		const ValueT& at(const KeyT& key) const;
 
 		/// Look up reference to value with `key` <br>
-		/// @return value reference
-		/// @param key key to search for
 		/// @see at
 		const ValueT& operator[](const KeyT& key) const;
 
 		/// Check if value with `key` exists in container
-		/// @return result of search
-		/// @param key key to search for
 		bool exists(const KeyT& key) const noexcept;
 
 		/// Check if `value` exists in container
-		/// @return result of search
-		/// @param value value to search for
 		bool exists_val(const ValueT& value) const noexcept;
 
 		/// Insert key-value pair into map <br>
 		/// If value already exists, it is not overwritten
 		/// @see insert_or_assign
-		/// @param key key to insert
-		/// @param value value to insert
 		void insert(const KeyT& key, const ValueT& value);
 
 		/// Insert key-value pair into map <br>
 		/// If value already exists, it is overwritten
 		/// @see insert
-		/// @param key key to insert
-		/// @param value value to insert
 		void insert_or_assign(const KeyT& key, const ValueT& value);
 
-		/// Remove item at `key`
-		/// @param key key to remove from map
+		/// Remove item under `key`
 		void erase(const KeyT& key);
 	};
 

@@ -10,6 +10,7 @@ namespace wlib
 {
 namespace math
 {
+	/// Get next multiple of `multiple` that's larger than or equal to `n`
 	template<typename T, typename MulT, typename = std::enable_if_t<std::is_integral_v<T> && std::is_integral_v<MulT>>>
 	auto next_multiple(const T n, const MulT multiple) {
 		if (multiple == 0)
@@ -25,6 +26,7 @@ namespace math
 			return n + multiple - remainder;
 	}
 
+	/// Get previous multiple of `multiple` that's smaller than or equal to `n`
 	template<typename T, typename MulT, typename = std::enable_if_t<std::is_integral_v<T> && std::is_integral_v<MulT>>>
 	auto previous_multiple(const T n, const MulT multiple) {
 		if (multiple == 0)
@@ -37,6 +39,7 @@ namespace math
 		return next_mul - multiple == 0 ? next_mul : next_mul - multiple;
 	}
 
+	/// Get nearest multiple of `multiple` that's nearest to `n`
 	template<typename T, typename MulT, typename = std::enable_if_t<std::is_integral_v<T> && std::is_integral_v<MulT>>>
 	auto nearest_multiple(const T n, const MulT multiple) {
 		if (multiple == 0)
@@ -52,6 +55,7 @@ namespace math
 		}
 	}
 
+	/// Check for equality between `a` and `b` with specified tolerance
 	template<typename TLHS, typename TRHS, typename = std::enable_if_t<std::is_floating_point_v<TLHS> && std::is_floating_point_v<TRHS>>>
 	bool float_eq(const TLHS a, const TRHS b, const std::common_type_t<TLHS, TRHS> tolerance = 4.0) {
 		using CommonT = std::common_type_t<TLHS, TRHS>;
@@ -60,11 +64,13 @@ namespace math
 		return std::abs(a - b) <= std::min(std::abs(a), std::abs(b)) * std::numeric_limits<CommonT>::epsilon() * tolerance;
 	}
 
+	/// Get maximum value in given parameter set
 	template<typename T>
 	constexpr T max(T&& v) {
 		return std::forward<T>(v);
 	}
 
+	/// Get maximum value in given parameter set
 	template<typename T0, typename T1, typename... Args>
 	constexpr std::common_type_t<T0, T1, Args...> max(T0&& v0, T1&& v1, Args... args) {
 		return v1 > v0
@@ -72,11 +78,13 @@ namespace math
 		: max(v0, std::forward<Args>(args)...);
 	}
 
+	/// Get maximum value in given parameter set
 	template<typename T>
 	constexpr T min(T&& v) {
 		return std::forward<T>(v);
 	}
 
+	/// Get maximum value in given parameter set
 	template<typename T0, typename T1, typename... Args>
 	constexpr std::common_type_t<T0, T1, Args...> min(T0&& v0, T1&& v1, Args... args) {
 		return v1 < v0
@@ -84,7 +92,7 @@ namespace math
 		: min(v0, std::forward<Args>(args)...);
 	}
 
-	// Specialized for all integral
+	/// Get average of given parameters (integers)
 	template<typename T0, typename T1, typename... Args> constexpr
 	std::enable_if_t<std::is_integral_v<T0> && std::is_integral_v<T1>
 	&& (std::is_integral_v<Args> && ...),
@@ -94,7 +102,7 @@ namespace math
 		return tmp / (sizeof...(rest) + 2);
 	}
 
-	// Average with remainder
+	/// Get average of given parameters along with remainder
 	template<typename T0, typename T1, typename... Args> constexpr
 	std::enable_if_t<std::is_integral_v<T0> && std::is_integral_v<T1>
 	&& (std::is_integral_v<Args> && ...),
@@ -104,7 +112,7 @@ namespace math
 		return std::make_pair(tmp / (sizeof...(rest) + 2), tmp % (sizeof...(rest) + 2));
 	}
 
-	// Specialized for all floating
+	/// Get average of given parameters (floats)
 	template<typename T0, typename T1, typename... Args> constexpr
 	std::enable_if_t<std::is_floating_point_v<T0> && std::is_floating_point_v<T1>
 	&& (std::is_floating_point_v<Args> && ...),
@@ -114,7 +122,7 @@ namespace math
 		return tmp / static_cast<std::common_type_t<T0, T1, Args...>>((sizeof...(rest) + 2));
 	}
 
-	// Specialized for mixed
+	/// Get average of given parameters (mixed)
 	template<typename T0, typename T1, typename... Args> constexpr
 	std::enable_if_t<(!(std::is_floating_point_v<T0> && std::is_floating_point_v<T1>
 	&& (std::is_floating_point_v<Args> && ...))) && (!(std::is_integral_v<T0> && std::is_integral_v<T1>
@@ -124,7 +132,7 @@ namespace math
 		return tmp / static_cast<std::common_type_t<T0, T1, Args...>>((sizeof...(rest) + 2));
 	}
 
-	// Specialized for iterators
+	/// Get average of elements between `start` and `end`
 	template<typename IterT> constexpr
 	typename std::iterator_traits<IterT>::value_type average(const IterT start, const IterT end) {
 		auto out = typename std::iterator_traits<IterT>::value_type {};
@@ -135,7 +143,7 @@ namespace math
 		return out / std::distance(start, end);
 	}
 
-	// Specialized for iterators
+	/// Get average of elements between `start` and `end` along with remainder
 	template<typename IterT> constexpr
 	std::enable_if_t<std::is_integral_v<typename std::iterator_traits<IterT>::value_type>,
 	std::pair<typename std::iterator_traits<IterT>::value_type, size_t>> average_and_remainder(const IterT start, const IterT end) {

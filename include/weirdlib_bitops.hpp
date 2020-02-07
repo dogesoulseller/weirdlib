@@ -18,69 +18,49 @@ namespace bop
 	// SINGLE BIT OPERATIONS //
 	//-----------------------//
 
-	/// Test bit at pos of value x
-	/// @param x input value
-	/// @param pos bit position (Little Endian)
-	/// @return boolean true if bit set, false if bit reset
+	/// Test bit at pos of value x (Little Endian)
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	constexpr bool test(const T x, const uint8_t pos) noexcept {
 		return ((x >> pos) & 1) != 0;
 	}
 
-	/// Set bit at pos of value x (in-place)
-	/// @param x value to modify
-	/// @param pos bit position (Little Endian)
+	/// Set bit at pos of value x (in-place, Little Endian)
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	void set_ip(T& x, const uint8_t pos) noexcept {
 		x |= (1u << pos);
 	}
 
 	/// Set bit at pos of value x
-	/// @param x input value
-	/// @param pos bit position (Little Endian)
-	/// @return modified x
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	constexpr T set(const T x, const uint8_t pos) noexcept {
 		return x | T(1u << pos);
 	}
 
-	/// Reset bit at pos of value x (in-place)
-	/// @param x value to modify
-	/// @param pos bit position (Little Endian)
+	/// Reset bit at pos of value x (in-place) (Little Endian)
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	void reset_ip(T& x, const uint8_t pos) noexcept {
 		x &= ~(1u << pos);
 	}
 
-	/// Reset bit at pos of value x
-	/// @param x input value
-	/// @param pos bit position (Little Endian)
-	/// @return modified x
+	/// Reset bit at pos of value x (Little Endian)
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	constexpr T reset(const T x, const uint8_t pos) noexcept {
 		return x & ~(1u << pos);
 	}
 
-	/// Toggle (complement) bit at pos of value x (in-place)
-	/// @param x value to modify
-	/// @param pos bit position (Little Endian)
+	/// Toggle (complement) bit at pos of value x (in-place) (Little Endian)
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	void toggle_ip(T& x, const uint8_t pos) noexcept {
 		x ^= 1u << pos;
 	}
 
-	/// Complement bit at pos of value x
-	/// @param x input value
-	/// @param pos bit position (Little Endian)
-	/// @return modified x
+	/// Complement bit at pos of value x (Little endian)
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	constexpr T toggle(const T x, const uint8_t pos) noexcept {
 		return x ^ T(1u << pos);
 	}
 
 	/// Reset leftmost bit of x
-	/// @param x input value
-	/// @return modified x
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	constexpr T clear_leftmost_set(const T x) noexcept {
 		return x & (x - 1);
@@ -91,8 +71,6 @@ namespace bop
 	//-------------------------//
 
 	/// Count contiguous reset bits starting from least significant end
-	/// @param x tested value
-	/// @return count of trailing zeros
 	/// @see count_leading_zeros
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t count_trailing_zeros(T x) noexcept {
@@ -157,8 +135,6 @@ namespace bop
 	}
 
 	/// Count contiguous reset bits starting from most significant end
-	/// @param x tested value
-	/// @return count of leading zeros
 	/// @see count_trailing_zeros
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t count_leading_zeros(T x) noexcept {
@@ -221,8 +197,6 @@ namespace bop
 	}
 
 	/// Find last set bit (from least significant)
-	/// @param x tested value
-	/// @return 0-based index of last set bit
 	/// @see bit_scan_reverse
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t bit_scan_forward(T x) noexcept {
@@ -278,8 +252,6 @@ namespace bop
 	}
 
 	/// Find first set bit (from least significant)
-	/// @param x tested value
-	/// @return 0-based index of first set bit
 	/// @see bit_scan_forward
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t bit_scan_reverse(T x) noexcept {
@@ -329,8 +301,6 @@ namespace bop
 	}
 
 	/// Count set bits
-	/// @param x tested value
-	/// @return number of set bits
 	template<typename T, typename = std::enable_if_t<traits::has_bitops_v<T>>>
 	uint32_t population_count(T x) noexcept {
 		#if (defined(__POPCNT__) || defined(__ABM__)) && defined(__GNUC__) && !defined(__clang__)
@@ -397,9 +367,6 @@ namespace bop
 	//-------------------------//
 
 	/// Perform a series of bit rotation to the left
-	/// @param x input value
-	/// @param c rotations steps to perform
-	/// @return modified value
 	/// @see rotate_right
 	template<typename T, typename = std::enable_if_t<std::conjunction_v<std::is_unsigned<T>, traits::has_bitops<T>>>>
 	T rotate_left(const T x, uint8_t c) noexcept {
@@ -441,9 +408,6 @@ namespace bop
 	}
 
 	/// Perform a series bit rotation to the left
-	/// @param x input value
-	/// @param c rotations steps to perform
-	/// @return modified value
 	/// @see rotate_left
 	template<typename T, typename = std::enable_if_t<std::conjunction_v<std::is_unsigned<T>, traits::has_bitops<T>>>>
 	T rotate_right(const T x, uint8_t c) noexcept {
