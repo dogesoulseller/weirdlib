@@ -57,8 +57,8 @@ namespace file
 	/// Get extension (including .) corresponding to file type
 	std::string GetFiletypeExtension(FileType type) noexcept;
 
-	// TODO:
-	// bool ChangeExtensionToMatchType();
+	/// Get new path after changing extension
+	std::string ChangeExtensionToMatchType(const std::string& path) noexcept;
 
 } // namespace file
 } // namespace wlib
