@@ -25,6 +25,12 @@ namespace detail
 	std::tuple<double, bool> parseStringToDouble(const std::string& str);
 } // namespace detail
 
+	/// Remove leading whitespace from str
+	void RemoveLeadingWhitespace(std::string& str);
+
+	/// Remove all occurences of **needle** from **str**
+	void RemoveAllOccurences(std::string& str, const std::string& needle);
+
 	/// Split string into multiple strings at every **delimiter**
 	/// @param delimiter char to use for splitting
 	/// @return vector of strings resulting from split

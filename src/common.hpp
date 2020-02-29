@@ -1,5 +1,6 @@
 #pragma once
 #include "../include/weirdlib_simdhelper.hpp"
+#include "../include/weirdlib_utility.hpp"
 
 #include <type_traits>
 #include <cstdint>
@@ -55,15 +56,4 @@ inline static NumberParseResult<PtrT, OutputT> GetNextNumber(const PtrT startPtr
 	std::from_chars(reinterpret_cast<const char*>(digitLocation), reinterpret_cast<const char*>(whitespaceLocation), out);
 
 	return std::move(std::make_tuple(digitLocation, whitespaceLocation, out));
-}
-
-template<typename ElemT, typename IterT>
-inline static bool EqualToOneOf(const ElemT& elem, IterT start, IterT end) noexcept {
-	while (start != end) {
-		if (elem == *start) {
-			return true;
-		}
-		++start;
-	}
-	return false;
 }

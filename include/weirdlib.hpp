@@ -1,5 +1,7 @@
 #pragma once
 
+#include "weirdlib_utility.hpp"
+
 #include "weirdlib_bitops.hpp"
 #include "weirdlib_traits.hpp"
 #include "weirdlib_string.hpp"

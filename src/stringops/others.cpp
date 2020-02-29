@@ -1,17 +1,8 @@
-#pragma once
-#ifdef WEIRDLIB_ENABLE_FILE_PARSERS
-#if !defined(WEIRDLIB_ENABLE_STRING_OPERATIONS)
-	#error "File parsers module requires the string operations module"
-#endif
-
 #include "../../include/weirdlib_string.hpp"
-
-#include <cstring>
-#include <algorithm>
-#include <cctype>
 #include <string>
+#include <algorithm>
 
-namespace wlib::parse::common
+namespace wlib::str
 {
 	void RemoveLeadingWhitespace(std::string& str) {
 		bool encounteredCharacter = false;
@@ -32,7 +23,7 @@ namespace wlib::parse::common
 		}), str.end());
 	}
 
-	inline void RemoveAllOccurences(std::string& str, const std::string& needle) {
+	void RemoveAllOccurences(std::string& str, const std::string& needle) {
 		auto needleStartPos = wlib::str::strstr(str, needle);
 		while(needleStartPos != nullptr) {
 			str.erase(str.begin()+(reinterpret_cast<size_t>(needleStartPos)-str.size()),
@@ -42,5 +33,4 @@ namespace wlib::parse::common
 		}
 	}
 
-} // namespace wlib::parse::common
-#endif
+} // namespace wlib::str

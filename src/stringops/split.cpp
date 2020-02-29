@@ -14,7 +14,7 @@ namespace wlib::str
 	}
 
 	inline static bool isInvalidStrSlice(const std::string& str, const std::string& delimiter) noexcept {
-		return str.empty() || (str.length() == 1 && EqualToOneOf(str[0], delimiter.cbegin(), delimiter.cend()));
+		return str.empty() || (str.length() == 1 && wlib::util::EqualToOneOf(str[0], delimiter.cbegin(), delimiter.cend()));
 	}
 
 	std::vector<std::string> SplitAt(const std::string& str, char delimiter) {
@@ -77,7 +77,7 @@ namespace wlib::str
 
 		// Collect break points (i.e. delimiter indices)
 		for (size_t i = 0; i < str.size(); i++) {
-			if (EqualToOneOf(str[i], delimiter.cbegin(), delimiter.cend())) {
+			if (wlib::util::EqualToOneOf(str[i], delimiter.cbegin(), delimiter.cend())) {
 				breakPoints.push_back(i);
 			}
 		}
@@ -113,7 +113,7 @@ namespace wlib::str
 	std::pair<std::string, std::string> SplitOnce(const std::string& str, const std::string& delimiter) {
 		size_t pos;
 		for (pos = 0; pos < str.size(); pos++) {
-			if (EqualToOneOf(str[pos], delimiter.cbegin(), delimiter.cend())) {
+			if (wlib::util::EqualToOneOf(str[pos], delimiter.cbegin(), delimiter.cend())) {
 				break;
 			}
 		}

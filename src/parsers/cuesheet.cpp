@@ -16,8 +16,6 @@
 #include <string_view>
 #include <utility>
 
-#include "parser_common.hpp"
-
 using namespace std::string_literals;
 
 namespace wlib::parse
@@ -188,7 +186,7 @@ namespace wlib::parse
 		linesPerTrack.reserve(trackBounds.size());
 		for (const auto& c: trackBounds) {
 			std::vector<std::string> tmp(fileCommandLines.data()+c.first, fileCommandLines.data()+c.second);
-			std::for_each(tmp.begin(), tmp.end(), common::RemoveLeadingWhitespace);
+			std::for_each(tmp.begin(), tmp.end(), wlib::str::RemoveLeadingWhitespace);
 			linesPerTrack.push_back(std::move(tmp));
 		}
 
@@ -222,7 +220,7 @@ namespace wlib::parse
 			return s.empty() || std::all_of(s.begin(), s.end(), isspace);
 		}), lines.end());
 
-		std::for_each(lines.begin(), lines.end(), common::RemoveLeadingWhitespace);
+		std::for_each(lines.begin(), lines.end(), wlib::str::RemoveLeadingWhitespace);
 
 		// Remove CR from line endings
 		std::for_each(lines.begin(), lines.end(), [](auto& line){
@@ -237,7 +235,7 @@ namespace wlib::parse
 
 			// Get filetype and file name
 			if (auto pathStart = currentFILELines[0].find_first_of('"'); pathStart == std::string::npos) {
-				common::RemoveAllOccurences(currentFILELines[0], "FILE ");
+				wlib::str::RemoveAllOccurences(currentFILELines[0], "FILE ");
 
 				auto [typePos, isAudio_tmp] = detectFiletype(currentFILELines[0]);
 
@@ -279,7 +277,7 @@ namespace wlib::parse
 						if (titlePos != nullptr) {
 							if (auto titleStart = line.find_first_of('"'); titleStart == std::string::npos) {
 								auto tmpLine = line;
-								common::RemoveAllOccurences(tmpLine, "TITLE ");
+								wlib::str::RemoveAllOccurences(tmpLine, "TITLE ");
 								trackInfo.title = tmpLine;
 							} else {
 								auto titleEnd = line.find_last_of('"');
@@ -293,7 +291,7 @@ namespace wlib::parse
 						if (artistPos != nullptr) {
 							if (auto artistStart = line.find_first_of('"'); artistStart == std::string::npos) {
 								auto tmpLine = line;
-								common::RemoveAllOccurences(tmpLine, "PERFORMER ");
+								wlib::str::RemoveAllOccurences(tmpLine, "PERFORMER ");
 								trackInfo.artist = tmpLine;
 							} else {
 								auto artistEnd = line.find_last_of('"');
@@ -340,7 +338,7 @@ namespace wlib::parse
 				if (titlePos != nullptr) {
 					if (auto titleStart = line.find_first_of('"'); titleStart == std::string::npos) {
 						auto tmpLine = line;
-						common::RemoveAllOccurences(tmpLine, "TITLE ");
+						wlib::str::RemoveAllOccurences(tmpLine, "TITLE ");
 						contents[i].title = tmpLine;
 					} else {
 						auto titleEnd = line.find_last_of('"');
@@ -354,7 +352,7 @@ namespace wlib::parse
 				if (artistPos != nullptr) {
 					if (auto artistStart = line.find_first_of('"'); artistStart == std::string::npos) {
 						auto tmpLine = line;
-						common::RemoveAllOccurences(tmpLine, "PERFORMER ");
+						wlib::str::RemoveAllOccurences(tmpLine, "PERFORMER ");
 						contents[i].artist = tmpLine;
 					} else {
 						auto artistEnd = line.find_last_of('"');
