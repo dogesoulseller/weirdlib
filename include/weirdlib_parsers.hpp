@@ -33,29 +33,6 @@ namespace wlib::parse
 		}
 	};
 
-	class cuesheet_invalid_filetype : public std::exception
-	{
-		std::string what_message;
-
-		public:
-		inline cuesheet_invalid_filetype(const std::string& msg) noexcept {
-			what_message = msg;
-		}
-
-		inline cuesheet_invalid_filetype(std::string&& msg) noexcept {
-			what_message = std::move(msg);
-		}
-
-		explicit inline cuesheet_invalid_filetype(const char* msg) noexcept {
-			what_message = std::string(msg);
-		}
-
-		[[nodiscard]] inline const char* what() const noexcept override
-		{
-			return what_message.c_str();
-		}
-	};
-
 	enum class ComfygType
 	{
 		Integer,
@@ -70,23 +47,6 @@ namespace wlib::parse
 		TokenizeFailed,
 		InvalidValue,
 		InvalidType
-	};
-
-	struct CuesheetTrack
-	{
-		uint8_t idx;
-		std::string pregapTimestamp;
-		std::string startTimestamp;
-		std::string title;
-		std::string artist;
-	};
-
-	struct CuesheetFile
-	{
-		std::string path;
-		std::string title;
-		std::string artist;
-		std::vector<CuesheetTrack> tracks;
 	};
 
 	using ComfygValue = std::variant<int64_t, double, bool, std::string>;
@@ -161,6 +121,69 @@ namespace wlib::parse
 		std::vector<ComfygErrType> errors;
 		unordered_flat_map<std::string, ComfygValue> values;
 		std::vector<std::pair<std::string, ComfygType>> sortedLines;
+	};
+
+	class file_encoding_error : public std::exception
+	{
+		std::string what_message;
+
+		public:
+		inline file_encoding_error(const std::string& msg) noexcept {
+			what_message = msg;
+		}
+
+		inline file_encoding_error(std::string&& msg) noexcept {
+			what_message = std::move(msg);
+		}
+
+		explicit inline file_encoding_error(const char* msg) noexcept {
+			what_message = std::string(msg);
+		}
+
+		[[nodiscard]] inline const char* what() const noexcept override
+		{
+			return what_message.c_str();
+		}
+	};
+
+	class cuesheet_format_error : public std::exception
+	{
+		std::string what_message;
+
+		public:
+		inline cuesheet_format_error(const std::string& msg) noexcept {
+			what_message = msg;
+		}
+
+		inline cuesheet_format_error(std::string&& msg) noexcept {
+			what_message = std::move(msg);
+		}
+
+		explicit inline cuesheet_format_error(const char* msg) noexcept {
+			what_message = std::string(msg);
+		}
+
+		[[nodiscard]] inline const char* what() const noexcept override
+		{
+			return what_message.c_str();
+		}
+	};
+
+	struct CuesheetTrack
+	{
+		uint8_t idx;
+		std::string pregapTimestamp;
+		std::string startTimestamp;
+		std::string title;
+		std::string artist;
+	};
+
+	struct CuesheetFile
+	{
+		std::string path;
+		std::string title;
+		std::string artist;
+		std::vector<CuesheetTrack> tracks;
 	};
 
 	class Cuesheet

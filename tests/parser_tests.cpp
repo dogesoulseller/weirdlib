@@ -53,6 +53,8 @@ TEST(Parse, Comfyg) {
 TEST(Parse, CuesheetSimple) {
 	std::filesystem::path filePath = std::filesystem::path(wlibTestDir) / "parser_files" / "test_audiocue_single.cue";
 
+	ASSERT_TRUE(std::filesystem::exists(filePath));
+
 	wlib::parse::Cuesheet cue(filePath);
 
 	EXPECT_EQ(cue.GetContents().size(), 1);
@@ -74,6 +76,8 @@ TEST(Parse, CuesheetSimple) {
 
 TEST(Parse, CuesheetUnicode) {
 	std::filesystem::path filePath = std::filesystem::path(wlibTestDir) / "parser_files" / "test_audiocue_utf8.cue";
+
+	ASSERT_TRUE(std::filesystem::exists(filePath));
 
 	wlib::parse::Cuesheet cue(filePath);
 
@@ -98,6 +102,7 @@ TEST(Parse, CuesheetUnicode) {
 
 TEST(Parse, CuesheetMultifile) {
 	std::filesystem::path filePath = std::filesystem::path(wlibTestDir) / "parser_files" / "test_audiocue_multifile.cue";
+	ASSERT_TRUE(std::filesystem::exists(filePath));
 
 	wlib::parse::Cuesheet cue(filePath);
 
