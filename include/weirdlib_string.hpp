@@ -7,6 +7,7 @@
 #include <utility>
 #include <sstream>
 #include <iomanip>
+#include <string_view>
 
 namespace wlib
 {
@@ -24,6 +25,18 @@ namespace detail
 	std::tuple<float, bool> parseStringToFloat(const std::string& str);
 	std::tuple<double, bool> parseStringToDouble(const std::string& str);
 } // namespace detail
+
+	/// Check if **str** starts with **pattern**
+	bool StartsWith(const std::string& str, const std::string& pattern);
+
+	/// Check if **str** ends with **pattern**
+	bool EndsWith(const std::string& str, const std::string& pattern);
+
+	/// Check if **str** starts with **pattern**
+	bool StartsWith(const std::string_view& str, const std::string_view& pattern);
+
+	/// Check if **str** ends with **pattern**
+	bool EndsWith(const std::string_view& str, const std::string_view& pattern);
 
 	/// Remove leading whitespace from str
 	void RemoveLeadingWhitespace(std::string& str);

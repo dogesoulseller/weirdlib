@@ -33,4 +33,20 @@ namespace wlib::str
 		}
 	}
 
+	bool StartsWith(const std::string& str, const std::string& pattern) {
+		return std::equal(pattern.cbegin(), pattern.cend(), str.cbegin());
+	}
+
+	bool EndsWith(const std::string& str, const std::string& pattern) {
+		return std::equal(pattern.cbegin(), pattern.cend(), str.cend()-pattern.size());
+	}
+
+	bool StartsWith(const std::string_view& str, const std::string_view& pattern) {
+		return std::equal(pattern.cbegin(), pattern.cend(), str.cbegin());
+	}
+
+	bool EndsWith(const std::string_view& str, const std::string_view& pattern) {
+		return std::equal(pattern.cbegin(), pattern.cend(), str.cend()-pattern.size());
+	}
+
 } // namespace wlib::str
