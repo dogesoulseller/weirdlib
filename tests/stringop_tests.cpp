@@ -228,4 +228,26 @@ TEST(StringOps, Lines) {
 	EXPECT_EQ(unlined, "0,1\n,2,3,4");
 }
 
+TEST(StringOps, HasPrefix_Suffix) {
+	std::string suffix_awoo = "THIS IS A STRING THAT HAS A PREFIX OF AWOO";
+	std::string prefix_awoo = "AWOO IS A STRING THAT HAS A PREFIX OF AWOO, BUT NOT A SUFFIX";
+	std::string suffix_noawoo = "AWOO IS A STRING THAT HAS A PREFIX OF AWOO, BUT NOT A SUFFIX";
+	std::string prefix_noawoo = "THIS IS A STRING THAT DOES NOT HAVE A PREFIX OF AWOO, BUT HAS A SUFFIX OF AWOO";
+
+	std::string_view view_suffix_awoo = "THIS IS A STRING THAT HAS A PREFIX OF AWOO";
+	std::string_view view_prefix_awoo = "AWOO IS A STRING THAT HAS A PREFIX OF AWOO, BUT NOT A SUFFIX";
+	std::string_view view_suffix_noawoo = "AWOO IS A STRING THAT HAS A PREFIX OF AWOO, BUT NOT A SUFFIX";
+	std::string_view view_prefix_noawoo = "THIS IS A STRING THAT DOES NOT HAVE A PREFIX OF AWOO, BUT HAS A SUFFIX OF AWOO";
+
+	EXPECT_TRUE(wlib::str::StartsWith(prefix_awoo, "AWOO"));
+	EXPECT_TRUE(wlib::str::EndsWith(suffix_awoo, "AWOO"));
+	EXPECT_FALSE(wlib::str::StartsWith(prefix_noawoo, "AWOO"));
+	EXPECT_FALSE(wlib::str::EndsWith(suffix_noawoo, "AWOO"));
+
+	EXPECT_TRUE(wlib::str::StartsWith(view_prefix_awoo, "AWOO"));
+	EXPECT_TRUE(wlib::str::EndsWith(view_suffix_awoo, "AWOO"));
+	EXPECT_FALSE(wlib::str::StartsWith(view_prefix_noawoo, "AWOO"));
+	EXPECT_FALSE(wlib::str::EndsWith(view_suffix_noawoo, "AWOO"));
+}
+
 #endif //WEIRDLIB_ENABLE_STRING_OPERATIONS
