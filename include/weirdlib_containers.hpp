@@ -83,6 +83,17 @@ namespace wlib
 
 		/// Remove item under `key`
 		void erase(const KeyT& key);
+
+		auto begin() noexcept;
+		auto end() noexcept;
+		auto cbegin() const noexcept;
+		auto cend() const noexcept;
+		auto rbegin() noexcept;
+		auto rend() noexcept;
+		auto crbegin() const noexcept;
+		auto crend() const noexcept;
+
+		bool empty();
 	};
 
 	/// Simple version
@@ -121,29 +132,19 @@ namespace wlib
 		unordered_flat_map& operator=(const unordered_flat_map&) = default;
 		unordered_flat_map& operator=(unordered_flat_map&&) noexcept = default;
 
-		[[nodiscard]] size_t size() const noexcept {
-			return m_kvpairs.size();
-		}
+		[[nodiscard]] size_t size() const noexcept {return m_kvpairs.size();}
 
-		[[nodiscard]] size_t capacity() const noexcept {
-			return m_kvpairs.capacity();
-		}
+		[[nodiscard]] size_t capacity() const noexcept {return m_kvpairs.capacity();}
 
-		void shrink_to_fit() {
-			m_kvpairs.shrink_to_fit();
-		}
+		void shrink_to_fit() {m_kvpairs.shrink_to_fit();}
 
-		void clear() noexcept {
-			m_kvpairs.clear();
-		}
+		void clear() noexcept {m_kvpairs.clear();}
 
-		void reserve(size_t size) {
-			m_kvpairs.reserve(size);
-		}
+		void reserve(size_t size) {m_kvpairs.reserve(size);}
 
-		[[nodiscard]] size_t max_size() const noexcept {
-			return m_kvpairs.max_size();
-		}
+		[[nodiscard]] size_t max_size() const noexcept {return m_kvpairs.max_size();}
+
+		bool empty() {return m_kvpairs.empty();}
 
 		const ValueT& at(const KeyT& key) const {
 			size_t i;
@@ -195,6 +196,15 @@ namespace wlib
 				return elem.first == key;
 			}));
 		}
+
+		auto begin() noexcept {return m_kvpairs.begin();}
+		auto end() noexcept {return m_kvpairs.end();}
+		auto cbegin() const noexcept {return m_kvpairs.cbegin();}
+		auto cend() const noexcept {return m_kvpairs.cend();}
+		auto rbegin() noexcept {return m_kvpairs.rbegin();}
+		auto rend() noexcept {return m_kvpairs.rend();}
+		auto crbegin() const noexcept {return m_kvpairs.crbegin();}
+		auto crend() const noexcept {return m_kvpairs.crend();}
 	};
 
 	/// Complex version
@@ -234,29 +244,19 @@ namespace wlib
 		}
 
 
-		[[nodiscard]] size_t size() const noexcept {
-			return m_kvpairs.size();
-		}
+		[[nodiscard]] size_t size() const noexcept {return m_kvpairs.size();}
 
-		[[nodiscard]] size_t capacity() const noexcept {
-			return m_kvpairs.capacity();
-		}
+		[[nodiscard]] size_t capacity() const noexcept {return m_kvpairs.capacity();}
 
-		void shrink_to_fit() {
-			m_kvpairs.shrink_to_fit();
-		}
+		void shrink_to_fit() {m_kvpairs.shrink_to_fit();}
 
-		void clear() noexcept {
-			m_kvpairs.clear();
-		}
+		void clear() noexcept {m_kvpairs.clear();}
 
-		void reserve(const size_t size) {
-			m_kvpairs.reserve(size);
-		}
+		void reserve(const size_t size) {m_kvpairs.reserve(size);}
 
-		[[nodiscard]] size_t max_size() const noexcept {
-			return m_kvpairs.max_size();
-		}
+		[[nodiscard]] size_t max_size() const noexcept {return m_kvpairs.max_size();}
+
+		bool empty() {return m_kvpairs.empty();}
 
 		const ValueT& at(const KeyT& key) const {
 			size_t i;
@@ -307,6 +307,15 @@ namespace wlib
 				return elem.first.second == std::hash<KeyT>{}(key);
 			}));
 		}
+
+		auto begin() noexcept {return m_kvpairs.begin();}
+		auto end() noexcept {return m_kvpairs.end();}
+		auto cbegin() const noexcept {return m_kvpairs.cbegin();}
+		auto cend() const noexcept {return m_kvpairs.cend();}
+		auto rbegin() noexcept {return m_kvpairs.rbegin();}
+		auto rend() noexcept {return m_kvpairs.rend();}
+		auto crbegin() const noexcept {return m_kvpairs.crbegin();}
+		auto crend() const noexcept {return m_kvpairs.crend();}
 	};
 
 } // namespace wlib

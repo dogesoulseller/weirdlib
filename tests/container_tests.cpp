@@ -2,7 +2,6 @@
 #include "../include/weirdlib.hpp"
 #include <iostream>
 
-//TODO: Test erase
 TEST(Containers, UnorderedFlatMap) {
 	wlib::unordered_flat_map<std::string, std::string> flatmap;
 	wlib::unordered_flat_map<uint32_t, std::string> flatmap_simple;
@@ -105,6 +104,28 @@ TEST(Containers, UnorderedFlatMap) {
 
 	EXPECT_EQ(flatmap.capacity(), 2);
 	EXPECT_EQ(flatmap_simple.capacity(), 2);
+}
+
+TEST(Containers, UnorderedFlatMap_erase) {
+	wlib::unordered_flat_map<std::string, std::string> flatmap = {std::pair{"test0", "test0"}, std::pair{"test1", "test1"},
+		std::pair{"test2", "test2"}, std::pair{"test3", "test3"}, std::pair{"test4", "test4"}, std::pair{"test5", "test5"}
+	};
+
+	// Pre erase: 6/6
+	ASSERT_EQ(flatmap.capacity(), 6);
+	ASSERT_EQ(flatmap.size(), 6);
+	ASSERT_TRUE(flatmap.exists("test4"));
+
+	// Post erase 6:5
+	flatmap.erase("test4");
+	EXPECT_EQ(flatmap.capacity(), 6);
+	EXPECT_EQ(flatmap.size(), 5);
+	EXPECT_FALSE(flatmap.exists("test4"));
+
+	// Post shrink 5:5
+	flatmap.shrink_to_fit();
+	EXPECT_EQ(flatmap.capacity(), 5);
+	EXPECT_EQ(flatmap.size(), 5);
 }
 
 TEST(Containers, UnorderedFlatMap_initlist) {
