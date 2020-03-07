@@ -65,7 +65,6 @@ namespace wlib::image
 
 			__m128 accumulatorVec = _mm_setzero_ps();
 
-			// TODO: Maybe unroll?
 			for (size_t i = 0; i < iters; i++) {
 				__m128 lVals = _mm_loadu_ps(lhs+4*i);
 				__m128 rVals = _mm_loadu_ps(rhs+4*i);

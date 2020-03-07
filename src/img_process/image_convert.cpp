@@ -415,7 +415,7 @@ namespace wlib::image
 			for (size_t i = iters * 32; i < iters * 32 + itersRem; i++) {
 				out[i] = static_cast<float>(in[i]);
 			}
-		#elif X86_SIMD_LEVEL >= LV_SSE41 // TODO: SSSE3 version
+		#elif X86_SIMD_LEVEL >= LV_SSE41
 			size_t iters = fileSize / 16;
 			size_t itersRem = fileSize % 16;
 

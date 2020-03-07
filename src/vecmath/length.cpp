@@ -5,7 +5,6 @@
 #include <cmath>
 #include <array>
 
-// TODO: SIMD doubles
 
 namespace wlib::vecmath
 {
@@ -59,6 +58,8 @@ namespace wlib::vecmath
 			return std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
 		#endif
 	}
+
+	// TODO: SIMD doubles
 
 	double Length(const Vector3<double>& vec) {
 		return std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);

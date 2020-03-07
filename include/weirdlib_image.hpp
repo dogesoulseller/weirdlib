@@ -341,6 +341,8 @@ namespace image
 	/// @param withAlpha whether to preserve alpha channel
 	void NegateValues(ImageSoA& in, bool withAlpha = false);
 
+	//TODO: Image difference
+
 	namespace detail
 	{
 		void swapRAndB_3c(float* in, size_t count);
