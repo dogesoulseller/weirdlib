@@ -26,7 +26,8 @@ namespace detail
 		TITLE,
 		PREGAP_START,
 		TRACK_START,
-		FILE_PATH
+		FILE_PATH,
+		TRACK_ID
 	};
 
 	inline constexpr static const char* FieldToSearch(FieldType field) {
@@ -42,6 +43,8 @@ namespace detail
 			return "INDEX 01";
 		case FieldType::FILE_PATH:
 			return "FILE";
+		case FieldType::TRACK_ID:
+			return "TRACK";
 		default:
 			return "";
 		}
@@ -59,6 +62,8 @@ namespace detail
 			return "INDEX 01";
 		} else if constexpr (field == FieldType::FILE_PATH) {
 			return "FILE";
+		} else if constexpr (field == FieldType::TRACK_ID) {
+			return "TRACK";
 		} else {
 			return "";
 		}
@@ -148,6 +153,12 @@ namespace detail
 			} else {
 				throw wlib::parse::cuesheet_format_error("FILE type must be MP3, AIFF, or WAVE");
 			}
+		} else if (field == FieldType::TRACK_ID) {
+			if (wlib::str::EndsWith(strView, "AUDIO"sv)) {
+				strView.remove_suffix(5);
+			} else {
+				throw wlib::parse::cuesheet_format_error("Only AUDIO mode is supported");
+			}
 		}
 
 		strView.remove_prefix(wlib::str::strlen(FieldToSearch(field)));
@@ -185,7 +196,7 @@ namespace detail
 	template<FieldType field>
 	static inline std::optional<std::string> GetField(const std::vector<std::string>& lines) {
 		static_assert(field == FieldType::ARTIST || field == FieldType::FILE_PATH || field == FieldType::PREGAP_START
-			|| field == FieldType::TITLE || field == FieldType::TRACK_START
+			|| field == FieldType::TITLE || field == FieldType::TRACK_START || field == FieldType::TRACK_ID
 		);
 
 		std::string fieldLine;
@@ -201,7 +212,7 @@ namespace detail
 		} else {
 			if constexpr (field == FieldType::ARTIST || field == FieldType::TITLE || field == FieldType::FILE_PATH) {
 				return GetQuotedValue(fieldLine).value_or(GetUnquotedValue(fieldLine, field));
-			} else if constexpr (field == FieldType::PREGAP_START || field == FieldType::TRACK_START) {
+			} else if constexpr (field == FieldType::PREGAP_START || field == FieldType::TRACK_START || field == FieldType::TRACK_ID) {
 				return GetUnquotedValue(fieldLine, field);
 			} else {
 				return std::nullopt;
@@ -231,8 +242,6 @@ namespace wlib::parse
 	Cuesheet::Cuesheet(const uint8_t* ptr, size_t len) {
 		ParseFormat(ptr, len);
 	}
-
-	// TODO: Improve format verification
 
 	void Cuesheet::ParseFormat(const uint8_t* ptr, size_t len) {
 		detail::FixEncoding(ptr, len);
@@ -266,17 +275,39 @@ namespace wlib::parse
 		for (auto& fileSection : fileSections) {
 			CuesheetFile cueFileInfo;
 			auto trackSections = detail::SplitIntoSections<detail::SectionName::TRACK>(fileSection);
+
 			cueFileInfo.artist = albumArtist;
 			cueFileInfo.title  = albumTitle;
-			cueFileInfo.path   = detail::GetField<detail::FieldType::FILE_PATH>(fileSection).value_or("");
+
+			// File path is a required field
+			if (auto path = detail::GetField<detail::FieldType::FILE_PATH>(fileSection); path.has_value()) {
+				cueFileInfo.path = path.value();
+			} else {
+				throw cuesheet_format_error("No valid path found for FILE");
+			}
 
 			for (auto& section : trackSections) {
-				// TODO: Do something with the optional values
 				CuesheetTrack cueTrackInfo;
+
+				// Track index is a required field
+				if (auto idx = detail::GetField<detail::FieldType::TRACK_ID>(section); idx.has_value()) {
+					if (!wlib::str::ParseString(idx.value(), cueTrackInfo.idx)) {
+						throw cuesheet_format_error("Failed to parse track index");
+					}
+				} else {
+					throw cuesheet_format_error("No track index found in track");
+				}
+
 				cueTrackInfo.artist = detail::GetField<detail::FieldType::ARTIST>(section).value_or("");
 				cueTrackInfo.title = detail::GetField<detail::FieldType::TITLE>(section).value_or("");
 				cueTrackInfo.pregapTimestamp = detail::GetField<detail::FieldType::PREGAP_START>(section).value_or("");
-				cueTrackInfo.startTimestamp = detail::GetField<detail::FieldType::TRACK_START>(section).value_or("");
+
+				// Start timestamp is a required field
+				if (auto startTimestamp = detail::GetField<detail::FieldType::TRACK_START>(section); startTimestamp.has_value()) {
+					cueTrackInfo.startTimestamp = startTimestamp.value();
+				} else {
+					throw cuesheet_format_error("No start timestamp found in track");
+				}
 
 				cueFileInfo.tracks.push_back(std::move(cueTrackInfo));
 			}
