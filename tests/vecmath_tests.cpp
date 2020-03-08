@@ -336,10 +336,14 @@ TEST(Vecmath, Refract) {
 	EXPECT_LE(vec3refractiond.z, -0.7769923372903);
 	EXPECT_GE(vec3refractiond.z, -0.7769923372906);
 
-	EXPECT_FLOAT_EQ(vec4refraction.x, -0.22030413f);
-	EXPECT_FLOAT_EQ(vec4refraction.y, -0.38371742f);
-	EXPECT_FLOAT_EQ(vec4refraction.z, -0.54713082f);
-	EXPECT_FLOAT_EQ(vec4refraction.w, -0.71054387f);
+	EXPECT_LE(vec4refraction.x, -0.220304f);
+	EXPECT_GE(vec4refraction.x, -0.220305f);
+	EXPECT_LE(vec4refraction.y, -0.383717f);
+	EXPECT_GE(vec4refraction.y, -0.383718f);
+	EXPECT_LE(vec4refraction.z, -0.547129f);
+	EXPECT_GE(vec4refraction.z, -0.547133f);
+	EXPECT_LE(vec4refraction.w, -0.710540f);
+	EXPECT_GE(vec4refraction.w, -0.710546f);
 
 	EXPECT_DOUBLE_EQ(vec4refractiond.x, -0.22030436328164349);
 	EXPECT_DOUBLE_EQ(vec4refractiond.y, -0.38371784354204186);

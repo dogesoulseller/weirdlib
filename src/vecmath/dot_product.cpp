@@ -108,8 +108,23 @@ namespace wlib::vecmath
 			alignas(16)	std::array<float, 4> outvec;
 			_mm_store_ps(outvec.data(), _mm_dp_ps(lhs_vec, rhs_vec, 0xFF));
 			return outvec[0];
+		#elif X86_SIMD_LEVEL >= LV_SSE
+			auto lhs_vec = _mm_loadu_ps(&lhs.x);
+			auto rhs_vec = _mm_loadu_ps(&rhs.x);
 
-			//TODO: SSE version
+			auto prods = _mm_mul_ps(lhs_vec, rhs_vec);
+
+			auto el1 = _mm_shuffle_ps(prods, prods, _MM_SHUFFLE(0, 0, 3, 2));
+
+			auto sumtemp = _mm_add_ps(prods, el1);
+
+			auto el2 = _mm_shuffle_ps(sumtemp, sumtemp, _MM_SHUFFLE(0, 0, 0, 1));
+
+			auto result = _mm_add_ss(el2, sumtemp);
+
+			alignas(16)	std::array<float, 4> outvec;
+			_mm_store_ps(outvec.data(), result);
+			return outvec[0];
 		#else
 			return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z) + (lhs.w * rhs.w);
 		#endif

@@ -13,7 +13,6 @@ namespace wlib::vecmath
 	#endif
 
 	Vector3<float> CrossProduct(const Vector3<float>& lhs, const Vector3<float>& rhs) {
-		// TODO: This could be improved
 		#if X86_SIMD_LEVEL >= LV_AVX2
 			auto lhs_vec = _mm256_loadu_ps(&lhs.x);
 			auto rhs_vec = _mm256_loadu_ps(&rhs.x);

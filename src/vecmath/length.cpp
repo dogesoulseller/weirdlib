@@ -59,10 +59,23 @@ namespace wlib::vecmath
 		#endif
 	}
 
-	// TODO: SIMD doubles
-
 	double Length(const Vector3<double>& vec) {
-		return std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+		#if X86_SIMD_LEVEL >= LV_SSE2
+			auto vec_simd0 = _mm_loadu_pd(&vec.x);
+			auto vec_simd1 = _mm_loadu_pd(&vec.z);
+
+			auto power20 = _mm_mul_pd(vec_simd0, vec_simd0);
+			auto power21 = _mm_mul_pd(vec_simd1, vec_simd1);
+
+			auto comp1 = _mm_shuffle_pd(power20, power20, _MM_SHUFFLE2(0, 1));
+			auto result = _mm_sqrt_pd(_mm_add_sd(_mm_add_sd(power21, power20), comp1));
+
+			alignas(16) std::array<double, 2> outvec;
+			_mm_store_pd(outvec.data(), result);
+			return outvec[0];
+		#else
+			return std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+		#endif
 	}
 
 	float Length(const Vector4<float>& vec) {
@@ -88,7 +101,25 @@ namespace wlib::vecmath
 	}
 
 	double Length(const Vector4<double>& vec) {
-		return std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z + vec.w * vec.w);
+		#if X86_SIMD_LEVEL >= LV_SSE2
+			auto vec_simd0 = _mm_loadu_pd(&vec.x);
+			auto vec_simd1 = _mm_loadu_pd(&vec.z);
+
+			auto power20 = _mm_mul_pd(vec_simd0, vec_simd0);
+			auto power21 = _mm_mul_pd(vec_simd1, vec_simd1);
+
+			// Become x*z, y*w
+			auto add0 = _mm_add_pd(power20, power21);
+
+			auto comp1 = _mm_shuffle_pd(add0, add0, _MM_SHUFFLE2(0, 1));
+			auto result = _mm_sqrt_pd(_mm_add_sd(comp1, add0));
+
+			alignas(16) std::array<double, 2> outvec;
+			_mm_store_pd(outvec.data(), result);
+			return outvec[0];
+		#else
+			return std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z + vec.w * vec.w);
+		#endif
 	}
 
 } // namespace wlib::vecmath
