@@ -336,8 +336,27 @@ TEST(ImgOps, PSNR) {
 	EXPECT_LE(outDataDiffDbl.PSNRPerChannel[0], 45.01);
 	EXPECT_GE(outDataDiffDbl.PSNRPerChannel[0], 45.001);
 
-	// TODO: Test exceptions on wrong size
-	// TODO: Test on grayscale
+	// Images must be the same size and be of compatible formats
+	uint8_t* testImgWrongSize_data = new uint8_t[30*30*4];
+
+	wlib::image::Image testImgWrongSize_aos(testImgWrongSize_data, 30, 30, wlib::image::ColorFormat::F_RGBA);
+	auto testImgWrongSize = wlib::image::MakeSoAFromAoS(testImgWrongSize_aos);
+
+	wlib::image::Image testImgWrongFormat_aos(testImgWrongSize_data, 30, 30, wlib::image::ColorFormat::F_BGR);
+	auto testImgWrongFormat = wlib::image::MakeSoAFromAoS(testImgWrongFormat_aos);
+
+	EXPECT_THROW(wlib::image::CalculatePSNR(testImgSoA, testImgWrongSize), wlib::image::image_dimensions_error);
+	EXPECT_THROW(wlib::image::CalculatePSNR(testImgSoA, testImgWrongFormat), wlib::image::image_channel_error);
+
+	// Grayscale test
+	// Note: uses the "wrong size" data temporarily
+	wlib::image::Image testImgGrayscale0_aos(testImgWrongSize_data, 10, 10, wlib::image::ColorFormat::F_Grayscale);
+	wlib::image::Image testImgGrayscale1_aos(testImgWrongSize_data+100, 10, 10, wlib::image::ColorFormat::F_Grayscale);
+
+	auto testImgGrayscale0 = wlib::image::MakeSoAFromAoS(testImgGrayscale0_aos);
+	auto testImgGrayscale1 = wlib::image::MakeSoAFromAoS(testImgGrayscale1_aos);
+
+	EXPECT_NO_THROW(wlib::image::CalculatePSNR(testImgGrayscale0, testImgGrayscale1));
 }
 
 #endif
