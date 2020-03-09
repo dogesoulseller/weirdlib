@@ -6,12 +6,6 @@
 #include <array>
 #include <numeric>
 
-#if __has_include(<execution>)
-	#include <execution>
-#elif __has_include(<experimental/execution>)
-	#include <experimental/execution>
-	using std::execution::seq = std::experimental::execution::seq;
-#endif
 
 namespace wlib::image
 {
@@ -56,7 +50,7 @@ namespace wlib::image
 			std::array<float, 8> accumulatorVec_arr;
 			_mm256_storeu_ps(accumulatorVec_arr.data(), accumulatorVec);
 
-			accumulatorScal += std::reduce(std::execution::seq, accumulatorVec_arr.begin(), accumulatorVec_arr.end());
+			accumulatorScal += std::reduce(accumulatorVec_arr.begin(), accumulatorVec_arr.end());
 
 			return accumulatorScal / count;
 		#elif X86_SIMD_LEVEL >= LV_SSE2
@@ -83,7 +77,7 @@ namespace wlib::image
 			std::array<float, 4> accumulatorVec_arr;
 			_mm_storeu_ps(accumulatorVec_arr.data(), accumulatorVec);
 
-			accumulatorScal += std::reduce(std::execution::seq, accumulatorVec_arr.begin(), accumulatorVec_arr.end());
+			accumulatorScal += std::reduce(accumulatorVec_arr.begin(), accumulatorVec_arr.end());
 
 			return accumulatorScal / count;
 		#else
@@ -122,7 +116,7 @@ namespace wlib::image
 			std::array<double, 4> accumulatorVec_arr;
 			_mm256_storeu_pd(accumulatorVec_arr.data(), accumulatorVec);
 
-			accumulatorScal += std::reduce(std::execution::seq, accumulatorVec_arr.begin(), accumulatorVec_arr.end());
+			accumulatorScal += std::reduce(accumulatorVec_arr.begin(), accumulatorVec_arr.end());
 
 			return accumulatorScal / count;
 		#elif X86_SIMD_LEVEL >= LV_SSE2
@@ -166,7 +160,7 @@ namespace wlib::image
 			std::array<double, 2> accumulatorVec_arr;
 			_mm_storeu_pd(accumulatorVec_arr.data(), accumulatorVec);
 
-			accumulatorScal += std::reduce(std::execution::seq, accumulatorVec_arr.begin(), accumulatorVec_arr.end());
+			accumulatorScal += std::reduce(accumulatorVec_arr.begin(), accumulatorVec_arr.end());
 
 			return accumulatorScal / count;
 		#else
