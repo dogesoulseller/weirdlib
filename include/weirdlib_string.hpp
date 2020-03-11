@@ -130,6 +130,51 @@ namespace detail
 	/// @return pointer to first occurence of substring in string
 	const char* strstr(const std::string& str, const std::string& needle, size_t strLen = 0, size_t needleLen = 0);
 
+	/// Find first occurence of search in str
+	/// @param str string to search in
+	/// @param search char to search for
+	/// @param strLen length of string to search (if set to 0, determined in-function)
+	/// @return pointer to first occurence of char search in string
+	const char* strchr(const std::string& str, char search, size_t strLen = 0);
+
+	/// Find first occurence of search in str
+	/// @param str string to search in
+	/// @param search char to search for
+	/// @param strLen length of string to search (if set to 0, determined in-function)
+	/// @return pointer to first occurence of char search in string
+	char* strchr(char* str, char search, size_t strLen = 0);
+
+	/// Find first occurence of search in str
+	/// @param str string to search in
+	/// @param search char to search for
+	/// @param strLen length of string to search (if set to 0, determined in-function)
+	/// @return pointer to first occurence of char search in string
+	const char* strchr(const char* str, char search, size_t strLen = 0);
+
+	/// Find first occurence of one of searches in str
+	/// @param str string to search in
+	/// @param needles chars to search for
+	/// @param strLen length of string to search (if set to 0, determined in-function)
+	/// @param needlesLen length of string of needles to search for
+	/// @return pointer to first occurence of char search in string
+	const char* strpbrk(const std::string& str, const char* needles, size_t strLen = 0, size_t needlesLen = 0);
+
+	/// Find first occurence of one of searches in str
+	/// @param str string to search in
+	/// @param needles chars to search for
+	/// @param strLen length of string to search (if set to 0, determined in-function)
+	/// @param needlesLen length of string of needles to search for
+	/// @return pointer to first occurence of char search in string
+	char* strpbrk(char* str, const char* needles, size_t strLen = 0, size_t needlesLen = 0);
+
+	/// Find first occurence of one of searches in str
+	/// @param str string to search in
+	/// @param needles chars to search for
+	/// @param strLen length of string to search (if set to 0, determined in-function)
+	/// @param needlesLen length of string of needles to search for
+	/// @return pointer to first occurence of char search in string
+	const char* strpbrk(const char* str, const char* needles, size_t strLen = 0, size_t needlesLen = 0);
+
 	/// Parse string as boolean <br>
 	/// Case-insensitive, detects y, yes, t, true, on, enable, enabled; all others are false
 	inline bool ParseBool(const std::string& str) {

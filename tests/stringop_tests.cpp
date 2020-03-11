@@ -32,7 +32,6 @@ TEST(StringOps, Strlen) {
 	EXPECT_EQ(lenReference_zeroLen, lenActual_zeroLen) << "String lengths do not match";
 }
 
-
 TEST(StringOps, Strcmp) {
 	// Matching
 	const char* str0 = testringMatches;
@@ -98,6 +97,18 @@ TEST(StringOps, Strstr) {
 	const auto reference_zeroLen = std::strstr(teststringEmpty, "");
 	const auto actual_zeroLen = wlib::str::strstr(teststringEmpty, "");
 	EXPECT_EQ(reference_zeroLen, actual_zeroLen) << "Substring search results do not match";
+}
+
+TEST(StringOps, Strchr) {
+	EXPECT_EQ(wlib::str::strchr(testringMatches, 'y'), std::strchr(testringMatches, 'y'));
+	EXPECT_EQ(wlib::str::strchr(testringMatches, 'T'), std::strchr(testringMatches, 'T'));
+	EXPECT_EQ(wlib::str::strchr(testringMatches, 'A'), std::strchr(testringMatches, 'A'));
+}
+
+TEST(StringOps, Strpbrk) {
+	EXPECT_EQ(wlib::str::strpbrk(testringMatches, "s i"), std::strpbrk(testringMatches, "s i"));
+	EXPECT_EQ(wlib::str::strpbrk(testringMatches, "Th "), std::strpbrk(testringMatches, "Th "));
+	EXPECT_EQ(wlib::str::strpbrk(testringMatches, "W"), std::strpbrk(testringMatches, "W"));
 }
 
 // TODO: Mark as false if had unexpected char
