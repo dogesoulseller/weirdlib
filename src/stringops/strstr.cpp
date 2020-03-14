@@ -7,14 +7,10 @@
 namespace wlib::str
 {
 	const char* strstr(const char* str, const char* needle, size_t strLen, size_t needleLen) {
-		if (strLen == 0) {
-			strLen = wlib::str::strlen(str);
-		}
+		strLen = strLen == 0 ? str::strlen(str) : strLen;
+		needleLen = needleLen == 0 ? str::strlen(needle) : needleLen;
 
-		if (needleLen == 0) {
-			needleLen = wlib::str::strlen(needle);
-		}
-
+		// If after calculation the search pattern is empty, return the entire string
 		if (needleLen == 0) {
 			return str;
 		}
@@ -33,13 +29,14 @@ namespace wlib::str
 				auto mask = static_cast<uint64_t>(_mm512_movepi8_mask(_mm256_and_si256(_mm256_cmpeq_epi8(start, first), _mm256_cmpeq_epi8(end, last))));
 				while (mask != 0) {
 					// Get lowest set bit
-					const auto pos = bop::bit_scan_reverse(mask);
+					const auto pos = bop::count_trailing_zeros(mask);
 
 					// Check for equality between str and needle search position
 					const auto eq0 = str+i+pos+1;
 					const auto eq1 = needle+1;
 					if (std::equal(eq0, eq0+needleLen-2, eq1)) {
-						return str + i + pos;
+						const auto result = str + i + pos;
+						return result > str+strLen ? nullptr : result;
 					} else {
 						mask = bop::clear_leftmost_set(mask);
 					}
@@ -62,13 +59,14 @@ namespace wlib::str
 				auto mask = _mm256_movemask_epi8(_mm256_and_si256(_mm256_cmpeq_epi8(start, first), _mm256_cmpeq_epi8(end, last)));
 				while (mask != 0) {
 					// Get lowest set bit
-					const auto pos = bop::bit_scan_reverse(mask);
+					const auto pos = bop::count_trailing_zeros(mask);
 
 					// Check for equality between str and needle search position
 					const auto eq0 = str+i+pos+1;
 					const auto eq1 = needle+1;
 					if (std::equal(eq0, eq0+needleLen-2, eq1)) {
-						return str + i + pos;
+						const auto result = str + i + pos;
+						return result > str+strLen ? nullptr : result;
 					} else {
 						mask = bop::clear_leftmost_set(mask);
 					}
@@ -93,13 +91,14 @@ namespace wlib::str
 				auto mask = _mm_movemask_epi8(_mm_and_si128(_mm_cmpeq_epi8(start, first), _mm_cmpeq_epi8(end, last)));
 				while (mask != 0) {
 					// Get lowest set bit
-					const auto pos = bop::bit_scan_reverse(mask);
+					const auto pos = bop::count_trailing_zeros(mask);
 
 					// Check for equality between str and needle search position
 					const auto eq0 = str+i+pos+1;
 					const auto eq1 = needle+1;
 					if (std::equal(eq0, eq0+needleLen-2, eq1)) {
-						return str + i + pos;
+						const auto result = str + i + pos;
+						return result > str+strLen ? nullptr : result;
 					} else {
 						mask = bop::clear_leftmost_set(mask);
 					}

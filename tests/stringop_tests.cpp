@@ -97,6 +97,28 @@ TEST(StringOps, Strstr) {
 	const auto reference_zeroLen = std::strstr(teststringEmpty, "");
 	const auto actual_zeroLen = wlib::str::strstr(teststringEmpty, "");
 	EXPECT_EQ(reference_zeroLen, actual_zeroLen) << "Substring search results do not match";
+
+	// No match outside of string bounds
+	const char* baseMultistring = "This is not a\0match, match?";
+	const char* multistring_nomatch = baseMultistring;
+	const char* multistring_match = baseMultistring+wlib::str::strlen(baseMultistring)+1;
+
+	ASSERT_STREQ(multistring_nomatch, "This is not a");
+	ASSERT_STREQ(multistring_match, "match, match?");
+
+	EXPECT_EQ(wlib::str::strstr(multistring_nomatch, "match"), std::strstr(multistring_nomatch, "match"));
+
+	// Also check a double field match at the same time
+	EXPECT_EQ(wlib::str::strstr(multistring_match, "match"), std::strstr(multistring_match, "match"));
+	EXPECT_EQ(wlib::str::strstr(multistring_match, "match?"), std::strstr(multistring_match, "match?"));
+
+	// Check a very long search pattern
+	EXPECT_EQ(
+		wlib::str::strstr(loremIpsum,
+			"Sed feugiat, orci eu varius efficitur, arcu ex condimentum leo, et auctor felis nisi ut sapien."),
+		std::strstr(loremIpsum,
+			"Sed feugiat, orci eu varius efficitur, arcu ex condimentum leo, et auctor felis nisi ut sapien.")
+	);
 }
 
 TEST(StringOps, Strchr) {
