@@ -89,7 +89,7 @@ namespace wlib::image
 			throw except::invalid_image_data("PAM Loader: Image depth must not be 0");
 		}
 
-		info.pixels.resize(info.width * info.height*info.colorChannels);
+		info.pixels.resize(info.width * info.height * info.colorChannels);
 
 		if (info.maxValue == 1) {	// PBM-like (1 bit per pixel)
 			size_t iters = info.width / 8;
@@ -101,9 +101,8 @@ namespace wlib::image
 				for (size_t b = 0; b < iters; b++) {	// For each full byte
 					const uint8_t val = *(headerEnd + (h*(iters+1)) + b);
 
-					for (int_fast8_t i = 0; i < 8; i++) { // For each bit in byte
-						info.pixels[totalOffset+i] = wlib::bop::test(val, 7-i) ? 0 : 255;
-					}
+					std::generate_n(info.pixels.begin()+totalOffset, 8,
+						[i=0,&val]() mutable {return bop::test(val, 7 - i++) ? 0 : 255;});
 
 					totalOffset += 8;
 				}

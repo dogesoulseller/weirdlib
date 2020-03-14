@@ -34,11 +34,7 @@ namespace wlib::image
 		width = img.width;
 		format = img.format;
 
-		for (auto& ptr : channels) {
-			if (ptr != nullptr) {
-				delete[] ptr;
-			}
-		}
+		std::for_each(channels.begin(), channels.end(), [](auto ptr){delete[] ptr;});
 
 		channels.resize(img.channels.size());
 		channels.shrink_to_fit();
@@ -61,29 +57,19 @@ namespace wlib::image
 		width = img.width;
 		format = img.format;
 
-		for (auto& ptr : channels) {
-			if (ptr != nullptr) {
-				delete[] ptr;
-			}
-		}
+		std::for_each(channels.begin(), channels.end(), [](auto ptr){delete[] ptr;});
 
 		channels.resize(img.channels.size());
 		channels.shrink_to_fit();
 		channels.assign(img.channels.begin(), img.channels.end());
 
-		for (auto& ptr: img.channels) {
-			ptr = nullptr;
-		}
+		img.channels.assign(img.channels.size(), nullptr);
 
 		return *this;
 	}
 
 	ImageSoA::~ImageSoA() {
-		for (auto& c : channels) {
-			if (c != nullptr) {
-				delete[] c;
-			}
-		}
+		std::for_each(channels.begin(), channels.end(), [](auto ptr){delete[] ptr;});
 	}
 
 	void ImageSoA::ConvertToRGB(ImageSoA& in) {

@@ -62,9 +62,7 @@ namespace wlib::image
 
 		// Get data
 		auto inFloat = reinterpret_cast<const float*>(in+currentOffset);
-		for (size_t i = 0; i < info.width * info.height; i++) {
-			info.data[i] = *(inFloat+i);
-		}
+		std::copy(inFloat, inFloat+info.height*info.height, info.data.begin());
 
 		return info;
 	}

@@ -6,6 +6,7 @@
 #include <utility>
 #include <memory>
 #include <cstring>
+#include <algorithm>
 
 using namespace std::string_literals;
 
@@ -145,9 +146,9 @@ namespace wlib::image
 					const int b = in[totalOffset+1];
 
 					for (size_t i = 0; i < repCount; i++) {
-						tmp[outputOffset+(i*3)] = r;
-						tmp[outputOffset+(i*3)+1] = g;
-						tmp[outputOffset+(i*3)+2] = b;
+						tmp[outputOffset+i*3] = r;
+						tmp[outputOffset+i*3+1] = g;
+						tmp[outputOffset+i*3+2] = b;
 					}
 
 					totalOffset += 4;
@@ -224,10 +225,10 @@ namespace wlib::image
 					b = (b << 3) | (b >> 2);
 
 					for (size_t i = 0; i < repCount; i++) {
-						tmp[outputOffset+(i*4)] = r;
-						tmp[outputOffset+(i*4)+1] = g;
-						tmp[outputOffset+(i*4)+2] = b;
-						tmp[outputOffset+(i*4)+3] = a;
+						tmp[outputOffset+i*4] = r;
+						tmp[outputOffset+i*4+1] = g;
+						tmp[outputOffset+i*4+2] = b;
+						tmp[outputOffset+i*4+3] = a;
 					}
 
 					totalOffset += 3;
@@ -247,10 +248,10 @@ namespace wlib::image
 						g = (g << 3) | (g >> 2);
 						b = (b << 3) | (b >> 2);
 
-						tmp[outputOffset+(i*4)] = r;
-						tmp[outputOffset+(i*4)+1] = g;
-						tmp[outputOffset+(i*4)+2] = b;
-						tmp[outputOffset+(i*4)+3] = a;
+						tmp[outputOffset+i*4] = r;
+						tmp[outputOffset+i*4+1] = g;
+						tmp[outputOffset+i*4+2] = b;
+						tmp[outputOffset+i*4+3] = a;
 					}
 
 					totalOffset += repCount*2;
@@ -276,9 +277,9 @@ namespace wlib::image
 					b = (b << 3) | (b >> 2);
 
 					for (size_t i = 0; i < repCount; i++) {
-						tmp[outputOffset+(i*3)] = r;
-						tmp[outputOffset+(i*3)+1] = g;
-						tmp[outputOffset+(i*3)+2] = b;
+						tmp[outputOffset+i*3] = r;
+						tmp[outputOffset+i*3+1] = g;
+						tmp[outputOffset+i*3+2] = b;
 					}
 
 					totalOffset += 3;
@@ -297,9 +298,9 @@ namespace wlib::image
 						g = (g << 3) | (g >> 2);
 						b = (b << 3) | (b >> 2);
 
-						tmp[outputOffset+(i*3)] = r;
-						tmp[outputOffset+(i*3)+1] = g;
-						tmp[outputOffset+(i*3)+2] = b;
+						tmp[outputOffset+i*3] = r;
+						tmp[outputOffset+i*3+1] = g;
+						tmp[outputOffset+i*3+2] = b;
 					}
 
 					totalOffset += repCount*2;
@@ -320,10 +321,7 @@ namespace wlib::image
 			if (bop::test(in[totalOffset], 7)) { // RLE Packet
 				uint8_t repCount = bop::reset(in[totalOffset], 7)+1;
 
-				int gray = in[totalOffset+1];
-				for (size_t i = 0; i < repCount; i++) {
-					tmp[outputOffset+i] = gray;
-				}
+				std::generate_n(tmp.begin()+outputOffset, repCount, [gray=in[totalOffset+1]]() {return gray;});
 
 				totalOffset+=2;
 				outputOffset+=repCount;
@@ -331,9 +329,7 @@ namespace wlib::image
 				uint8_t repCount = bop::reset(in[totalOffset], 7)+1;
 				totalOffset++;
 
-				for (size_t i = 0; i < repCount; i++) {
-					tmp[outputOffset+i] = in[totalOffset+i];
-				}
+				std::generate_n(tmp.begin()+outputOffset, repCount, [&,i=0]() mutable {return in[totalOffset + i++];});
 
 				totalOffset+=repCount;
 				outputOffset+=repCount;

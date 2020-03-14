@@ -27,11 +27,9 @@ inline static std::vector<uint8_t> GetASCIIPBMPixels(const char* pixin, size_t w
 	auto firstDigitLocation = std::find_first_of(pix_nowspace.get(), pix_nowspace.get()+maxFileSize,
 				digits.cbegin(), digits.cend());
 
-	// Loop over all digits:
-	// 0s and 1s are stored contiguously in memory
-	for (size_t offset = 0; offset < width*height; offset++) {
-		pixels[offset] = (*(firstDigitLocation+offset)) == '0' ? 255 : 0;
-	}
+	// Generate from 0s and 1s stored contiguously in memory
+	std::generate(pixels.begin(), pixels.end(),
+		[&,off=0]() mutable { return *(firstDigitLocation + off++) == '0' ? 255 : 0;} );
 
 	return pixels;
 }
@@ -89,13 +87,7 @@ inline static std::vector<uint8_t> GetASCIIPPMPixels(const char* pixin, size_t w
 }
 
 inline static std::vector<uint8_t> GetBinaryPNMPixels(const char* pixin, size_t width, size_t height, uint8_t chans) noexcept {
-	std::vector<uint8_t> pixels(width*height*chans);
-
-	for (size_t i = 0; i < pixels.size(); i++) {
-		pixels[i] = *(pixin+i);
-	}
-
-	return pixels;
+	return std::vector<uint8_t>(pixin, pixin+width*height*chans);
 }
 
 inline static std::vector<uint8_t> GetBinaryPBMPixels(const char* pixin, size_t width, size_t height) noexcept {
@@ -108,22 +100,19 @@ inline static std::vector<uint8_t> GetBinaryPBMPixels(const char* pixin, size_t 
 
 	for (size_t h = 0; h < height; h++) {	// For each row
 		for (size_t b = 0; b < iters; b++) {	// For each full byte
-			const uint8_t val = *(pixin + (h*(iters+1)) + b);
+			const uint8_t val = pixin[h*(iters+1) + b];
 
-			for (int_fast8_t i = 0; i < 8; i++) { // For each bit in byte
-				pixels[totalOffset+i] = wlib::bop::test(val, 7-i) ? 0 : 255;
-			}
+			// From each bit in byte
+			std::generate_n(pixels.begin()+totalOffset, 8,
+				[&,i=0]() mutable {return wlib::bop::test(val, 7 - i++) ? 0 : 255;});
 
 			totalOffset += 8;
 		}
 
-		const uint8_t val = *(pixin + (h*(iters+1)) + iters);
-		for (size_t i = 0; i < itersRem; i++) {	// For each bit in last byte
-			pixels[totalOffset] = wlib::bop::test(val, 7-i) ? 0 : 255;
-			totalOffset++;
-		}
+		const uint8_t val = pixin[h*(iters+1) + iters];
+		std::generate_n(pixels.begin()+totalOffset, itersRem,
+			[&,i=0]() mutable {totalOffset++; return wlib::bop::test(val, 7 - i++) ? 0 : 255;});
 	}
-
 
 	return pixels;
 }
