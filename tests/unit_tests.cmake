@@ -10,7 +10,7 @@ if(WEIRDLIB_ENABLE_TESTING)
 	include(GoogleTest)
 
 	set(WEIRDLIB_TEST_SOURCES "tests/bitop_tests.cpp" "tests/container_tests.cpp"
-		"tests/math_tests.cpp" "tests/simdop_tests.cpp" "tests/test_main.cpp"
+		"tests/math_tests.cpp" "tests/simdop_tests.cpp" "tests/utility_tests.cpp" "tests/test_main.cpp"
 	)
 
 	# Cryptography module

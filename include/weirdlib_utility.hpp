@@ -2,8 +2,9 @@
 
 namespace wlib::util
 {
+	/// Check if *elem* is equal to one of the elements in [start, end)
 	template<typename ElemT, typename IterT>
-	inline static bool EqualToOneOf(const ElemT& elem, IterT start, IterT end) noexcept {
+	inline bool EqualToOneOf(const ElemT& elem, IterT start, IterT end) noexcept {
 		while (start != end) {
 			if (elem == *start) {
 				return true;
