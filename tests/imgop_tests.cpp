@@ -155,7 +155,6 @@ TEST(ImgOps, FloatToUint8) {
 	EXPECT_TRUE(std::equal(pixelsRef.cbegin(), pixelsRef.cend(), pixels.cbegin()));
 }
 
-// TODO: Change to 64x64 images
 TEST(ImgOps, ColorOrderConversions) {
 	const std::string imgPath = std::string(wlibTestDir) + "imgload_files/base.rawpix"s;
 	ASSERT_TRUE(std::filesystem::exists(imgPath));
