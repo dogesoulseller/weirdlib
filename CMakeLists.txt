@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.9.6)
 project(weirdlib C CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-# TODO: Remove unnecessary files from build sources when module disabled
 
 cmake_policy(SET CMP0077 NEW)
 
