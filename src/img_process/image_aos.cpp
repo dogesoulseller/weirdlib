@@ -8,6 +8,7 @@
 #include "../../include/cpu_detection.hpp"
 #include "../../include/weirdlib_traits.hpp"
 #include "../../include/weirdlib_fileops.hpp"
+#include "../../include/weirdlib_utility.hpp"
 #include "../img_loaders/image_format_loaders.hpp"
 #include <fstream>
 #include <cstring>
@@ -20,24 +21,24 @@
 
 namespace wlib::image
 {
-	Image::Image(const std::string& path, const bool isRawData, const uint64_t _width, const uint64_t _height, const ColorFormat requestedFormat) {
-		LoadImage(path, isRawData,_width, _height, requestedFormat);
+	Image::Image(const std::string& path, const bool isRawData, const uint64_t _width, const uint64_t _height, const ColorFormat requestedFormat, bool isFloat, bool isNormalized) {
+		LoadImage(path, isRawData,_width, _height, requestedFormat, isFloat, isNormalized);
 	}
 
 	Image::Image(const uint8_t* _pixels, const uint64_t _width, const uint64_t _height, const ColorFormat _format) {
 		LoadImage(_pixels, _width, _height, _format);
 	}
 
-	Image::Image(const float* _pixels, const uint64_t _width, const uint64_t _height, const ColorFormat _format) {
-		LoadImage(_pixels, _width, _height, _format);
+	Image::Image(const float* _pixels, const uint64_t _width, const uint64_t _height, const ColorFormat _format, bool isNormalized) {
+		LoadImage(_pixels, _width, _height, _format, isNormalized);
 	}
 
-	void Image::LoadImage(const std::string& path, const bool isRawData, const uint64_t _width, const uint64_t _height, const ColorFormat requestedFormat) {
+	void Image::LoadImage(const std::string& path, const bool isRawData, const uint64_t _width, const uint64_t _height, const ColorFormat requestedFormat, bool isFloat, bool isNormalized) {
 		std::ifstream f(path, std::ios::binary | std::ios::ate);
 		size_t fileSize = f.tellg();
 		f.seekg(0);
 
-		if (isRawData) {
+		if (isRawData && !isFloat) {
 			width = _width;
 			height = _height;
 			format = requestedFormat;
@@ -49,6 +50,20 @@ namespace wlib::image
 
 			ConvertUint8ToFloat(pixtmp, pixels.data(), fileSize);
 			delete[] pixtmp;
+			return;
+		} else if (isRawData && isFloat) {
+			width = _width;
+			height = _height;
+			format = requestedFormat;
+			pixels.resize(fileSize / sizeof(float));
+			pixels.shrink_to_fit();
+
+			f.read(reinterpret_cast<char*>(pixels.data()), fileSize);
+
+			if (isNormalized) {
+				wlib::util::DenormalizeData(pixels.data(), fileSize/4, 255.0f);
+			}
+
 			return;
 		}
 
@@ -164,7 +179,7 @@ namespace wlib::image
 		pixels.assign(_pixels, _pixels + GetTotalImageSize(width, height, format));
 	}
 
-	void Image::LoadImage(const float* _pixels, const uint64_t _width, const uint64_t _height, const ColorFormat _format) {
+	void Image::LoadImage(const float* _pixels, const uint64_t _width, const uint64_t _height, const ColorFormat _format, bool isNormalized) {
 		width = _width;
 		height = _height;
 		format = _format;
@@ -173,6 +188,10 @@ namespace wlib::image
 		pixels.shrink_to_fit();
 
 		pixels.assign(_pixels, _pixels + GetTotalImageSize(width, height, format));
+
+		if (isNormalized) {
+			wlib::util::DenormalizeData(pixels.data(), pixels.size(), 255.0f);
+		}
 	}
 
 	size_t Image::GetTotalImageSize(const uint64_t width, const uint64_t height, const ColorFormat format) noexcept {

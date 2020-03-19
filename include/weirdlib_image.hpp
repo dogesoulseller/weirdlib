@@ -111,17 +111,18 @@ namespace image
 		/// Constructor from a file readable by the filesystem
 		/// @param isRawData whether to load data as a dump of pixel values
 		/// @param requestedFormat format to convert to on load, or in case of raw data, to interpret as
-		Image(const std::string& path, bool isRawData = false, uint64_t width = 0, uint64_t height = 0, ColorFormat requestedFormat = F_Default);
+		/// @param isFloat if data in raw file is stored as single precision floating point
+		/// @param isNormalized if floating point data is normalized between 0.0 and 1.0
+		Image(const std::string& path, bool isRawData = false, uint64_t width = 0, uint64_t height = 0, ColorFormat requestedFormat = F_Default, bool isFloat = false, bool isNormalized = false);
 
 		/// Constructor from in-memory 8-bit per color pixel data
 		/// @param format format to interpret data as
 		Image(const uint8_t* pixels, uint64_t width, uint64_t height, ColorFormat format);
 
-		// TODO: Allow loading from normalized pixel data
-
-		/// Constructor from in-memory non-normalized floating point pixel data
+		/// Constructor from in-memory floating point pixel data
 		/// @param format format to interpret data as
-		Image(const float* pixels, uint64_t width, uint64_t height, ColorFormat format);
+		/// @param isNormalized if floating point data is normalized between 0.0 and 1.0
+		Image(const float* pixels, uint64_t width, uint64_t height, ColorFormat format, bool isNormalized = false);
 
 		Image(const Image&) = default;
 		Image(Image&&) = default;
@@ -159,7 +160,9 @@ namespace image
 		/// Load image from a file readable by the filesystem
 		/// @param isRawData whether to load data as a dump of pixel values
 		/// @param requestedFormat format to convert to on load, or in case of raw data, to interpret as
-		void LoadImage(const std::string& path, bool isRawData = false, uint64_t width = 0, uint64_t height = 0, ColorFormat requestedFormat = F_Default);
+		/// @param isFloat if data in raw file is stored as single precision floating point
+		/// @param isNormalized if floating point data is normalized between 0.0 and 1.0
+		void LoadImage(const std::string& path, bool isRawData = false, uint64_t width = 0, uint64_t height = 0, ColorFormat requestedFormat = F_Default, bool isFloat = false, bool isNormalized = false);
 
 		/// Load image from in-memory 8-bit per color pixel data
 		/// @param format format to interpret data as
@@ -167,7 +170,8 @@ namespace image
 
 		/// Load image from in-memory floating point pixel data
 		/// @param format format to interpret data as
-		void LoadImage(const float* pixels, uint64_t width, uint64_t height, ColorFormat format);
+		/// @param isNormalized if floating point data is normalized between 0.0 and 1.0
+		void LoadImage(const float* pixels, uint64_t width, uint64_t height, ColorFormat format, bool isNormalized = false);
 
 		/// Get image width
 		inline auto GetWidth()  const noexcept { return width;  }
