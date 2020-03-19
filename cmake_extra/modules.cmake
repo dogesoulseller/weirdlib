@@ -46,6 +46,11 @@ if(WERIDLIB_ENABLE_BUILD_VECMATH)
 	add_compile_definitions(WEIRDLIB_ENABLE_VECTOR_MATH)
 endif(WERIDLIB_ENABLE_BUILD_VECMATH)
 
+# Utility module - forced on for now
+file(GLOB_RECURSE WEIRDLIB_UTILITY_SOURCES "src/utility/*.*")
+list(APPEND WEIRDLIB_SOURCES ${WEIRDLIB_UTILITY_SOURCES})
+list(APPEND WEIRDLIB_INCLUDE_SOURCES "include/weirdlib_utility.hpp")
+
 # Remaining files
 list(APPEND WEIRDLIB_INCLUDE_SOURCES
 	"include/weirdlib_bitops.hpp" "include/weirdlib_containers.hpp" "include/weirdlib_math.hpp"

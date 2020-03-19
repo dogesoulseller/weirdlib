@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 
 namespace wlib::util
 {
@@ -13,4 +14,9 @@ namespace wlib::util
 		}
 		return false;
 	}
+
+	void DenormalizeData(float* inout, size_t count, float maxval);
+	void DenormalizeData(double* inout, size_t count, double maxval);
+	void DenormalizeData(long double* inout, size_t count, long double maxval);
+
 } // namespace wlib::util
