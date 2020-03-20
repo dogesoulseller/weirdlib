@@ -1,99 +1,66 @@
 #ifdef WEIRDLIB_ENABLE_FILE_OPERATIONS
 #include "../../include/weirdlib_fileops.hpp"
+#include <array>
 
 namespace wlib::file
 {
+
+	constexpr std::array<const char*, 42> _makeFiletypeMappings() noexcept {
+		std::array<const char*, 42> output = {};
+		output[FILETYPE_JPEG] = ".jpg";
+		output[FILETYPE_PNG] = ".png";
+		output[FILETYPE_BMP] = ".bmp";
+		output[FILETYPE_TIFF] = ".tiff";
+		output[FILETYPE_TGA] = ".tga";
+		output[FILETYPE_GIF] = ".gif";
+		output[FILETYPE_PSD] = ".psd";
+		output[FILETYPE_PSB] = ".psb";
+		output[FILETYPE_WEBP] = ".webp";
+		output[FILETYPE_FLIF] = ".flif";
+		output[FILETYPE_PBM] = ".pbm";
+		output[FILETYPE_PGM] = ".pgm";
+		output[FILETYPE_PPM] = ".ppm";
+		output[FILETYPE_PAM] = ".pam";
+		output[FILETYPE_XML] = ".xml";
+		output[FILETYPE_SVG] = ".svg";
+		output[FILETYPE_PDF] = ".pdf";
+		output[FILETYPE_MATROSKA] = ".mkv";
+		output[FILETYPE_AVI] = ".avi";
+		output[FILETYPE_MP4] = ".mp4";
+		output[FILETYPE_FLV] = ".flv";
+		output[FILETYPE_F4V] = ".f4v";
+		output[FILETYPE_WEBM] = ".webm";
+		output[FILETYPE_WAVE] = ".wav";
+		output[FILETYPE_OGG] = ".ogg";
+		output[FILETYPE_APE] = ".ape";
+		output[FILETYPE_TTA] = ".tta";
+		output[FILETYPE_WAVPACK] = ".wv";
+		output[FILETYPE_FLAC] = ".flac";
+		output[FILETYPE_CAF] = ".caf";
+		output[FILETYPE_OPTIMFROG] = ".ofr";
+		output[FILETYPE_3GP] = ".3gp";
+		output[FILETYPE_3G2] = ".3g2";
+		output[FILETYPE_AIFF] = ".aiff";
+		output[FILETYPE_7Z] = ".7z";
+		output[FILETYPE_RAR] = ".rar";
+		output[FILETYPE_TAR] = ".tar";
+		output[FILETYPE_BZIP2] = ".bz2";
+		output[FILETYPE_GZIP] = ".gz";
+		output[FILETYPE_LZIP] = ".lz";
+		output[FILETYPE_ZSTD] = ".zst";
+		output[FILETYPE_XZ] = ".xz";
+
+		return output;
+	}
+
+	constexpr std::array<const char*, 42> FILETYPE_MAPPINGS = _makeFiletypeMappings();
+
 	std::string GetFiletypeExtension(const FileType type) noexcept {
-		switch (type)
-		{
-		  case FILETYPE_JPEG:
-			return ".jpg";
-		  case FILETYPE_PNG:
-			return ".png";
-		  case FILETYPE_BMP:
-			return ".bmp";
-		  case FILETYPE_TIFF:
-			return ".tiff";
-		  case FILETYPE_TGA:
-			return ".tga";
-		  case FILETYPE_GIF:
-			return ".gif";
-		  case FILETYPE_PSD:
-			return ".psd";
-		  case FILETYPE_PSB:
-			return ".psb";
-		  case FILETYPE_WEBP:
-			return ".webp";
-		  case FILETYPE_FLIF:
-			return ".flif";
-		  case FILETYPE_PBM:
-			return ".pbm";
-		  case FILETYPE_PGM:
-			return ".pgm";
-		  case FILETYPE_PPM:
-			return ".ppm";
-		  case FILETYPE_PAM:
-			return ".pam";
-		  case FILETYPE_XML:
-		  	return ".xml";
-		  case FILETYPE_SVG:
-			return ".svg";
-		  case FILETYPE_PDF:
-			return ".pdf";
-		  case FILETYPE_MATROSKA:
-			return ".mkv";
-		  case FILETYPE_AVI:
-			return ".avi";
-		  case FILETYPE_MP4:
-			return ".mp4";
-		  case FILETYPE_FLV:
-			return ".flv";
-		  case FILETYPE_F4V:
-			return ".f4v";
-		  case FILETYPE_WEBM:
-			return ".webm";
-		  case FILETYPE_WAVE:
-			return ".wav";
-		  case FILETYPE_OGG:
-			return ".ogg";
-		  case FILETYPE_APE:
-			return ".ape";
-		  case FILETYPE_TTA:
-			return ".tta";
-		  case FILETYPE_WAVPACK:
-			return ".wv";
-		  case FILETYPE_FLAC:
-			return ".flac";
-		  case FILETYPE_CAF:
-			return ".caf";
-		  case FILETYPE_OPTIMFROG:
-			return ".ofr";
-		  case FILETYPE_3GP:
-			return ".3gp";
-		  case FILETYPE_3G2:
-			return ".3g2";
-		  case FILETYPE_AIFF:
-			return ".aiff";
-		  case FILETYPE_7Z:
-		  	return ".7z";
-		  case FILETYPE_RAR:
-		  	return ".rar";
-		  case FILETYPE_TAR:
-		  	return ".tar";
-		  case FILETYPE_BZIP2:
-		  	return ".bz2";
-		  case FILETYPE_GZIP:
-		  	return ".gz";
-		  case FILETYPE_LZIP:
-		  	return ".lz";
-		  case FILETYPE_ZSTD:
-		  	return ".zst";
-		  case FILETYPE_XZ:
-		  	return ".xz";
-		  case FILETYPE_UNKNOWN:
-		  default:
+		if (type == FILETYPE_UNKNOWN || type > 41) {
 			return "";
 		}
+
+		return FILETYPE_MAPPINGS[type];
 	}
 
 } // namespace wlib::file

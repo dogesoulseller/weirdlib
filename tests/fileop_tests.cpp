@@ -130,83 +130,47 @@ TEST(WlibFileop, DetectTypeMemory) {
 
 TEST(WlibFileop, FiletypeExtension) {
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_BMP), ".bmp");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_JPEG), ".jpg");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PNG), ".png");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_TIFF), ".tiff");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_TGA), ".tga");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_GIF), ".gif");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PSD), ".psd");
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PSB), ".psb");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_WEBP), ".webp");
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_AVI), ".avi");
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_WAVE), ".wav");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PBM), ".pbm");
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PGM), ".pgm");
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PPM), ".ppm");
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PAM), ".pam");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_FLIF), ".flif");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_XML), ".xml");
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_SVG), ".svg");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PDF), ".pdf");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_MATROSKA), ".mkv");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_MP4), ".mp4");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_FLV), ".flv");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_F4V), ".f4v");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_WEBM), ".webm");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_OGG), ".ogg");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_APE), ".ape");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_TTA), ".tta");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_WAVPACK), ".wv");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_FLAC), ".flac");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_CAF), ".caf");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_OPTIMFROG), ".ofr");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_3GP), ".3gp");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_3G2), ".3g2");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_AIFF), ".aiff");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_7Z), ".7z");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_RAR), ".rar");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_TAR), ".tar");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_BZIP2), ".bz2");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_GZIP), ".gz");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_LZIP), ".lz");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_ZSTD), ".zst");
-
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_XZ), ".xz");
-
-
 
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_UNKNOWN), "");
 }
