@@ -23,6 +23,7 @@ const auto ppmFilePath = fileOpDir / "ppm.ppm";
 const auto pamFilePath = fileOpDir / "pam.pam";
 const auto webpFilePath = fileOpDir / "webp.webp";
 const auto flifFilePath = fileOpDir / "flif.flif";
+const auto xmlFilePath = fileOpDir / "xml.xml";
 const auto svgFilePath = fileOpDir / "svg.svg";
 const auto mkvFilePath = fileOpDir / "mkv.mkv";
 const auto aviFilePath = fileOpDir / "avi.avi";
@@ -60,6 +61,7 @@ const std::vector<std::pair<std::filesystem::path, wlib::file::FileType>> FileMa
 	std::pair<std::filesystem::path, wlib::file::FileType>(ppmFilePath, wlib::file::FileType::FILETYPE_PPM),
 	std::pair<std::filesystem::path, wlib::file::FileType>(pamFilePath, wlib::file::FileType::FILETYPE_PAM),
 	std::pair<std::filesystem::path, wlib::file::FileType>(flifFilePath, wlib::file::FileType::FILETYPE_FLIF),
+	std::pair<std::filesystem::path, wlib::file::FileType>(xmlFilePath, wlib::file::FileType::FILETYPE_XML),
 	std::pair<std::filesystem::path, wlib::file::FileType>(svgFilePath, wlib::file::FileType::FILETYPE_SVG),
 	std::pair<std::filesystem::path, wlib::file::FileType>(pdfFilePath, wlib::file::FileType::FILETYPE_PDF),
 	std::pair<std::filesystem::path, wlib::file::FileType>(mkvFilePath, wlib::file::FileType::FILETYPE_MATROSKA),
@@ -134,6 +136,8 @@ TEST(WlibFileop, FiletypeExtension) {
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PAM), ".pam");
 
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_FLIF), ".flif");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_XML), ".xml");
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_SVG), ".svg");
 
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_PDF), ".pdf");

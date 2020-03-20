@@ -34,6 +34,8 @@ namespace wlib::file
 			return ".ppm";
 		  case FILETYPE_PAM:
 			return ".pam";
+		  case FILETYPE_XML:
+		  	return ".xml";
 		  case FILETYPE_SVG:
 			return ".svg";
 		  case FILETYPE_PDF:

@@ -25,20 +25,24 @@ namespace wlib::file
 		return std::equal(identifier.cbegin(), identifier.cend(), source.cbegin()+offset);
 	}
 
-	static bool isSVG(const std::string& path) noexcept {
+	static bool isXML(const std::string& path) noexcept {
 		std::ifstream f(path, std::ios::ate | std::ios::binary);
 		f.seekg(0);
 		constexpr std::array<uint8_t, 5> xmlHeader {'<', '?', 'x', 'm', 'l'};
-		constexpr std::array<uint8_t, 4> svgStart = {'<', 's', 'v', 'g'};
 
-		std::array<uint8_t, 16384> svgBuffer;
 		std::array<uint8_t, 512> headerStuff;
 		f.read(reinterpret_cast<char*>(headerStuff.data()), 512);
 		f.seekg(0);
 
-		if (std::search(headerStuff.begin(), headerStuff.end(), std::default_searcher(xmlHeader.begin(), xmlHeader.end())) == headerStuff.end()) {
-			return false;
-		}
+		return std::search(headerStuff.begin(), headerStuff.end(), std::default_searcher(xmlHeader.begin(), xmlHeader.end())) != headerStuff.end();
+	}
+
+	static bool isSVG(const std::string& path) noexcept {
+		std::ifstream f(path, std::ios::ate | std::ios::binary);
+		f.seekg(0);
+		constexpr std::array<uint8_t, 4> svgStart = {'<', 's', 'v', 'g'};
+
+		std::array<uint8_t, 16384> svgBuffer;
 
 		f.read(reinterpret_cast<char*>(svgBuffer.data()), 16384);
 
@@ -107,14 +111,16 @@ namespace wlib::file
 	}
 
 	template<typename FileIterT>
-	bool isSVG(const FileIterT dataStart, const FileIterT dataEnd) noexcept {
+	bool isXML(const FileIterT dataStart, const FileIterT dataEnd) noexcept {
 		constexpr std::array<uint8_t, 5> xmlHeader {'<', '?', 'x', 'm', 'l'};
-		constexpr std::array<uint8_t, 4> svgStart = {'<', 's', 'v', 'g'};
 
 		auto headerScanEnd = dataStart + (std::min(std::distance(dataStart, dataEnd), std::ptrdiff_t(512)));
-		if (std::search(dataStart, headerScanEnd, std::default_searcher(xmlHeader.begin(), xmlHeader.end())) == headerScanEnd) {
-			return false;
-		}
+		return std::search(dataStart, headerScanEnd, std::default_searcher(xmlHeader.begin(), xmlHeader.end())) != headerScanEnd;
+	}
+
+	template<typename FileIterT>
+	bool isSVG(const FileIterT dataStart, const FileIterT dataEnd) noexcept {
+		constexpr std::array<uint8_t, 4> svgStart = {'<', 's', 'v', 'g'};
 
 		auto svgDataScanEnd = dataStart + (std::min(std::distance(dataStart, dataEnd), std::ptrdiff_t(16384)));
 
@@ -339,9 +345,15 @@ namespace wlib::file
 		detectedType = isMPEG4(path) ? FILETYPE_MP4 : detectedType;
 		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
 
-		// SVG - keep last, expensive
-		detectedType = isSVG(path) ? FILETYPE_SVG : detectedType;
-		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+		// XML and XML-based
+		detectedType = isXML(path) ? FILETYPE_XML : detectedType;
+		if (detectedType == FILETYPE_XML) {
+			// SVG
+			detectedType = isSVG(path) ? FILETYPE_SVG : detectedType;
+			if (detectedType != FILETYPE_XML) return detectedType;
+
+			return detectedType;
+		}
 
 		return detectedType;
 	}
@@ -398,9 +410,15 @@ namespace wlib::file
 		detectedType = isMPEG4(fileData, fileData+size) ? FILETYPE_MP4 : detectedType;
 		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
 
-		// SVG - keep last, expensive
-		detectedType = isSVG(fileData, fileData+size) ? FILETYPE_SVG : detectedType;
-		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+		// XML and XML-based
+		detectedType = isXML(fileData, fileData+size) ? FILETYPE_XML : detectedType;
+		if (detectedType == FILETYPE_XML) {
+			// SVG
+			detectedType = isSVG(fileData, fileData+size) ? FILETYPE_SVG : detectedType;
+			if (detectedType != FILETYPE_XML) return detectedType;
+
+			return detectedType;
+		}
 
 		return detectedType;
 	}

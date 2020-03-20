@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+	<song>
+		<title>Song One</title>
+		<artist>ArtistOne</artist>
+		<language>English</language>
+		<genre>EDM</genre>
+	</song>
+	<song>
+		<title>Song Two</title>
+		<artist>ArtistTwo</artist>
+		<language>English</language>
+		<genre>Jazz</genre>
+	</song>
+	<song>
+		<title>Song Three</title>
+		<artist>ArtistTwo</artist>
+		<language>French</language>
+		<genre>Jazz</genre>
+	</song>
+</catalog>
