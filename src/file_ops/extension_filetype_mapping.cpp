@@ -74,6 +74,22 @@ namespace wlib::file
 			return ".3g2";
 		  case FILETYPE_AIFF:
 			return ".aiff";
+		  case FILETYPE_7Z:
+		  	return ".7z";
+		  case FILETYPE_RAR:
+		  	return ".rar";
+		  case FILETYPE_TAR:
+		  	return ".tar";
+		  case FILETYPE_BZIP2:
+		  	return ".bz2";
+		  case FILETYPE_GZIP:
+		  	return ".gz";
+		  case FILETYPE_LZIP:
+		  	return ".lz";
+		  case FILETYPE_ZSTD:
+		  	return ".zst";
+		  case FILETYPE_XZ:
+		  	return ".xz";
 		  case FILETYPE_UNKNOWN:
 		  default:
 			return "";

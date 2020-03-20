@@ -25,6 +25,17 @@ namespace wlib::file
 		return std::equal(identifier.cbegin(), identifier.cend(), source.cbegin()+offset);
 	}
 
+	static bool isTar(const std::string& path) noexcept {
+		std::ifstream f(path, std::ios::ate | std::ios::binary);
+		f.seekg(257);
+		constexpr std::array<uint8_t, 5> tarHeader {'u', 's', 't', 'a', 'r'};
+
+		std::array<uint8_t, 5> buffer;
+		f.read(reinterpret_cast<char*>(buffer.data()), 5);
+
+		return std::equal(tarHeader.begin(), tarHeader.end(), buffer.data());
+	}
+
 	static bool isXML(const std::string& path) noexcept {
 		std::ifstream f(path, std::ios::ate | std::ios::binary);
 		f.seekg(0);
@@ -108,6 +119,22 @@ namespace wlib::file
 
 		auto isFORM = std::search(header.begin(), header.begin()+4, std::default_searcher(ident.begin(), ident.end())) != header.end();
 		return std::search(header.begin(), header.end(), std::default_searcher(ident_aiff.begin(), ident_aiff.end())) != header.end() && isFORM;
+	}
+
+	template<typename FileIterT>
+	bool isTar(const FileIterT dataStart, const FileIterT dataEnd) noexcept {
+		constexpr std::array<uint8_t, 5> tarHeader {'u', 's', 't', 'a', 'r'};
+
+		// Magic number is at offset 257
+		if (std::distance(dataStart, dataEnd) <= 261) {
+			return false;
+		}
+
+		if (std::equal(tarHeader.begin(), tarHeader.end(), dataStart+257)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	template<typename FileIterT>
@@ -280,6 +307,38 @@ namespace wlib::file
 		detectedType = MatchIdentifier(PAM_IDENTIFIER, arrayData) ? FILETYPE_PAM : detectedType;
 		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
 
+		// 7-Zip
+		detectedType = MatchIdentifier(SEVENZIP_IDENTIFIER, arrayData) ? FILETYPE_7Z : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// RAR
+		detectedType = MatchIdentifier(RAR_IDENTIFIER, arrayData) ? FILETYPE_RAR : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// Tar
+		detectedType = MatchIdentifier(TAR_IDENTIFIER, arrayData) ? FILETYPE_TAR : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// BZIP2
+		detectedType = MatchIdentifier(BZIP2_IDENTIFIER, arrayData) ? FILETYPE_BZIP2 : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// GZIP
+		detectedType = MatchIdentifier(GZIP_IDENTIFIER, arrayData) ? FILETYPE_GZIP : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// LZIP
+		detectedType = MatchIdentifier(LZIP_IDENTIFIER, arrayData) ? FILETYPE_LZIP : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// ZSTD
+		detectedType = MatchIdentifier(ZSTD_IDENTIFIER, arrayData) ? FILETYPE_ZSTD : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// ZSTD
+		detectedType = MatchIdentifier(XZ_IDENTIFIER, arrayData) ? FILETYPE_XZ : detectedType;
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
 		return detectedType;
 	}
 
@@ -323,6 +382,10 @@ namespace wlib::file
 
 		// Easily identified types
 		detectedType = _getSimpleFileType(headerTemp);
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// Tar
+		detectedType = isTar(path) ? FILETYPE_TAR : detectedType;
 		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
 
 		// AIFF - keep last, expensive
@@ -388,6 +451,10 @@ namespace wlib::file
 
 		// Easily identified types
 		detectedType = _getSimpleFileType(headerTemp);
+		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
+
+		// Tar
+		detectedType = isTar(fileData, fileData+size) ? FILETYPE_TAR : detectedType;
 		if (detectedType != FILETYPE_UNKNOWN) return detectedType;
 
 		// AIFF - keep last, expensive

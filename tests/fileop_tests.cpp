@@ -42,6 +42,15 @@ const auto ofrFilePath = fileOpDir / "ofr.ofr";
 const auto _3gpFilePath = fileOpDir / "3gp.3gp";
 const auto _3g2FilePath = fileOpDir / "3g2.3g2";
 const auto aiffFilePath = fileOpDir / "aiff.aiff";
+const auto sevenzipfilePath = fileOpDir / "7z.7z";
+const auto rar4filePath = fileOpDir / "rar4.rar";
+const auto rar5filePath = fileOpDir / "rar5.rar";
+const auto tarFilePath = fileOpDir / "tar.tar";
+const auto bzip2FilePath = fileOpDir / "bz2.tar.bz2";
+const auto gzipFilePath = fileOpDir / "gz.tar.gz";
+const auto lzipFilePath = fileOpDir / "lz.tar.lz";
+const auto zstdFilePath = fileOpDir / "zst.tar.zst";
+const auto xzFilePath = fileOpDir / "xz.tar.xz";
 const auto randomFilePath = fileOpDir / "random.random";
 
 const std::vector<std::pair<std::filesystem::path, wlib::file::FileType>> FileMappings {
@@ -79,6 +88,15 @@ const std::vector<std::pair<std::filesystem::path, wlib::file::FileType>> FileMa
 	std::pair<std::filesystem::path, wlib::file::FileType>(_3gpFilePath, wlib::file::FileType::FILETYPE_3GP),
 	std::pair<std::filesystem::path, wlib::file::FileType>(_3g2FilePath, wlib::file::FileType::FILETYPE_3G2),
 	std::pair<std::filesystem::path, wlib::file::FileType>(aiffFilePath, wlib::file::FileType::FILETYPE_AIFF),
+	std::pair<std::filesystem::path, wlib::file::FileType>(sevenzipfilePath, wlib::file::FileType::FILETYPE_7Z),
+	std::pair<std::filesystem::path, wlib::file::FileType>(rar4filePath, wlib::file::FileType::FILETYPE_RAR),
+	std::pair<std::filesystem::path, wlib::file::FileType>(rar5filePath, wlib::file::FileType::FILETYPE_RAR),
+	std::pair<std::filesystem::path, wlib::file::FileType>(tarFilePath, wlib::file::FileType::FILETYPE_TAR),
+	std::pair<std::filesystem::path, wlib::file::FileType>(bzip2FilePath, wlib::file::FileType::FILETYPE_BZIP2),
+	std::pair<std::filesystem::path, wlib::file::FileType>(gzipFilePath, wlib::file::FileType::FILETYPE_GZIP),
+	std::pair<std::filesystem::path, wlib::file::FileType>(lzipFilePath, wlib::file::FileType::FILETYPE_LZIP),
+	std::pair<std::filesystem::path, wlib::file::FileType>(zstdFilePath, wlib::file::FileType::FILETYPE_ZSTD),
+	std::pair<std::filesystem::path, wlib::file::FileType>(xzFilePath, wlib::file::FileType::FILETYPE_XZ),
 
 
 	std::pair<std::filesystem::path, wlib::file::FileType>(randomFilePath, wlib::file::FileType::FILETYPE_UNKNOWN)
@@ -171,6 +189,24 @@ TEST(WlibFileop, FiletypeExtension) {
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_3G2), ".3g2");
 
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_AIFF), ".aiff");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_7Z), ".7z");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_RAR), ".rar");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_TAR), ".tar");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_BZIP2), ".bz2");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_GZIP), ".gz");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_LZIP), ".lz");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_ZSTD), ".zst");
+
+	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_XZ), ".xz");
+
+
 
 	EXPECT_EQ(wlib::file::GetFiletypeExtension(wlib::file::FileType::FILETYPE_UNKNOWN), "");
 }

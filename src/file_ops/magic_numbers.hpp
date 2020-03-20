@@ -65,5 +65,14 @@ namespace wlib::file
 
 	constexpr std::array<uint8_t, 3> OPTIMFROG_IDENTIFIER {'O', 'F', 'R'};
 
+	constexpr std::array<uint8_t, 6> SEVENZIP_IDENTIFIER {'7', 'z', 0xBC, 0xAF, 0x27, 0x1C};
+	constexpr std::array<uint8_t, 6> RAR_IDENTIFIER {0x52, 0x61, 0x72, 0x21, 0x1A, 0x07};
+	constexpr std::array<uint8_t, 5> TAR_IDENTIFIER {'u', 's', 't', 'a', 'r'};
+	constexpr std::array<uint8_t, 3> BZIP2_IDENTIFIER {'B', 'Z', 'h'};
+	constexpr std::array<uint8_t, 3> GZIP_IDENTIFIER {0x1F, 0x8B, 0x08};
+	constexpr std::array<uint8_t, 4> LZIP_IDENTIFIER {'L', 'Z', 'I', 'P'};
+	constexpr std::array<uint8_t, 4> ZSTD_IDENTIFIER {0x28, 0xB5, 0x2F, 0xFD};
+	constexpr std::array<uint8_t, 7> XZ_IDENTIFIER {0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00, 0x00};
+
 } // namespace wlib::file
 #endif
